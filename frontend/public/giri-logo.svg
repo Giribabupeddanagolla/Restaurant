@@ -1,0 +1,46 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle - dark green -->
+  <circle cx="100" cy="100" r="95" stroke="#0D4A2D" stroke-width="4" fill="none"/>
+  
+  <!-- Inner circle - gold -->
+  <circle cx="100" cy="100" r="88" stroke="#C8A055" stroke-width="3" fill="none"/>
+  
+  <!-- Chef hat - gold -->
+  <path d="M70 50 Q70 40 80 40 Q85 35 90 35 Q95 35 100 38 Q105 35 110 35 Q115 35 120 40 Q130 40 130 50 Q130 55 125 55 L75 55 Q70 55 70 50Z" fill="#C8A055"/>
+  <rect x="75" y="55" width="50" height="15" rx="2" fill="#C8A055"/>
+  
+  <!-- Text GIRI -->
+  <text x="100" y="115" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="#8B0000" text-anchor="middle">GIRI</text>
+  
+  <!-- Text RESTAURANT -->
+  <text x="100" y="135" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#0D4A2D" text-anchor="middle" letter-spacing="2">RESTAURANT</text>
+  
+  <!-- Spoon and Fork crossed - gold -->
+  <g transform="translate(100, 150)">
+    <!-- Spoon -->
+    <ellipse cx="-12" cy="-5" rx="4" ry="5" fill="#C8A055"/>
+    <rect x="-13" y="0" width="2" height="25" fill="#C8A055" transform="rotate(-20, -12, 0)"/>
+    
+    <!-- Fork -->
+    <rect x="10" y="-5" width="2" height="30" fill="#C8A055" transform="rotate(20, 11, -5)"/>
+    <rect x="7" y="-5" width="2" height="8" fill="#C8A055" transform="rotate(20, 8, -5)"/>
+    <rect x="13" y="-5" width="2" height="8" fill="#C8A055" transform="rotate(20, 14, -5)"/>
+    
+    <!-- Star in middle -->
+    <polygon points="0,-3 1,-1 3,-1 1,0 2,2 0,1 -2,2 -1,0 -3,-1 -1,-1" fill="#C8A055"/>
+  </g>
+  
+  <!-- Decorative leaves - left -->
+  <path d="M35 120 Q30 115 28 110 Q30 113 33 116 Z" fill="#0D4A2D"/>
+  <path d="M32 125 Q27 120 25 115 Q27 118 30 121 Z" fill="#0D4A2D"/>
+  <path d="M30 130 Q25 125 23 120 Q25 123 28 126 Z" fill="#0D4A2D"/>
+  
+  <!-- Decorative leaves - right -->
+  <path d="M165 120 Q170 115 172 110 Q170 113 167 116 Z" fill="#0D4A2D"/>
+  <path d="M168 125 Q173 120 175 115 Q173 118 170 121 Z" fill="#0D4A2D"/>
+  <path d="M170 130 Q175 125 177 120 Q175 123 172 126 Z" fill="#0D4A2D"/>
+  
+  <!-- Gold lines beside star -->
+  <line x1="65" y1="150" x2="85" y2="150" stroke="#C8A055" stroke-width="2"/>
+  <line x1="115" y1="150" x2="135" y2="150" stroke="#C8A055" stroke-width="2"/>
+</svg>

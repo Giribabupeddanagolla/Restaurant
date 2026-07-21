@@ -1,0 +1,19 @@
+{
+  "name": "giri-restaurant-backend",
+  "version": "1.0.0",
+  "description": "Node.js Express REST API backend for Giri Restaurant Management System",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.2"
+  },
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
