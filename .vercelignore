@@ -1,0 +1,24 @@
+# Root level ignores
+src/
+data/
+modules/
+index.html
+app.js
+architecture.md
+disegn.md
+phases.md
+prd.md
+*.md
+
+# Build artifacts
+.git
+node_modules
+*.log
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
