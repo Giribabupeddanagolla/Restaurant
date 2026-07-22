@@ -42,7 +42,7 @@ export default function MenuPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5" />
             <input
               type="text"
-              placeholder="Search aliments is create prapali..."
+              placeholder="Search alliments is create prapali..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input-light pl-12 pr-12 w-full py-2.5 sm:py-3"
