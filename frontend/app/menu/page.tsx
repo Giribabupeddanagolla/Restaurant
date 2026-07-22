@@ -36,33 +36,33 @@ export default function MenuPage() {
           <hr className="divider-gold mt-6" />
         </div>
 
-        {/* Search + Filter Button */}
+        {/* Search + Filter Button - Mobile Optimized */}
         <div className="flex flex-col gap-3 mb-6 sm:mb-8">
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search Truffle, Wagyu, Salmon, Pizza..."
+                placeholder="Search dishes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-light pl-12 w-full"
+                className="input-light pl-12 w-full py-2.5 sm:py-3 text-base sm:text-base"
               />
             </div>
-            {/* Filter Button */}
+            {/* Filter Button - Mobile Optimized */}
             <button
               onClick={() => setShowDietFilters(!showDietFilters)}
-              className="px-4 py-2.5 rounded-lg bg-[#8B0000] text-white font-bold text-sm sm:text-base flex items-center gap-2 hover:bg-[#C8102E] transition-all shadow-md"
+              className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-[#8B0000] text-white font-bold text-sm sm:text-base flex items-center gap-1.5 sm:gap-2 hover:bg-[#C8102E] transition-all shadow-md shrink-0 active:shadow-lg"
               title="Toggle diet filters"
             >
-              <Filter className="w-5 h-5" />
+              <Filter className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="hidden sm:inline">Filter</span>
             </button>
           </div>
 
-          {/* Diet Filter Buttons - Collapsible */}
+          {/* Diet Filter Buttons - Collapsible, Mobile Friendly */}
           {showDietFilters && (
-            <div className="flex gap-2 overflow-x-auto pb-2 flex-wrap">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-3 bg-[#FFF8F5] rounded-lg border border-[#8B0000]/10">
               {[
                 { id: 'all',          label: 'All Diets' },
                 { id: 'veg',          label: '🌱 Vegetarian' },
@@ -72,10 +72,10 @@ export default function MenuPage() {
                 <button
                   key={diet.id}
                   onClick={() => setDietFilter(diet.id)}
-                  className={`px-4 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-1 sm:flex-none ${
                     dietFilter === diet.id
                       ? 'bg-[#8B0000] text-white shadow-md'
-                      : 'bg-[#F8F5F0] text-[#6b5840] hover:bg-[#FFF0EB] border border-[#8B0000]/15'
+                      : 'bg-white text-[#6b5840] hover:bg-[#FFF0EB] border border-[#8B0000]/20 active:shadow-md'
                   }`}
                 >
                   {diet.label}
