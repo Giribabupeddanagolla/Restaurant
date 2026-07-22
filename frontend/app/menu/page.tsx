@@ -38,19 +38,19 @@ export default function MenuPage() {
 
         {/* Search with Hamburger Menu */}
         <div className="flex flex-col gap-4 mb-6 sm:mb-8">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5" />
+          <div className="relative w-full flex items-center">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5 z-10" />
             <input
               type="text"
               placeholder="Search aliments create prapali..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-light pl-12 pr-12 w-full py-2.5 sm:py-3"
+              className="input-light pl-12 pr-14 w-full py-2.5 sm:py-3"
             />
             {/* Hamburger Menu Button - Mobile Only */}
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className="sm:hidden absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[#8B0000] hover:text-[#C8102E] transition-colors"
+              className="sm:hidden absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[#8B0000] hover:text-[#C8102E] transition-colors z-20"
               title="Open filters menu"
             >
               {showFilterMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
