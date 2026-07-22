@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { INITIAL_CATEGORIES, INITIAL_DISHES } from '@/data/mockData';
-import { Search, Leaf, Filter, X } from 'lucide-react';
+import { Search, Leaf } from 'lucide-react';
 import { MenuItem } from '@/types';
 import DishModal from '@/components/DishModal';
 import AddButton from '@/components/AddButton';
@@ -13,7 +13,6 @@ export default function MenuPage() {
   const [searchQuery,    setSearchQuery]    = useState('');
   const [dietFilter,     setDietFilter]     = useState('all');
   const [selectedDish,   setSelectedDish]   = useState<MenuItem | null>(null);
-  const [showFilters,    setShowFilters]    = useState(false);
 
   const filteredDishes = INITIAL_DISHES.filter((dish) => {
     const matchCategory = activeCategory === 'all' || dish.category === activeCategory;
@@ -37,7 +36,7 @@ export default function MenuPage() {
         </div>
 
         {/* Search */}
-        <div className="flex flex-col gap-3 mb-4 sm:mb-6">
+        <div className="flex flex-col gap-3 mb-6 sm:mb-8">
           <div className="relative w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5" />
             <input
@@ -48,54 +47,30 @@ export default function MenuPage() {
               className="input-light pl-12"
             />
           </div>
+        </div>
 
-          {/* Filter Button + Diet Filters */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Filter Button (Mobile) */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="sm:hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#8B0000] text-white font-bold text-sm shadow-md"
-            >
-              <Filter className="w-4 h-4" />
-              Filter
-            </button>
-
-            {/* Diet Filter Buttons - Hidden on Mobile by default */}
-            <div className={`${showFilters ? 'flex' : 'hidden sm:flex'} flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto`}>
-              {[
-                { id: 'all',          label: 'All Diets' },
-                { id: 'veg',          label: '🌱 Vegetarian' },
-                { id: 'spicy',        label: '🔥 Spicy' },
-                { id: 'chef-special', label: '⭐ Chef Special' },
-              ].map((diet) => (
-                <button
-                  key={diet.id}
-                  onClick={() => {
-                    setDietFilter(diet.id);
-                    setShowFilters(false);
-                  }}
-                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-2 rounded-full text-sm sm:text-xs font-bold transition-all whitespace-nowrap ${
-                    dietFilter === diet.id
-                      ? 'bg-[#8B0000] text-white shadow-md'
-                      : 'bg-[#F8F5F0] text-[#6b5840] hover:text-[#1a1008] border border-[#8B0000]/15'
-                  }`}
-                >
-                  {diet.label}
-                </button>
-              ))}
-            </div>
+        {/* Diet Filter Buttons - Always Visible, Horizontal Scroll on Mobile */}
+        <div className="mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap sm:justify-start">
+            {[
+              { id: 'all',          label: 'All Diets' },
+              { id: 'veg',          label: '🌱 Vegetarian' },
+              { id: 'spicy',        label: '🔥 Spicy' },
+              { id: 'chef-special', label: '⭐ Chef Special' },
+            ].map((diet) => (
+              <button
+                key={diet.id}
+                onClick={() => setDietFilter(diet.id)}
+                className={`px-4 sm:px-5 py-2.5 rounded-full text-sm sm:text-sm font-bold flex items-center gap-2 whitespace-nowrap sm:whitespace-normal transition-all shrink-0 sm:shrink ${
+                  dietFilter === diet.id
+                    ? 'bg-[#8B0000] text-white shadow-md'
+                    : 'bg-[#F8F5F0] text-[#6b5840] hover:bg-[#FFF0EB] border border-[#8B0000]/15'
+                }`}
+              >
+                {diet.label}
+              </button>
+            ))}
           </div>
-
-          {/* Close button for filter drawer */}
-          {showFilters && (
-            <button
-              onClick={() => setShowFilters(false)}
-              className="sm:hidden flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#F8F5F0] text-[#8B0000] font-bold text-sm border border-[#8B0000]/15"
-            >
-              <X className="w-4 h-4" />
-              Close Filters
-            </button>
-          )}
         </div>
 
         {/* Category Pills - Horizontal Scroll on Mobile */}
