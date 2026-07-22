@@ -19,21 +19,29 @@ function CartDrawerComponent() {
         />
       )}
 
-      {/* Drawer - Floating Panel Style */}
+      {/* Drawer */}
       <div
-        className={`fixed bottom-0 sm:top-0 sm:right-0 h-full w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0 sm:translate-x-0' : 'translate-y-full sm:translate-x-full'
+        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        {/* Header - Floating Style */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#C8A055]/20">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#C8A055]/20 bg-gradient-to-r from-[#8B0000] to-[#C8102E]">
+          <div className="flex items-center gap-2 text-white">
+            <ShoppingBag className="w-5 h-5" />
+            <h2 className="font-extrabold text-lg">Your Cart</h2>
+            {totalItems > 0 && (
+              <span className="bg-white text-[#8B0000] text-xs font-extrabold w-5 h-5 rounded-full flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </div>
           <button
             onClick={closeCart}
-            className="text-[#8B0000] hover:text-[#C8102E] transition-colors p-1 ml-auto"
+            className="text-white/80 hover:text-white transition-colors p-1"
             aria-label="Close cart"
-            title="Close cart"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
