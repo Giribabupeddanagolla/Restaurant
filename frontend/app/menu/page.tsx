@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { INITIAL_CATEGORIES, INITIAL_DISHES } from '@/data/mockData';
-import { Search, Leaf, Filter, X } from 'lucide-react';
+import { Search, Leaf, Menu, X } from 'lucide-react';
 import { MenuItem } from '@/types';
 import DishModal from '@/components/DishModal';
 import AddButton from '@/components/AddButton';
@@ -13,7 +13,7 @@ export default function MenuPage() {
   const [searchQuery,    setSearchQuery]    = useState('');
   const [dietFilter,     setDietFilter]     = useState('all');
   const [selectedDish,   setSelectedDish]   = useState<MenuItem | null>(null);
-  const [showDietFilters, setShowDietFilters] = useState(false);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
   const filteredDishes = INITIAL_DISHES.filter((dish) => {
     const matchCategory = activeCategory === 'all' || dish.category === activeCategory;
@@ -36,68 +36,94 @@ export default function MenuPage() {
           <hr className="divider-gold mt-6" />
         </div>
 
-        {/* Search + Filter Button - Mobile Integrated */}
-        <div className="flex flex-col gap-3 mb-6 sm:mb-8">
-          <div className="flex gap-2 sm:gap-3">
-            {/* Search Input - Full width on mobile */}
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search Truffle, Wagyu, Salmon, Pizza..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-light pl-12 pr-12 sm:pr-4 w-full py-2.5 sm:py-3 text-base sm:text-base"
-              />
-              {/* Filter Button - Inside search on mobile, next to on desktop */}
-              <button
-                onClick={() => setShowDietFilters(!showDietFilters)}
-                className="sm:hidden absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-[#8B0000] hover:text-[#C8102E] transition-colors"
-                title="Toggle diet filters"
-              >
-                <Filter className="w-5 h-5" />
-              </button>
-            </div>
-            
-            {/* Filter Button - Desktop only, outside search */}
+        {/* Search with Hamburger Menu */}
+        <div className="flex flex-col gap-4 mb-6 sm:mb-8">
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search Truffle, Wagyu, Salmon, Pizza..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input-light pl-12 pr-12 w-full py-2.5 sm:py-3"
+            />
+            {/* Hamburger Menu Button */}
             <button
-              onClick={() => setShowDietFilters(!showDietFilters)}
-              className="hidden sm:flex px-4 py-2.5 sm:py-3 rounded-lg bg-[#8B0000] text-white font-bold text-sm sm:text-base items-center gap-2 hover:bg-[#C8102E] transition-all shadow-md active:shadow-lg"
-              title="Toggle diet filters"
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className="sm:hidden absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[#8B0000] hover:text-[#C8102E] transition-colors"
+              title="Open filters menu"
             >
-              <Filter className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span>Filter</span>
+              {showFilterMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
-          {/* Diet Filter Buttons - Collapsible, Mobile Friendly */}
-          {showDietFilters && (
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-3 sm:p-4 bg-[#FFF8F5] rounded-lg border border-[#8B0000]/10">
-              {[
-                { id: 'all',          label: 'All Diets' },
-                { id: 'veg',          label: '🌱 Vegetarian' },
-                { id: 'spicy',        label: '🔥 Spicy' },
-                { id: 'chef-special', label: '⭐ Chef Special' },
-              ].map((diet) => (
-                <button
-                  key={diet.id}
-                  onClick={() => setDietFilter(diet.id)}
-                  className={`px-4 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-1 sm:flex-none ${
-                    dietFilter === diet.id
-                      ? 'bg-[#8B0000] text-white shadow-md'
-                      : 'bg-white text-[#6b5840] hover:bg-[#FFF0EB] border border-[#8B0000]/20 active:shadow-md'
-                  }`}
-                >
-                  {diet.label}
-                </button>
-              ))}
+          {/* Full Filter & Category Menu - Mobile Drawer */}
+          {showFilterMenu && (
+            <div className="sm:hidden flex flex-col gap-4 p-4 bg-gradient-to-b from-[#FFF8F5] to-white rounded-xl border border-[#8B0000]/15 shadow-lg">
+              {/* Diet Filters Section */}
+              <div className="flex flex-col gap-2">
+                <h3 className="text-xs font-extrabold text-[#8B0000] uppercase tracking-wider">Diet Filters</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'all',          label: 'All Diets' },
+                    { id: 'veg',          label: '🌱 Vegetarian' },
+                    { id: 'spicy',        label: '🔥 Spicy' },
+                    { id: 'chef-special', label: '⭐ Chef Special' },
+                  ].map((diet) => (
+                    <button
+                      key={diet.id}
+                      onClick={() => {
+                        setDietFilter(diet.id);
+                      }}
+                      className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
+                        dietFilter === diet.id
+                          ? 'bg-[#8B0000] text-white shadow-md'
+                          : 'bg-white text-[#6b5840] border border-[#8B0000]/20 hover:bg-[#FFF0EB]'
+                      }`}
+                    >
+                      {diet.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category Filters Section */}
+              <div className="flex flex-col gap-2 pt-2 border-t border-[#8B0000]/10">
+                <h3 className="text-xs font-extrabold text-[#8B0000] uppercase tracking-wider">Categories</h3>
+                <div className="flex flex-col gap-2">
+                  {INITIAL_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        setActiveCategory(cat.id);
+                      }}
+                      className={`px-3 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-left ${
+                        activeCategory === cat.id
+                          ? 'bg-gradient-to-r from-[#8B0000] to-[#C8102E] text-white shadow-md'
+                          : 'bg-white text-[#4a3820] border border-[#8B0000]/10 hover:bg-[#FFF0EB]'
+                      }`}
+                    >
+                      <span className="text-lg">{cat.icon}</span> 
+                      <span>{cat.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowFilterMenu(false)}
+                className="px-4 py-2.5 rounded-lg bg-[#8B0000] text-white font-bold text-sm mt-2"
+              >
+                Done
+              </button>
             </div>
           )}
         </div>
 
-        {/* Category Pills - Horizontal Scroll on Mobile */}
-        <div className="mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap sm:justify-start">
+        {/* Category Pills - Desktop Only */}
+        <div className="hidden sm:block mb-6 sm:mb-8">
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
             {INITIAL_CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
