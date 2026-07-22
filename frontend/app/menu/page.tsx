@@ -48,7 +48,8 @@ export default function MenuPage() {
             />
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          {/* Diet Filter Buttons - Responsive Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
               { id: 'all',          label: 'All Diets' },
               { id: 'veg',          label: '🌱 Vegetarian' },
@@ -58,9 +59,9 @@ export default function MenuPage() {
               <button
                 key={diet.id}
                 onClick={() => setDietFilter(diet.id)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                className={`px-2 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all text-center ${
                   dietFilter === diet.id
-                    ? 'bg-[#8B0000] text-white shadow'
+                    ? 'bg-[#8B0000] text-white shadow-md'
                     : 'bg-[#F8F5F0] text-[#6b5840] hover:text-[#1a1008] border border-[#8B0000]/15'
                 }`}
               >
@@ -70,52 +71,54 @@ export default function MenuPage() {
           </div>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex gap-3 overflow-x-auto pb-4 mb-8">
+        {/* Category Pills - Responsive */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-8">
           {INITIAL_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+              className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center sm:justify-start gap-1 sm:gap-2 transition-all ${
                 activeCategory === cat.id
                   ? 'bg-gradient-to-r from-[#8B0000] to-[#C8102E] text-white shadow-md'
                   : 'bg-[#F8F5F0] text-[#4a3820] hover:bg-[#FFF0EB] border border-[#8B0000]/10'
               }`}
             >
-              <span>{cat.icon}</span> {cat.name}
+              <span>{cat.icon}</span> 
+              <span className="hidden sm:inline">{cat.name}</span>
+              <span className="sm:hidden text-xs">{cat.name.split(' ')[0]}</span>
             </button>
           ))}
         </div>
 
-        {/* Dish Grid */}
+        {/* Dish Grid - Mobile Optimized */}
         {filteredDishes.length === 0 ? (
           <div className="text-center py-20 text-[#a09070]">
             <p className="text-4xl mb-3">🍽️</p>
             <p className="font-semibold">No dishes match your filters.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredDishes.map((dish) => (
               <div
                 key={dish.id}
                 onClick={() => setSelectedDish(dish)}
-                className="glass-card rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-all cursor-pointer group"
+                className="glass-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-all cursor-pointer group"
               >
                 {/* Image */}
-                <div className="relative h-48 w-full bg-[#F8F5F0] overflow-hidden">
+                <div className="relative h-40 sm:h-48 w-full bg-[#F8F5F0] overflow-hidden">
                   <Image
                     src={dish.image}
                     alt={dish.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-[#1a1008] shadow">
+                  <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-white/90 backdrop-blur-sm px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-bold text-[#1a1008] shadow">
                     {dish.dietary.includes('veg')
                       ? <span className="flex items-center gap-1"><Leaf className="w-3 h-3 text-[#16603A]" /> Veg</span>
                       : '🥩 Non-Veg'}
                   </div>
                   {dish.dietary.includes('chef-special') && (
-                    <div className="absolute top-3 right-3 bg-[#8B0000] px-2.5 py-1 rounded-full text-xs font-bold text-white">
+                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-[#8B0000] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-bold text-white">
                       ⭐ Special
                     </div>
                   )}
@@ -128,19 +131,19 @@ export default function MenuPage() {
                 </div>
 
                 {/* Info */}
-                <div className="p-5 flex flex-col flex-1 gap-4">
+                <div className="p-3 sm:p-5 flex flex-col flex-1 gap-3 sm:gap-4">
                   <div>
-                    <h3 className="font-extrabold text-[#1a1008] text-lg mb-1 group-hover:text-[#8B0000] transition-colors">
+                    <h3 className="font-extrabold text-[#1a1008] text-base sm:text-lg mb-1 group-hover:text-[#8B0000] transition-colors line-clamp-2">
                       {dish.name}
                     </h3>
                     <p className="text-xs text-[#6b5840] line-clamp-2 leading-relaxed">{dish.description}</p>
                   </div>
-                  <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center justify-between mt-auto gap-2">
                     <div>
-                      <span className="text-xl font-extrabold text-[#8B0000]">${dish.price.toFixed(2)}</span>
-                      <span className="text-xs text-[#a09070] ml-2">• {dish.prepTime} min</span>
+                      <span className="text-lg sm:text-xl font-extrabold text-[#8B0000]">${dish.price.toFixed(2)}</span>
+                      <span className="text-xs text-[#a09070] ml-1 sm:ml-2">• {dish.prepTime} min</span>
                     </div>
-                    <AddButton dish={dish} />
+                    <AddButton dish={dish} variant="sm" />
                   </div>
                 </div>
               </div>
