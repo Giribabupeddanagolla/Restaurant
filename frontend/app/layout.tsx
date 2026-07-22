@@ -4,7 +4,6 @@ import Navbar    from '@/components/Navbar';
 import Footer    from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import BottomBar  from '@/components/BottomBar';
-import FloatingCartButton from '@/components/FloatingCartButton';
 import { CartProvider } from '@/context/CartContext';
 
 export const metadata: Metadata = {
@@ -40,7 +39,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <CartDrawer />
           <BottomBar />
-          <FloatingCartButton />
         </CartProvider>
       </body>
     </html>

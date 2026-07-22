@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, LogIn, UserPlus } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, ShoppingBag } from 'lucide-react';
 import { useState, memo } from 'react';
+import { useCart } from '@/context/CartContext';
 
 function NavbarComponent() {
   const pathname     = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { totalItems, openCart } = useCart();
 
   const navLinks = [
     { name: 'Home',           href: '/' },
@@ -66,6 +68,20 @@ function NavbarComponent() {
 
         {/* CTAs */}
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* Cart Button */}
+          <button
+            onClick={openCart}
+            className="relative flex items-center justify-center w-10 h-10 md:w-12 md:h-12 hover:bg-[#FFF0F0] rounded-lg transition-all active:scale-95"
+            aria-label="Open cart"
+          >
+            <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 text-[#8B0000]" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#8B0000] text-white text-[10px] md:text-xs font-extrabold w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center border-2 border-white">
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
+
           {/* Login / Register — md+ only */}
           <Link
             href="/login"
