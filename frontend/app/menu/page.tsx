@@ -3,37 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { INITIAL_CATEGORIES, INITIAL_DISHES } from '@/data/mockData';
-import { Search, Plus, Check, Leaf } from 'lucide-react';
-import { useCart } from '@/context/CartContext';
+import { Search, Leaf } from 'lucide-react';
 import { MenuItem } from '@/types';
 import DishModal from '@/components/DishModal';
-
-/* ── Quick-add button (stops propagation so card click still works) */
-function AddButton({ dish }: { dish: MenuItem }) {
-  const { addItem, items } = useCart();
-  const [flashed, setFlashed] = useState(false);
-  const inCart = items.find((i) => i.dish.id === dish.id);
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.stopPropagation(); // don't open modal
-    addItem(dish);
-    setFlashed(true);
-    setTimeout(() => setFlashed(false), 1200);
-  };
-
-  return (
-    <button
-      onClick={handleAdd}
-      className={`text-xs px-4 py-2 rounded-lg flex items-center gap-1 font-bold transition-all ${
-        flashed ? 'bg-[#16603A] text-white scale-95' : 'btn-primary'
-      }`}
-    >
-      {flashed
-        ? <><Check className="w-3.5 h-3.5" /> Added!</>
-        : <><Plus className="w-4 h-4" /> {inCart ? `Add (${inCart.qty})` : 'Add'}</>}
-    </button>
-  );
-}
+import AddButton from '@/components/AddButton';
 
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState('all');

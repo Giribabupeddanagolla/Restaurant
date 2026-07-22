@@ -4,33 +4,33 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { INITIAL_DISHES, INITIAL_CATEGORIES } from '@/data/mockData';
-import { Search, ChevronLeft, ChevronRight, Star, Clock, Leaf, Plus, Check } from 'lucide-react';
-import { useCart } from '@/context/CartContext';
+import { Search, ChevronLeft, ChevronRight, Star, Clock, Leaf } from 'lucide-react';
 import { MenuItem } from '@/types';
-import DishModal from '@/components/DishModal';
+import dynamic from 'next/dynamic';
+import AddButton from '@/components/AddButton';
 
-/* ── Category images ───────────────────────────────────────────── */
+// Lazy load modal - improves page transition speed
+const DishModal = dynamic(() => import('@/components/DishModal'), { ssr: false });
+
 const CATEGORY_IMAGES: Record<string, string> = {
-  all:      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&auto=format&fit=crop',
-  specials: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&auto=format&fit=crop',
-  starters: 'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=300&auto=format&fit=crop',
-  mains:    'https://images.unsplash.com/photo-1544025162-d76694265947?w=300&auto=format&fit=crop',
-  pizzas:   'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=300&auto=format&fit=crop',
-  desserts: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300&auto=format&fit=crop',
-  drinks:   'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=300&auto=format&fit=crop',
+  all:      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=80',
+  specials: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&auto=format&fit=crop&q=80',
+  starters: 'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=400&h=300&auto=format&fit=crop&q=80',
+  mains:    'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
+  pizzas:   'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=300&auto=format&fit=crop&q=80',
+  desserts: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&auto=format&fit=crop&q=80',
+  drinks:   'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&auto=format&fit=crop&q=80',
 };
 
-/* ── Shops data ─────────────────────────────────────────────────── */
 const SHOPS = [
-  { name: 'Giri Fine Dining',  tag: 'Signature Experience', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&auto=format&fit=crop', rating: 4.9, time: '30–40 min' },
-  { name: 'Giri Kitchen',      tag: 'Home Comfort Food',    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&auto=format&fit=crop', rating: 4.7, time: '20–30 min' },
-  { name: 'Giri Bakery',       tag: 'Pastries & Desserts',  image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop', rating: 4.8, time: '15–20 min' },
-  { name: 'Giri Grill',        tag: 'BBQ & Mains',          image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop', rating: 4.6, time: '25–35 min' },
-  { name: 'Giri Spice Garden', tag: 'Indian & Asian',       image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&auto=format&fit=crop', rating: 4.7, time: '20–30 min' },
-  { name: 'Giri Café',         tag: 'Coffee & Snacks',      image: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=400&auto=format&fit=crop', rating: 4.5, time: '10–15 min' },
+  { name: 'Giri Fine Dining',  tag: 'Signature Experience', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.9, time: '30–40 min' },
+  { name: 'Giri Kitchen',      tag: 'Home Comfort Food',    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.7, time: '20–30 min' },
+  { name: 'Giri Bakery',       tag: 'Pastries & Desserts',  image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.8, time: '15–20 min' },
+  { name: 'Giri Grill',        tag: 'BBQ & Mains',          image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.6, time: '25–35 min' },
+  { name: 'Giri Spice Garden', tag: 'Indian & Asian',       image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.7, time: '20–30 min' },
+  { name: 'Giri Café',         tag: 'Coffee & Snacks',      image: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.5, time: '10–15 min' },
 ];
 
-/* ── Horizontal scroll row ──────────────────────────────────────── */
 function ScrollRow({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroll = (dir: 'left' | 'right') =>
@@ -38,7 +38,6 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative">
-      {/* Arrows visible on md+, hidden on mobile (touch scroll works naturally) */}
       <button onClick={() => scroll('left')}
         className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-white border border-[#8B0000]/20 shadow-md items-center justify-center text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-all"
         aria-label="scroll left"
@@ -60,34 +59,6 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ── Add-to-cart button with flash animation ────────────────────── */
-function AddButton({ dish }: { dish: MenuItem }) {
-  const { addItem, items } = useCart();
-  const [flashed, setFlashed] = useState(false);
-  const inCart = items.find((i) => i.dish.id === dish.id);
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    addItem(dish);
-    setFlashed(true);
-    setTimeout(() => setFlashed(false), 1200);
-  };
-
-  return (
-    <button
-      onClick={handleAdd}
-      className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-bold transition-all ${
-        flashed
-          ? 'bg-[#16603A] text-white scale-95'
-          : 'btn-primary'
-      }`}
-    >
-      {flashed ? <><Check className="w-3.5 h-3.5" /> Added!</> : <><Plus className="w-3.5 h-3.5" /> {inCart ? `Add (${inCart.qty})` : 'Add'}</>}
-    </button>
-  );
-}
-
-/* ── Main page ──────────────────────────────────────────────────── */
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
@@ -101,7 +72,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col gap-12 pb-16">
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
+      {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#8B0000] to-[#C8102E] text-white">
         <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&auto=format')] bg-cover bg-center" />
         <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-14 flex flex-col md:flex-row items-center gap-8 md:gap-10">
@@ -113,11 +84,9 @@ export default function HomePage() {
               Authentic Flavours,<br />Delivered Fresh to You
             </h1>
             <p className="text-xs sm:text-sm text-red-100 max-w-lg leading-relaxed">
-              Explore Giri Restaurant's full menu — from chef specials to desserts —
-              all made with organic ingredients and served with genuine warmth.
+              Explore Giri Restaurant's full menu — from chef specials to desserts — all made with organic ingredients and served with genuine warmth.
             </p>
 
-            {/* Search */}
             <div className="relative w-full max-w-lg">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#a09070]" />
               <input
@@ -141,12 +110,19 @@ export default function HomePage() {
           </div>
 
           <div className="relative w-60 h-60 sm:w-72 sm:h-72 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl shrink-0 hidden md:block">
-            <Image src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&auto=format&fit=crop" alt="Giri food" fill className="object-cover" />
+            <Image 
+              src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&auto=format&fit=crop&q=85" 
+              alt="Giri signature dish" 
+              fill 
+              priority
+              className="object-cover" 
+              sizes="400px"
+            />
           </div>
         </div>
       </section>
 
-      {/* ── Search results ──────────────────────────────────────── */}
+      {/* Search results */}
       {search && (
         <section className="max-w-7xl mx-auto px-4 w-full">
           <h2 className="text-lg font-extrabold text-[#1a1008] mb-4">
@@ -161,8 +137,14 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {filteredDishes.map((dish) => (
                 <div key={dish.id} className="glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all">
-                  <div className="relative h-40 bg-[#F8F5F0]">
-                    <Image src={dish.image} alt={dish.name} fill className="object-cover" />
+                  <div className="relative h-40 w-full bg-[#F8F5F0]">
+                    <Image 
+                      src={dish.image} 
+                      alt={dish.name} 
+                      fill 
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    />
                   </div>
                   <div className="p-4 flex flex-col gap-2">
                     <h3 className="font-bold text-[#1a1008] text-sm line-clamp-1">{dish.name}</h3>
@@ -179,7 +161,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── Category cards ──────────────────────────────────────── */}
+      {/* Category cards */}
       {!search && (
         <section className="max-w-7xl mx-auto px-4 w-full">
           <div className="flex justify-between items-center mb-5">
@@ -190,7 +172,13 @@ export default function HomePage() {
             {INITIAL_CATEGORIES.map((cat) => (
               <Link key={cat.id} href="/menu" className="shrink-0 flex flex-col items-center gap-2 group">
                 <div className="relative w-24 h-20 sm:w-36 sm:h-28 rounded-2xl overflow-hidden border-2 border-transparent group-hover:border-[#8B0000] transition-all shadow-sm">
-                  <Image src={CATEGORY_IMAGES[cat.id] || CATEGORY_IMAGES.all} alt={cat.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <Image 
+                    src={CATEGORY_IMAGES[cat.id] || CATEGORY_IMAGES.all} 
+                    alt={cat.name} 
+                    fill 
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 96px, 144px"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 </div>
                 <span className="text-[10px] sm:text-xs font-extrabold text-[#1a1008] text-center group-hover:text-[#8B0000] transition-colors max-w-[90px] sm:max-w-none">
@@ -202,7 +190,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── Best Shops ──────────────────────────────────────────── */}
+      {/* Best Shops */}
       {!search && (
         <section className="max-w-7xl mx-auto px-4 w-full">
           <div className="flex justify-between items-center mb-5">
@@ -212,8 +200,14 @@ export default function HomePage() {
           <ScrollRow>
             {SHOPS.map((shop) => (
               <Link key={shop.name} href="/menu" className="shrink-0 w-56 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
-                <div className="relative h-36 bg-[#F8F5F0]">
-                  <Image src={shop.image} alt={shop.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="relative h-36 w-full bg-[#F8F5F0]">
+                  <Image 
+                    src={shop.image} 
+                    alt={shop.name} 
+                    fill 
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="224px"
+                  />
                 </div>
                 <div className="p-3.5">
                   <h3 className="font-extrabold text-[#1a1008] text-sm">{shop.name}</h3>
@@ -233,7 +227,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── Popular Dishes (scrollable) ──────────────────────────── */}
+      {/* Popular Dishes */}
       {!search && (
         <section className="max-w-7xl mx-auto px-4 w-full">
           <div className="flex justify-between items-center mb-5">
@@ -247,8 +241,14 @@ export default function HomePage() {
                 onClick={() => setSelectedDish(dish)}
                 className="shrink-0 w-52 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all group cursor-pointer"
               >
-                <div className="relative h-36 bg-[#F8F5F0] overflow-hidden">
-                  <Image src={dish.image} alt={dish.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="relative h-36 w-full bg-[#F8F5F0] overflow-hidden">
+                  <Image 
+                    src={dish.image} 
+                    alt={dish.name} 
+                    fill 
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="208px"
+                  />
                   {dish.dietary.includes('chef-special') && (
                     <span className="absolute top-2 left-2 bg-[#8B0000] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">⭐ Special</span>
                   )}
@@ -272,7 +272,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── Signature Dishes grid ────────────────────────────────── */}
+      {/* Signature Dishes */}
       {!search && (
         <section className="max-w-7xl mx-auto px-4 w-full">
           <div className="flex justify-between items-center mb-5">
@@ -289,8 +289,14 @@ export default function HomePage() {
                 onClick={() => setSelectedDish(dish)}
                 className="glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all group cursor-pointer"
               >
-                <div className="relative h-52 bg-[#F8F5F0] overflow-hidden">
-                  <Image src={dish.image} alt={dish.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="relative h-52 w-full bg-[#F8F5F0] overflow-hidden">
+                  <Image 
+                    src={dish.image} 
+                    alt={dish.name} 
+                    fill 
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                   <span className="absolute top-3 left-3 bg-[#8B0000] text-white text-xs font-bold px-2.5 py-1 rounded-full">⭐ Chef Special</span>
                 </div>
                 <div className="p-5">
@@ -307,7 +313,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── Offers Banner ────────────────────────────────────────── */}
+      {/* Offers Banner */}
       {!search && (
         <section className="max-w-7xl mx-auto px-4 w-full">
           <div className="rounded-3xl bg-gradient-to-br from-[#FFF8F0] to-[#FFF0E8] border border-[#C8A055]/30 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -326,8 +332,8 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Dish detail modal */}
-      <DishModal dish={selectedDish} onClose={() => setSelectedDish(null)} />
+      {/* Modal - lazy loaded only when needed */}
+      {selectedDish && <DishModal dish={selectedDish} onClose={() => setSelectedDish(null)} />}
 
     </div>
   );
