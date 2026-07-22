@@ -47,7 +47,7 @@ export default function MenuPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input-light pl-12 pr-12 w-full py-2.5 sm:py-3"
             />
-            {/* Hamburger Menu Button */}
+            {/* Hamburger Menu Button - Mobile Only */}
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
               className="sm:hidden absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[#8B0000] hover:text-[#C8102E] transition-colors"
@@ -57,7 +57,7 @@ export default function MenuPage() {
             </button>
           </div>
 
-          {/* Full Filter & Category Menu - Mobile Drawer */}
+          {/* Full Filter & Category Menu - Mobile Drawer Only */}
           {showFilterMenu && (
             <div className="sm:hidden flex flex-col gap-4 p-4 bg-gradient-to-b from-[#FFF8F5] to-white rounded-xl border border-[#8B0000]/15 shadow-lg">
               {/* Diet Filters Section */}
