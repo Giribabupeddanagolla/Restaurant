@@ -4,7 +4,6 @@ import Navbar    from '@/components/Navbar';
 import Footer    from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import BottomBar  from '@/components/BottomBar';
-import TopBar from '@/components/TopBar';
 import FloatingCartButton from '@/components/FloatingCartButton';
 import { CartProvider } from '@/context/CartContext';
 
@@ -29,13 +28,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartProvider>
           <div>
             <Navbar />
-            <TopBar />
             {/*
-              pt-[128px]  — clears the fixed navbar (64px) + top bar (64px) on mobile
-              pt-[64px]   — only navbar on desktop (md:)
+              pt-[64px]  — clears the fixed navbar on all screens
               pb-[72px]  — on mobile, clears the fixed bottom bar (md:pb-0 removes it on desktop)
             */}
-            <main className="pt-[128px] md:pt-[64px] pb-[72px] md:pb-0">{children}</main>
+            <main className="pt-[64px] pb-[72px] md:pb-0">{children}</main>
           </div>
           {/* Footer only on desktop */}
           <div className="hidden md:block">
