@@ -36,33 +36,43 @@ export default function MenuPage() {
           <hr className="divider-gold mt-6" />
         </div>
 
-        {/* Search + Filter Button - Mobile Optimized */}
+        {/* Search + Filter Button - Mobile Integrated */}
         <div className="flex flex-col gap-3 mb-6 sm:mb-8">
-          <div className="flex gap-2">
+          <div className="flex gap-2 sm:gap-3">
+            {/* Search Input - Full width on mobile */}
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search dishes..."
+                placeholder="Search Truffle, Wagyu, Salmon, Pizza..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-light pl-12 w-full py-2.5 sm:py-3 text-base sm:text-base"
+                className="input-light pl-12 pr-12 sm:pr-4 w-full py-2.5 sm:py-3 text-base sm:text-base"
               />
+              {/* Filter Button - Inside search on mobile, next to on desktop */}
+              <button
+                onClick={() => setShowDietFilters(!showDietFilters)}
+                className="sm:hidden absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-[#8B0000] hover:text-[#C8102E] transition-colors"
+                title="Toggle diet filters"
+              >
+                <Filter className="w-5 h-5" />
+              </button>
             </div>
-            {/* Filter Button - Mobile Optimized */}
+            
+            {/* Filter Button - Desktop only, outside search */}
             <button
               onClick={() => setShowDietFilters(!showDietFilters)}
-              className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-[#8B0000] text-white font-bold text-sm sm:text-base flex items-center gap-1.5 sm:gap-2 hover:bg-[#C8102E] transition-all shadow-md shrink-0 active:shadow-lg"
+              className="hidden sm:flex px-4 py-2.5 sm:py-3 rounded-lg bg-[#8B0000] text-white font-bold text-sm sm:text-base items-center gap-2 hover:bg-[#C8102E] transition-all shadow-md active:shadow-lg"
               title="Toggle diet filters"
             >
               <Filter className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="hidden sm:inline">Filter</span>
+              <span>Filter</span>
             </button>
           </div>
 
           {/* Diet Filter Buttons - Collapsible, Mobile Friendly */}
           {showDietFilters && (
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-3 bg-[#FFF8F5] rounded-lg border border-[#8B0000]/10">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 p-3 sm:p-4 bg-[#FFF8F5] rounded-lg border border-[#8B0000]/10">
               {[
                 { id: 'all',          label: 'All Diets' },
                 { id: 'veg',          label: '🌱 Vegetarian' },
