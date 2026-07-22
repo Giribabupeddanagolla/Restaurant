@@ -4,8 +4,9 @@ import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
+import { memo } from 'react';
 
-export default function CartDrawer() {
+function CartDrawerComponent() {
   const { items, totalItems, totalPrice, isOpen, closeCart, updateQty, removeItem, clearCart } = useCart();
 
   return (
@@ -153,3 +154,5 @@ export default function CartDrawer() {
     </>
   );
 }
+
+export default memo(CartDrawerComponent);

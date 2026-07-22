@@ -4,10 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X, LogIn, UserPlus, ShoppingBag } from 'lucide-react';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useCart } from '@/context/CartContext';
 
-export default function Navbar() {
+function NavbarComponent() {
   const pathname     = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems, openCart } = useCart();
@@ -144,3 +144,5 @@ export default function Navbar() {
     </header>
   );
 }
+
+export default memo(NavbarComponent);

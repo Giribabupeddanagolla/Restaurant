@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Plus, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { MenuItem } from '@/types';
@@ -13,9 +13,9 @@ interface AddButtonProps {
 /**
  * AddButton - Reusable add-to-cart button with flash animation
  * Used across homepage and menu pages to add items to cart
- * Prevents code duplication and ensures consistent behavior
+ * Memoized to prevent unnecessary re-renders when parent updates
  */
-export default function AddButton({ dish, variant = 'sm' }: AddButtonProps) {
+function AddButtonComponent({ dish, variant = 'sm' }: AddButtonProps) {
   const { addItem, items } = useCart();
   const [flashed, setFlashed] = useState(false);
   const inCart = items.find((i) => i.dish.id === dish.id);
@@ -54,3 +54,5 @@ export default function AddButton({ dish, variant = 'sm' }: AddButtonProps) {
     </button>
   );
 }
+
+export default memo(AddButtonComponent);

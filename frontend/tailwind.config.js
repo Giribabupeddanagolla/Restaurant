@@ -27,4 +27,17 @@ module.exports = {
     },
   },
   plugins: [],
+  // Optimize CSS output
+  corePlugins: {
+    preflight: true,
+  },
+  // Tree-shake unused styles in production
+  safelist: [
+    'btn-primary',
+    'btn-crimson',
+    'glass-card',
+    'input-light',
+    'section-label',
+    'divider-gold',
+  ],
 }
