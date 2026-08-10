@@ -18,13 +18,7 @@ export default function ContactPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
 
-      {/* Header */}
-      <div className="text-center mb-10">
-        <span className="section-label">Get In Touch</span>
-        <h1 className="text-3xl md:text-5xl font-extrabold text-[#1a1008] mt-1">Contact Us</h1>
-        <p className="text-sm text-[#6b5840] mt-2">Questions, catering requests or feedback — we'd love to hear from you.</p>
-        <hr className="divider-gold mt-6" />
-      </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Form */}

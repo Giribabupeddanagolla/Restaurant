@@ -1,63 +1,143 @@
-# Phase-Wise Development Roadmap
-## Project: FastMobile - Mobile Restaurant Platform
+# Giri Restaurant Management System - Development Phases
 
----
+## Phase 1: Project Planning
 
-## Overview
+-   Requirement Gathering
+-   PRD & TRD Preparation
+-   Architecture Design
+-   UI/UX Wireframes
+-   Database Design
 
-The development of **FastMobile** is structured into 4 sequential, highly focused phases. Each phase builds upon the previous one to deliver an ultra-fast, smooth, and complete end-to-end mobile restaurant experience.
+**Deliverables** - PRD - TRD - Architecture - Wireframes
 
----
+------------------------------------------------------------------------
 
-## Phase 1: High-Performance Mobile Customer App (Core MVP)
+## Phase 2: Project Setup
 
-**Objective**: Deliver a lightning-fast customer-facing mobile ordering experience with zero page reloads, instant menu browsing, floating cart drawer, and live order step tracker.
+### Frontend
 
-### Key Milestones & Deliverables:
-- [x] **Core Design System & Tokens**: Implement CSS dark luxury theme variables, glassmorphism utilities, and smooth CSS keyframe animations in `style.css`.
-- [x] **Mock Dataset**: Seed catalog of categories (Starters, Mains, Pizzas/Burgers, Desserts, Beverages) with detailed dishes, add-ons, pricing, dietary flags, and high-res images in `data/mockData.js`.
-- [x] **Header & Table Selector**: Sticky glass header showing Table # selection and search bar.
-- [x] **Category Pills & Instant Search**: Horizontal swipeable category selector with real-time fuzzy search and dietary filters (Veg, Spicy, Chef Special).
-- [x] **Interactive Customization Modal**: Dish details modal with add-on choices (Extra Cheese, Spice level) and item notes.
-- [x] **Floating Bottom Cart Drawer**: Thumb-friendly sliding cart drawer with quantity toggles, tip calculator, special instructions, and instant checkout trigger.
-- [x] **Live Order Status Tracker View**: Stepper component tracking order phases (*Placed -> Kitchen Preparing -> Cooking -> Ready to Serve*) with live timer and status updates.
+-   Next.js Setup
+-   Tailwind CSS
+-   TypeScript
+-   ESLint & Prettier
 
----
+### Backend
 
-## Phase 2: Kitchen Display System (KDS) & Waiter Call Center
+-   Node.js
+-   Express.js
+-   MongoDB Connection
+-   Environment Variables
 
-**Objective**: Connect the kitchen staff and table servers into the live order ecosystem with instant cross-tab real-time sync.
+**Deliverables** - Running frontend - Running backend - Database
+connected
 
-### Key Milestones & Deliverables:
-- [x] **Real-Time Cross-Tab Sync (`store.js`)**: Integrated `BroadcastChannel` event bus so orders placed on mobile instantly arrive at the Kitchen KDS board (<5ms latency).
-- [x] **Kitchen Display System (KDS) View**:
-  - 4-column Kanban tickets (*Pending, Preparing, Ready, Served*).
-  - Ticket timers showing elapsed time since customer placed order.
-  - Action buttons to advance order stage.
-  - Kitchen audio bell chime synthesized via Web Audio API.
-- [x] **Waiter Dispatch System**:
-  - Customer "Call Waiter", "Request Water", and "Request Bill" floating action buttons.
-  - Waiter alert notification panel with sound alert and table identification.
+------------------------------------------------------------------------
 
----
+## Phase 3: Authentication
 
-## Phase 3: Admin & Restaurant Owner Management Suite
+-   Login
+-   Register
+-   Forgot Password
+-   JWT Authentication
+-   Role-Based Access Control
 
-**Objective**: Enable restaurant managers to update menu items in real-time, mark out-of-stock items, and inspect sales analytics.
+------------------------------------------------------------------------
 
-### Key Milestones & Deliverables:
-- [x] **Menu Item CRUD & Stock Manager**: Form to edit prices, descriptions, and toggle "Sold Out" state instantly reflected on customer phones.
-- [x] **Live Sales Analytics Dashboard**: Today's revenue summary, active orders, total items sold, and top popular dishes.
-- [x] **Table Management**: View occupied vs available tables.
+## Phase 4: Master Modules
 
----
+-   Categories
+-   Menu Items
+-   Tables
+-   Employees
+-   Customers
+-   Suppliers
 
-## Phase 4: Mobile Polish, Audio Synth & Performance Tuning
+------------------------------------------------------------------------
 
-**Objective**: Guarantee 60 FPS performance, sub-1s load times, audio feedback, and haptic response.
+## Phase 5: Restaurant Operations
 
-### Key Milestones & Deliverables:
-- [x] **Web Audio API Synth (`audio.js`)**: Zero-dependency sound effects for button clicks, cart add, kitchen alert chimes, and order completion fanfares.
-- [x] **Haptic Touch Feedback**: Integrated `navigator.vibrate` touch feedback on mobile buttons.
-- [x] **Performance Optimization**: GPU transform animations, lazy loading images, zero cumulative layout shift (CLS).
-- [x] **Mobile PWA Shell Integration**: Responsive layout tested for mobile screen sizes (320px to 430px) and tablet/KDS views.
+-   Orders
+-   Kitchen Display System (KDS)
+-   Reservations
+-   POS Billing
+-   Payments
+
+------------------------------------------------------------------------
+
+## Phase 6: Inventory
+
+-   Stock Management
+-   Purchase Orders
+-   Vendor Management
+-   Low Stock Alerts
+
+------------------------------------------------------------------------
+
+## Phase 7: Reports & Dashboard
+
+-   Sales Reports
+-   Revenue Reports
+-   Inventory Reports
+-   Employee Reports
+-   Analytics Dashboard
+
+------------------------------------------------------------------------
+
+## Phase 8: Notifications
+
+-   Email Notifications
+-   SMS Notifications
+-   Push Notifications
+-   Real-Time Updates (Socket.io)
+
+------------------------------------------------------------------------
+
+## Phase 9: Testing
+
+-   Unit Testing
+-   Integration Testing
+-   API Testing
+-   UI Testing
+-   Security Testing
+-   Performance Testing
+
+------------------------------------------------------------------------
+
+## Phase 10: Deployment
+
+-   Frontend → Vercel
+-   Backend → Render/Railway
+-   Database → MongoDB Atlas
+-   Cloudinary Configuration
+-   Domain & SSL
+
+------------------------------------------------------------------------
+
+## Phase 11: Maintenance
+
+-   Bug Fixes
+-   Performance Optimization
+-   Security Updates
+-   Feature Enhancements
+
+------------------------------------------------------------------------
+
+# Suggested Timeline
+
+  Phase                   Duration
+  ----------------------- ----------
+  Planning                1 Week
+  Setup                   1 Week
+  Authentication          1 Week
+  Master Modules          2 Weeks
+  Restaurant Operations   3 Weeks
+  Inventory               1 Week
+  Reports                 1 Week
+  Notifications           1 Week
+  Testing                 2 Weeks
+  Deployment              1 Week
+  Maintenance             Ongoing
+
+## Total Estimated Development Time
+
+**14--16 Weeks** for a production-ready application.

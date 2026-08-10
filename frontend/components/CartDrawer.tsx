@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { memo } from 'react';
+import { formatCurrency } from '@/utils/formatters';
 
 function CartDrawerComponent() {
   const { items, totalItems, totalPrice, isOpen, closeCart, updateQty, removeItem, clearCart } = useCart();
@@ -14,14 +15,14 @@ function CartDrawerComponent() {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/40 z-[60] backdrop-blur-sm"
           onClick={closeCart}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[70] shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -76,7 +77,7 @@ function CartDrawerComponent() {
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-[#1a1008] text-sm line-clamp-1">{dish.name}</h4>
                     <p className="text-xs text-[#6b5840] mt-0.5">
-                      ${dish.price.toFixed(2)} each
+                      {formatCurrency(dish.price)} each
                     </p>
 
                     {/* Qty controls */}
@@ -109,7 +110,7 @@ function CartDrawerComponent() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <span className="font-extrabold text-[#8B0000] text-sm">
-                      ${(dish.price * qty).toFixed(2)}
+                      {formatCurrency(dish.price * qty)}
                     </span>
                   </div>
                 </div>
@@ -121,7 +122,7 @@ function CartDrawerComponent() {
               {/* Subtotal */}
               <div className="flex justify-between text-sm">
                 <span className="text-[#6b5840]">Subtotal ({totalItems} items)</span>
-                <span className="font-bold text-[#1a1008]">${totalPrice.toFixed(2)}</span>
+                <span className="font-bold text-[#1a1008]">{formatCurrency(totalPrice)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[#6b5840]">Delivery</span>
@@ -130,7 +131,7 @@ function CartDrawerComponent() {
               <hr className="border-[#C8A055]/20" />
               <div className="flex justify-between">
                 <span className="font-extrabold text-[#1a1008]">Total</span>
-                <span className="font-extrabold text-[#8B0000] text-lg">${totalPrice.toFixed(2)}</span>
+                <span className="font-extrabold text-[#8B0000] text-lg">{formatCurrency(totalPrice)}</span>
               </div>
 
               {/* Checkout */}
@@ -138,7 +139,7 @@ function CartDrawerComponent() {
                 onClick={() => { clearCart(); closeCart(); alert('Order placed! Thank you for dining with Giri Restaurant.'); }}
                 className="btn-crimson py-3.5 rounded-xl font-extrabold text-sm w-full mt-1"
               >
-                Place Order · ${totalPrice.toFixed(2)}
+                Place Order · {formatCurrency(totalPrice)}
               </button>
 
               <button

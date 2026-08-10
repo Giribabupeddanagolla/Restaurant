@@ -1,8 +1,15 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Instagram, Facebook, Twitter } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
   return (
     <footer className="bg-[#F8F5F0] border-t border-[#C8A055]/30 pt-12 pb-8 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -37,7 +44,7 @@ export default function Footer() {
                 { label: 'Our Menu',     href: '/menu' },
                 { label: 'Blog',         href: '/blog' },
                 { label: 'Promo Offers', href: '/offers' },
-                { label: 'About Us',     href: '/about' },
+                { label: 'About',        href: '/about' },
                 { label: 'Contact',      href: '/contact' },
               ].map((l) => (
                 <li key={l.href}>

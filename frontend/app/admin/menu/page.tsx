@@ -1,0 +1,676 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { INITIAL_DISHES, INITIAL_CATEGORIES, getStoredDishes, saveStoredDishes } from '@/data/mockData';
+import { MenuItem } from '@/types';
+import { menuApi } from '@/services/restaurantService';
+import { formatCurrency } from '@/utils/formatters';
+import {
+  Plus, Search, Edit2, Trash2, Clock, Star, Leaf, Utensils,
+  CheckCircle, XCircle, RefreshCw, Sparkles, Filter, ShieldAlert, Menu, X
+} from 'lucide-react';
+
+const PRESET_DISH_IMAGES = [
+  { label: '🍕 Pizza',    url: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🍔 Burger',   url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🍲 Risotto',  url: 'https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🐟 Salmon',   url: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🍛 Curry',    url: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🍰 Dessert',  url: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🍹 Drink',    url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🥗 Caprese',  url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&h=600&auto=format&fit=crop&q=85' },
+];
+
+export default function AdminMenuPage() {
+  const [dishes, setDishes] = useState<MenuItem[]>(getStoredDishes);
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [dietaryFilter, setDietaryFilter] = useState<string>('all');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingDish, setEditingDish] = useState<MenuItem | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Form State
+  const [formData, setFormData] = useState<Partial<MenuItem>>({
+    name: '',
+    category: 'mains',
+    price: 450,
+    description: '',
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=600&auto=format&fit=crop&q=85',
+    prepTime: 15,
+    available: true,
+    dietary: ['veg'],
+  });
+
+  const fetchDishes = async () => {
+    setLoading(true);
+    try {
+      const res = await menuApi.getDishes();
+      if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+        setDishes(res.data);
+        saveStoredDishes(res.data);
+      }
+    } catch (err) {
+      console.log('Using stored dishes fallback');
+      setDishes(getStoredDishes());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDishes();
+  }, []);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
+
+  const handleOpenAddModal = () => {
+    setEditingDish(null);
+    setFormData({
+      name: '',
+      category: 'mains',
+      price: 450,
+      description: '',
+      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=600&auto=format&fit=crop&q=85',
+      prepTime: 15,
+      available: true,
+      dietary: ['veg'],
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (dish: MenuItem) => {
+    setEditingDish(dish);
+    setFormData({
+      name: dish.name,
+      category: dish.category,
+      price: dish.price,
+      description: dish.description,
+      image: dish.image,
+      prepTime: dish.prepTime || 15,
+      available: dish.available !== false,
+      dietary: dish.dietary || [],
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSaveDish = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.price || !formData.image || !formData.description) {
+      setMessage({ type: 'error', text: 'Please fill in all required fields (Name, Price, Image, Description)' });
+      return;
+    }
+
+    setSaving(true);
+    setMessage(null);
+
+    let updatedList: MenuItem[] = [];
+
+    try {
+      if (editingDish && (editingDish.id || (editingDish as any)._id)) {
+        const id = editingDish.id || (editingDish as any)._id;
+        await menuApi.updateDish(id, formData);
+        setMessage({ type: 'success', text: `Dish "${formData.name}" updated successfully!` });
+      } else {
+        const res = await menuApi.createDish(formData);
+        if (res && res.data) {
+          updatedList = [res.data, ...dishes];
+        }
+        setMessage({ type: 'success', text: `New dish "${formData.name}" created successfully!` });
+      }
+      setIsModalOpen(false);
+      await fetchDishes();
+    } catch (err: any) {
+      // Local fallback
+      if (editingDish) {
+        updatedList = dishes.map((d) =>
+          d.id === editingDish.id || (d as any)._id === (editingDish as any)._id ? { ...d, ...formData } as MenuItem : d
+        );
+      } else {
+        const newDish: MenuItem = {
+          id: `dish-${Date.now()}`,
+          name: formData.name!,
+          category: formData.category || 'mains',
+          price: Number(formData.price),
+          description: formData.description!,
+          image: formData.image!,
+          dietary: formData.dietary || ['veg'],
+          prepTime: Number(formData.prepTime) || 15,
+          available: formData.available !== false,
+        };
+        updatedList = [newDish, ...dishes];
+      }
+      setDishes(updatedList);
+      saveStoredDishes(updatedList);
+      setIsModalOpen(false);
+      setMessage({ type: 'success', text: `Dish "${formData.name}" saved successfully!` });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteDish = async (dish: MenuItem) => {
+    if (!confirm(`Are you sure you want to delete "${dish.name}"?`)) return;
+
+    const id = dish.id || (dish as any)._id;
+    const updated = dishes.filter((d) => (d.id || (d as any)._id) !== id && d.name !== dish.name);
+    setDishes(updated);
+    saveStoredDishes(updated);
+
+    try {
+      if (id) {
+        await menuApi.deleteDish(id);
+      }
+      setMessage({ type: 'success', text: `Dish "${dish.name}" deleted!` });
+    } catch (err) {
+      setMessage({ type: 'success', text: `Dish "${dish.name}" removed!` });
+    }
+  };
+
+  const handleToggleAvailability = async (dish: MenuItem) => {
+    const newStatus = !(dish.available !== false);
+    const id = dish.id || (dish as any)._id;
+    const updated = dishes.map((d) =>
+      ((d.id || (d as any)._id) === id || d.name === dish.name) ? { ...d, available: newStatus } : d
+    );
+    setDishes(updated);
+    saveStoredDishes(updated);
+
+    try {
+      if (id) {
+        await menuApi.updateDish(id, { available: newStatus });
+      }
+    } catch (err) {
+      console.log('Status updated locally');
+    }
+  };
+
+  const filteredDishes = dishes.filter((dish) => {
+    const matchesSearch =
+      search === '' ||
+      dish.name.toLowerCase().includes(search.toLowerCase()) ||
+      dish.description.toLowerCase().includes(search.toLowerCase());
+
+    const matchesCategory = selectedCategory === 'all' || dish.category === selectedCategory;
+
+    let matchesDietary = true;
+    if (dietaryFilter === 'veg') {
+      matchesDietary = dish.dietary?.includes('veg') || false;
+    } else if (dietaryFilter === 'non-veg') {
+      matchesDietary = !dish.dietary?.includes('veg');
+    } else if (dietaryFilter === 'special') {
+      matchesDietary = dish.dietary?.includes('chef-special') || false;
+    } else if (dietaryFilter === 'available') {
+      matchesDietary = dish.available !== false;
+    } else if (dietaryFilter === 'out-of-stock') {
+      matchesDietary = dish.available === false;
+    }
+
+    return matchesSearch && matchesCategory && matchesDietary;
+  });
+
+  return (
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-bold text-[#8B0000] uppercase tracking-wider">
+            <Utensils className="w-4 h-4" /> ERP Catalog Management
+          </div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[#1a1008] mt-1">
+            Menu Item Catalog
+          </h1>
+          <p className="text-xs text-[#6b5840] mt-1">
+            Manage prices, descriptions, prep time, dietary tags, and stock availability for all dishes.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={fetchDishes}
+            className="p-2.5 rounded-xl bg-white border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-all shadow-xs cursor-pointer"
+            title="Refresh List"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            onClick={handleOpenAddModal}
+            className="btn-crimson px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Add New Dish
+          </button>
+        </div>
+      </div>
+
+      {/* Alert Banner */}
+      {message && (
+        <div
+          className={`p-4 rounded-xl text-xs font-bold flex items-center gap-2 ${
+            message.type === 'success' ? 'bg-emerald-50 border border-emerald-300 text-emerald-900' : 'bg-red-50 border border-red-300 text-red-900'
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          {message.text}
+        </div>
+      )}
+
+      {/* Search Bar with 3-Lines Filter Dropdown */}
+      <div className="glass-card p-3 md:p-4 rounded-2xl bg-white border border-[#8B0000]/10 flex items-center justify-between gap-3 relative z-30 w-full">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#a09070] z-10 pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search dish by name or description..."
+            className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl pl-9 pr-11 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]"
+          />
+
+          {/* Vertical Divider */}
+          <div className="absolute right-10 top-1/2 -translate-y-1/2 w-[1px] h-4 bg-[#8B0000]/20 z-10 pointer-events-none" />
+
+          {/* Three Lines Menu / Filter Button */}
+          <button
+            onClick={() => setShowFilterMenu(!showFilterMenu)}
+            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors z-20 flex items-center justify-center cursor-pointer ${
+              showFilterMenu ? 'bg-[#8B0000] text-white' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
+            }`}
+            title="Toggle Filter Dropdown"
+            aria-label="Toggle Filter Dropdown"
+          >
+            {showFilterMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
+
+          {/* Floating Dropdown Menu attached right under 3-lines button */}
+          {showFilterMenu && (
+            <>
+              {/* Backdrop listener to close when clicking outside */}
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowFilterMenu(false)}
+              />
+
+              <div className="absolute right-0 top-full mt-2 w-64 sm:w-72 bg-white rounded-2xl border border-[#8B0000]/20 shadow-2xl z-50 p-3 space-y-3 animate-in fade-in zoom-in-95 duration-150 max-h-[80vh] overflow-y-auto">
+                
+                {/* Categories Section */}
+                <div className="space-y-1">
+                  <div className="px-2 py-1 text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider border-b border-[#8B0000]/10 flex items-center justify-between">
+                    <span>Categories</span>
+                    {selectedCategory !== 'all' && (
+                      <span
+                        onClick={() => setSelectedCategory('all')}
+                        className="text-[9px] text-[#8B0000] hover:underline font-bold cursor-pointer"
+                      >
+                        Reset
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-0.5 pt-1">
+                    {INITIAL_CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => {
+                          setSelectedCategory(cat.id);
+                          setDietaryFilter('all');
+                          setShowFilterMenu(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                          selectedCategory === cat.id
+                            ? 'bg-[#8B0000] text-white font-extrabold shadow-xs'
+                            : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>{cat.icon}</span>
+                          <span>{cat.name}</span>
+                        </span>
+                        {selectedCategory === cat.id && <CheckCircle className="w-3.5 h-3.5 text-white" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Dietary & Stock Filters Section */}
+                <div className="space-y-1 pt-2 border-t border-[#8B0000]/10">
+                  <div className="px-2 py-1 text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider flex items-center justify-between">
+                    <span>Filter Options</span>
+                    {dietaryFilter !== 'all' && (
+                      <span
+                        onClick={() => setDietaryFilter('all')}
+                        className="text-[9px] text-[#8B0000] hover:underline font-bold cursor-pointer"
+                      >
+                        Reset
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-0.5 pt-1">
+                    {[
+                      { id: 'all',          label: 'All Items',         icon: '🔍' },
+                      { id: 'veg',          label: 'Veg Only',          icon: '🌱' },
+                      { id: 'non-veg',      label: 'Non-Veg Only',      icon: '🥩' },
+                      { id: 'special',      label: 'Chef Specials',     icon: '⭐' },
+                      { id: 'available',    label: 'In Stock',          icon: '✅' },
+                      { id: 'out-of-stock', label: 'Out of Stock',      icon: '⚠️' },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => {
+                          setDietaryFilter(f.id);
+                          setShowFilterMenu(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                          dietaryFilter === f.id
+                            ? 'bg-[#8B0000] text-white font-extrabold shadow-xs'
+                            : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>{f.icon}</span>
+                          <span>{f.label}</span>
+                        </span>
+                        {dietaryFilter === f.id && <CheckCircle className="w-3.5 h-3.5 text-white" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Dishes Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {filteredDishes.map((dish, idx) => (
+          <div
+            key={dish.id || (dish as any)._id || idx}
+            className="glass-card bg-white border border-[#8B0000]/15 rounded-2xl overflow-hidden hover:shadow-lg transition-all flex flex-col"
+          >
+            {/* Dish Image */}
+            <div className="relative h-44 w-full bg-[#F8F5F0]">
+              <Image src={dish.image} alt={dish.name} fill className="object-cover" sizes="300px" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+              {/* Status Badge */}
+              <button
+                onClick={() => handleToggleAvailability(dish)}
+                className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-md transition-all ${
+                  dish.available !== false
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    : 'bg-red-600 text-white hover:bg-red-700'
+                }`}
+              >
+                {dish.available !== false ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                {dish.available !== false ? 'IN STOCK' : 'SOLD OUT'}
+              </button>
+
+              {/* Category Pill */}
+              <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-0.5 rounded-lg text-white font-extrabold text-[10px] capitalize border border-white/20">
+                {dish.category}
+              </div>
+
+              {/* Dietary Tags */}
+              <div className="absolute bottom-3 left-3 flex gap-1">
+                {dish.dietary?.includes('chef-special') && (
+                  <span className="bg-[#8B0000] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">⭐ Chef Special</span>
+                )}
+                {dish.dietary?.includes('veg') && (
+                  <span className="bg-white/90 text-[#16603A] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#16603A]/20">
+                    <Leaf className="w-2.5 h-2.5 inline" /> Veg
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 flex flex-col flex-1 gap-2">
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="font-extrabold text-[#1a1008] text-sm line-clamp-1">{dish.name}</h3>
+                <span className="text-sm font-extrabold text-[#8B0000] shrink-0">{formatCurrency(dish.price)}</span>
+              </div>
+
+              <p className="text-xs text-[#6b5840] line-clamp-2 leading-relaxed">{dish.description}</p>
+
+              <div className="text-[11px] text-[#a09070] font-semibold flex items-center gap-1 pt-1">
+                <Clock className="w-3 h-3 text-[#8B0000]" /> Prep time: {dish.prepTime || 15} mins
+              </div>
+
+              {/* Actions */}
+              <div className="mt-auto pt-3 border-t border-[#8B0000]/10 flex items-center justify-between gap-2">
+                <button
+                  onClick={() => handleOpenEditModal(dish)}
+                  className="flex-1 py-2 px-3 bg-[#F8F5F0] border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000] hover:text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                >
+                  <Edit2 className="w-3.5 h-3.5" /> Edit Dish
+                </button>
+                <button
+                  onClick={() => handleDeleteDish(dish)}
+                  className="p-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all"
+                  title="Delete Dish"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filteredDishes.length === 0 && (
+        <div className="text-center py-16 glass-card bg-white rounded-2xl border border-[#8B0000]/10 flex flex-col items-center justify-center">
+          <Utensils className="w-10 h-10 text-[#8B0000] mx-auto mb-2 opacity-50" />
+          <h3 className="text-base font-bold text-[#1a1008]">No dishes found</h3>
+          <p className="text-xs text-[#6b5840] mt-1 mb-4">Try adjusting your search criteria or category filter.</p>
+          <button
+            onClick={() => {
+              setSearch('');
+              setSelectedCategory('all');
+              setDietaryFilter('all');
+            }}
+            className="btn-crimson px-5 py-2.5 rounded-xl text-xs font-bold shadow-md cursor-pointer flex items-center gap-2"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Reset All Filters (Show All Items)
+          </button>
+        </div>
+      )}
+
+      {/* Add / Edit Dish Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-hidden">
+          <div className="bg-white border border-[#8B0000]/20 rounded-3xl p-6 md:p-8 max-w-lg w-full max-h-[88vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b border-[#8B0000]/10 pb-4 shrink-0">
+              <h2 className="text-lg font-extrabold text-[#1a1008] flex items-center gap-2">
+                <Utensils className="w-5 h-5 text-[#8B0000]" />
+                {editingDish ? 'Edit Dish Details' : 'Add New Dish to Menu'}
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-[#a09070] hover:text-[#8B0000] font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Scrollable Form Body */}
+            <form onSubmit={handleSaveDish} className="flex-1 overflow-y-auto pr-1 text-xs flex flex-col">
+              <div className="space-y-4 pb-4">
+                <div>
+                  <label className="block text-[#1a1008] font-bold mb-1">Dish Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name || ''}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g. Sizzling Garlic Butter Prawns"
+                    className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[#1a1008] font-bold mb-1">Category *</label>
+                    <select
+                      value={formData.category || 'mains'}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-bold outline-none focus:ring-2 focus:ring-[#8B0000]"
+                    >
+                      {INITIAL_CATEGORIES.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.icon} {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[#1a1008] font-bold mb-1">Price (₹) *</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={formData.price || ''}
+                      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                      placeholder="e.g. 590"
+                      className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[#1a1008] font-bold mb-1">Image URL *</label>
+                  <input
+                    type="url"
+                    required
+                    value={formData.image || ''}
+                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
+                  />
+                  {/* Photo Presets */}
+                  <div className="flex gap-1.5 flex-wrap mt-2">
+                    <span className="text-[10px] text-[#6b5840] font-bold self-center">Presets:</span>
+                    {PRESET_DISH_IMAGES.map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, image: preset.url })}
+                        className="px-2 py-0.5 bg-[#F8F5F0] hover:bg-[#8B0000] hover:text-white border border-[#8B0000]/20 rounded-md text-[10px] font-bold text-[#8B0000] transition-colors"
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[#1a1008] font-bold mb-1">Description *</label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={formData.description || ''}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Describe flavor profile, ingredients, and key highlights..."
+                    className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#1a1008] font-bold mb-1">Preparation Time (minutes)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.prepTime || 15}
+                    onChange={(e) => setFormData({ ...formData, prepTime: Number(e.target.value) })}
+                    className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
+                  />
+                </div>
+
+                <div className="flex items-center gap-6 pt-2 flex-wrap">
+                  <label className="flex items-center gap-2 text-[#1a1008] font-bold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.available !== false}
+                      onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
+                      className="w-4 h-4 accent-[#8B0000] rounded"
+                    />
+                    <span>Available / In Stock</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-[#1a1008] font-bold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.dietary?.includes('veg') || false}
+                      onChange={(e) => {
+                        const current = formData.dietary || [];
+                        const updated = e.target.checked
+                          ? [...current.filter((d) => d !== 'non-veg'), 'veg']
+                          : current.filter((d) => d !== 'veg');
+                        setFormData({ ...formData, dietary: updated });
+                      }}
+                      className="w-4 h-4 accent-emerald-600 rounded"
+                    />
+                    <span>Vegetarian</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 text-[#1a1008] font-bold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.dietary?.includes('chef-special') || false}
+                      onChange={(e) => {
+                        const current = formData.dietary || [];
+                        const updated = e.target.checked
+                          ? [...current, 'chef-special']
+                          : current.filter((d) => d !== 'chef-special');
+                        setFormData({ ...formData, dietary: updated });
+                      }}
+                      className="w-4 h-4 accent-[#8B0000] rounded"
+                    />
+                    <span>Chef Special ⭐</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Sticky Action Footer */}
+              <div className="pt-4 mt-auto border-t border-[#8B0000]/10 bg-white sticky bottom-0 z-10 flex gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-[#8B0000]/20 text-[#6b5840] font-bold hover:bg-[#F8F5F0]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 btn-crimson py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                >
+                  {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Save Dish to Menu'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}

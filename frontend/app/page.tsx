@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useRef } from 'react';
-import { INITIAL_DISHES, INITIAL_CATEGORIES } from '@/data/mockData';
-import { Search, ChevronLeft, ChevronRight, Star, Clock, Leaf } from 'lucide-react';
-import { MenuItem } from '@/types';
+import { useState, useRef, useEffect } from 'react';
+import { INITIAL_DISHES, INITIAL_CATEGORIES, INITIAL_SHOPS, getStoredShops, saveStoredShops } from '@/data/mockData';
+import { Search, ChevronLeft, ChevronRight, Star, Clock, Leaf, MapPin } from 'lucide-react';
+import { MenuItem, Shop } from '@/types';
 import dynamic from 'next/dynamic';
 import AddButton from '@/components/AddButton';
+import { formatCurrency } from '@/utils/formatters';
+import { shopApi } from '@/services/restaurantService';
 
 // Lazy load modal - improves page transition speed
 const DishModal = dynamic(() => import('@/components/DishModal'), { ssr: false });
@@ -21,15 +23,6 @@ const CATEGORY_IMAGES: Record<string, string> = {
   desserts: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&auto=format&fit=crop&q=80',
   drinks:   'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&auto=format&fit=crop&q=80',
 };
-
-const SHOPS = [
-  { name: 'Giri Fine Dining',  tag: 'Signature Experience', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.9, time: '30–40 min' },
-  { name: 'Giri Kitchen',      tag: 'Home Comfort Food',    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.7, time: '20–30 min' },
-  { name: 'Giri Bakery',       tag: 'Pastries & Desserts',  image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.8, time: '15–20 min' },
-  { name: 'Giri Grill',        tag: 'BBQ & Mains',          image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.6, time: '25–35 min' },
-  { name: 'Giri Spice Garden', tag: 'Indian & Asian',       image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.7, time: '20–30 min' },
-  { name: 'Giri Café',         tag: 'Coffee & Snacks',      image: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=500&h=360&auto=format&fit=crop&q=80', rating: 4.5, time: '10–15 min' },
-];
 
 function ScrollRow({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -62,6 +55,21 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
+  const [shops, setShops] = useState<Shop[]>(getStoredShops);
+
+  useEffect(() => {
+    shopApi.getShops()
+      .then((res) => {
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setShops(res.data);
+          saveStoredShops(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log('Using stored initial shops:', err);
+        setShops(getStoredShops());
+      });
+  }, []);
 
   const filteredDishes = INITIAL_DISHES.filter(
     (d) => search === '' ||
@@ -150,7 +158,7 @@ export default function HomePage() {
                     <h3 className="font-bold text-[#1a1008] text-sm line-clamp-1">{dish.name}</h3>
                     <p className="text-xs text-[#6b5840] line-clamp-1">{dish.description}</p>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-base font-extrabold text-[#8B0000]">${dish.price.toFixed(2)}</span>
+                      <span className="text-base font-extrabold text-[#8B0000]">{formatCurrency(dish.price)}</span>
                       <AddButton dish={dish} />
                     </div>
                   </div>
@@ -194,30 +202,47 @@ export default function HomePage() {
       {!search && (
         <section className="max-w-7xl mx-auto px-4 w-full">
           <div className="flex justify-between items-center mb-5">
-            <h2 className="text-xl font-extrabold text-[#1a1008]">Best Shops</h2>
-            <Link href="/menu" className="text-sm font-bold text-[#8B0000] hover:underline">See all</Link>
+            <div>
+              <span className="section-label">Our Locations</span>
+              <h2 className="text-xl font-extrabold text-[#1a1008] mt-0.5">Best Shops</h2>
+            </div>
+            <Link href="/shops" className="text-sm font-bold text-[#8B0000] hover:underline flex items-center gap-1">
+              <MapPin className="w-4 h-4" /> See all locations →
+            </Link>
           </div>
           <ScrollRow>
-            {SHOPS.map((shop) => (
-              <Link key={shop.name} href="/menu" className="shrink-0 w-56 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
+            {shops.map((shop, idx) => (
+              <Link key={shop._id || shop.id || idx} href="/shops" className="shrink-0 w-60 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
                 <div className="relative h-36 w-full bg-[#F8F5F0]">
                   <Image 
                     src={shop.image} 
                     alt={shop.name} 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="224px"
+                    sizes="240px"
                   />
+                  {shop.isOpen === false && (
+                    <span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      Closed
+                    </span>
+                  )}
                 </div>
                 <div className="p-3.5">
-                  <h3 className="font-extrabold text-[#1a1008] text-sm">{shop.name}</h3>
-                  <p className="text-xs text-[#6b5840] mt-0.5">{shop.tag}</p>
-                  <div className="flex items-center justify-between mt-2">
+                  <h3 className="font-extrabold text-[#1a1008] text-sm group-hover:text-[#8B0000] transition-colors">{shop.name}</h3>
+                  <p className="text-xs text-[#6b5840] mt-0.5 line-clamp-1">{shop.tagline || shop.tag || 'Fine Dining & Takeaway'}</p>
+                  
+                  {shop.address && (
+                    <p className="text-[11px] text-[#8c7a6b] mt-1 flex items-center gap-1 line-clamp-1">
+                      <MapPin className="w-3 h-3 text-[#8B0000] shrink-0" /> {shop.address}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-[#8B0000]/10">
                     <span className="flex items-center gap-1 text-xs font-bold text-[#C8A055]">
                       <Star className="w-3.5 h-3.5 fill-[#C8A055]" /> {shop.rating}
                     </span>
                     <span className="flex items-center gap-1 text-xs text-[#a09070]">
-                      <Clock className="w-3 h-3" /> {shop.time}
+                      <Clock className="w-3 h-3" /> {shop.deliveryTime || shop.time || '20-30 min'}
                     </span>
                   </div>
                 </div>
@@ -262,7 +287,7 @@ export default function HomePage() {
                   <h3 className="font-extrabold text-[#1a1008] text-sm line-clamp-1 group-hover:text-[#8B0000] transition-colors">{dish.name}</h3>
                   <p className="text-xs text-[#6b5840] mt-0.5 line-clamp-1">{dish.description}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-base font-extrabold text-[#8B0000]">${dish.price.toFixed(2)}</span>
+                    <span className="text-base font-extrabold text-[#8B0000]">{formatCurrency(dish.price)}</span>
                     <AddButton dish={dish} />
                   </div>
                 </div>
@@ -303,7 +328,7 @@ export default function HomePage() {
                   <h3 className="font-extrabold text-[#1a1008] text-lg mb-1 group-hover:text-[#8B0000] transition-colors">{dish.name}</h3>
                   <p className="text-xs text-[#6b5840] line-clamp-2">{dish.description}</p>
                   <div className="flex items-center justify-between mt-4">
-                    <span className="text-xl font-extrabold text-[#8B0000]">${dish.price.toFixed(2)}</span>
+                    <span className="text-xl font-extrabold text-[#8B0000]">{formatCurrency(dish.price)}</span>
                     <AddButton dish={dish} />
                   </div>
                 </div>

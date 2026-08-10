@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
   /* GIRI Logo Palette */
@@ -90,7 +91,10 @@ body {
   background: #F8F5F0;
   border: 1px solid rgba(139, 0, 0, 0.18);
   border-radius: 0.75rem;
-  padding: 0.625rem 1rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   font-size: 0.8125rem;
   color: #1a1008;
   outline: none;
@@ -98,3 +102,21 @@ body {
 }
 .input-light::placeholder { color: #a09070; }
 .input-light:focus { border-color: var(--crimson); }
+
+/* Ensure icon padding rules are never overridden by .input-light default padding */
+.input-light.pl-10,
+.input-light[class*="pl-10"] {
+  padding-left: 2.75rem !important;
+}
+.input-light.pl-12,
+.input-light[class*="pl-12"] {
+  padding-left: 3.25rem !important;
+}
+.input-light.pr-10,
+.input-light[class*="pr-10"] {
+  padding-right: 2.75rem !important;
+}
+.input-light.pr-14,
+.input-light[class*="pr-14"] {
+  padding-right: 3.5rem !important;
+}

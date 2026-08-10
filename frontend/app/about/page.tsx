@@ -6,13 +6,7 @@ export default function AboutPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-20">
 
-      {/* Header */}
-      <div className="text-center">
-        <span className="section-label">Our Heritage</span>
-        <h1 className="text-3xl md:text-5xl font-extrabold text-[#1a1008] mt-1">About Giri Restaurant</h1>
-        <p className="text-sm text-[#6b5840] mt-2">Where traditional culinary perfection meets heartfelt hospitality.</p>
-        <hr className="divider-gold mt-6" />
-      </div>
+
 
       {/* Story */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

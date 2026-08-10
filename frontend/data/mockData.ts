@@ -2,10 +2,12 @@
 // Exports are organized for tree-shaking and lazy loading
 
 export { INITIAL_CATEGORIES } from './categories';
-export { INITIAL_DISHES } from './dishes';
+export { INITIAL_DISHES, getStoredDishes, saveStoredDishes } from './dishes';
 export { BLOG_POSTS } from './blog';
 export { PUBLIC_OFFERS } from './offers';
-export { PUBLIC_REVIEWS } from './reviews';
+export { PUBLIC_REVIEWS, getStoredReviews, saveStoredReviews } from './reviews';
+export { INITIAL_SHOPS, getStoredShops, saveStoredShops } from './shops';
 
 // Re-export types for convenience
-export type { Category, MenuItem, Offer, Review, BlogPost } from '../types';
+export type { Category, MenuItem, Offer, Review, BlogPost, Shop } from '../types';
+

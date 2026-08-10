@@ -22,11 +22,11 @@ export function renderNavbar(state) {
         <!-- Public Navigation Links -->
         <ul class="public-nav-links" id="public-nav-menu">
           <li><a href="#home" class="public-nav-link ${state.currentRoute === 'home' ? 'active' : ''}" onclick="store.setRoute('home')">Home</a></li>
+          <li><a href="#about" class="public-nav-link ${state.currentRoute === 'about' ? 'active' : ''}" onclick="store.setRoute('about')">About</a></li>
           <li><a href="#menu" class="public-nav-link ${state.currentRoute === 'menu' ? 'active' : ''}" onclick="store.setRoute('menu')">Menu</a></li>
           <li><a href="#reserve" class="public-nav-link ${state.currentRoute === 'reserve' ? 'active' : ''}" onclick="store.setRoute('reserve')">Table Booking</a></li>
           <li><a href="#offers" class="public-nav-link ${state.currentRoute === 'offers' ? 'active' : ''}" onclick="store.setRoute('offers')">Offers & Deals</a></li>
           <li><a href="#track" class="public-nav-link ${state.currentRoute === 'track' ? 'active' : ''}" onclick="store.setRoute('track')">Track Order</a></li>
-          <li><a href="#about" class="public-nav-link ${state.currentRoute === 'about' ? 'active' : ''}" onclick="store.setRoute('about')">About Us</a></li>
           <li><a href="#reviews" class="public-nav-link ${state.currentRoute === 'reviews' ? 'active' : ''}" onclick="store.setRoute('reviews')">Reviews</a></li>
           <li><a href="#contact" class="public-nav-link ${state.currentRoute === 'contact' ? 'active' : ''}" onclick="store.setRoute('contact')">Contact</a></li>
         </ul>

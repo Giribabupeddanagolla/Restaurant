@@ -7,6 +7,7 @@ import { Search, Leaf, Menu, X } from 'lucide-react';
 import { MenuItem } from '@/types';
 import DishModal from '@/components/DishModal';
 import AddButton from '@/components/AddButton';
+import { formatCurrency } from '@/utils/formatters';
 
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState('all');
@@ -28,117 +29,138 @@ export default function MenuPage() {
     <>
       <div className="max-w-7xl mx-auto px-4 py-8">
 
-        {/* Header */}
-        <div className="text-center mb-10">
-          <span className="section-label">Our Artisanal Catalog</span>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-[#1a1008] mt-1">Giri Menu</h1>
-          <p className="text-sm text-[#6b5840] mt-2">Click any dish to see details, or hit Add to add it straight to your cart.</p>
-          <hr className="divider-gold mt-6" />
-        </div>
+        {/* Search Bar with 3-Lines Categories & Filter Dropdown */}
+        <div className="relative w-full mb-6 sm:mb-8 z-30">
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5 z-10 pointer-events-none" />
 
-        {/* Search with Hamburger Menu */}
-        <div className="flex flex-col gap-4 mb-6 sm:mb-8">
-          <div className="relative w-full flex items-center">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5 z-10" />
             <input
               type="text"
-              placeholder="Search aliments create prapali..."
+              placeholder="Search dishes, ingredients, or cuisines..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-light pl-12 pr-14 w-full py-2.5 sm:py-3"
+              className="w-full bg-white border border-[#8B0000]/20 text-[#1a1008] rounded-full pl-12 pr-14 py-3 text-sm font-semibold placeholder:text-[#a09070]/70 outline-none focus:ring-2 focus:ring-[#8B0000] shadow-sm"
             />
-            {/* Hamburger Menu Button - Mobile Only */}
+
+            {/* Vertical Divider */}
+            <div className="absolute right-12 top-1/2 -translate-y-1/2 w-[1px] h-5 bg-[#8B0000]/20 z-10 pointer-events-none" />
+
+            {/* Three Lines Menu / Filter Button */}
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className="sm:hidden absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[#8B0000] hover:text-[#C8102E] transition-colors z-20"
-              title="Open filters menu"
+              className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors z-20 flex items-center justify-center cursor-pointer ${
+                showFilterMenu ? 'bg-[#8B0000] text-white shadow-md' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
+              }`}
+              title="Toggle Menu Categories & Filters"
+              aria-label="Toggle categories and filters"
             >
               {showFilterMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
-          {/* Full Filter & Category Menu - Mobile Drawer Only */}
+          {/* Floating Categories & Filters Popover Dropdown Menu */}
           {showFilterMenu && (
-            <div className="sm:hidden flex flex-col gap-4 p-4 bg-gradient-to-b from-[#FFF8F5] to-white rounded-xl border border-[#8B0000]/15 shadow-lg">
-              {/* Diet Filters Section */}
-              <div className="flex flex-col gap-2">
-                <h3 className="text-xs font-extrabold text-[#8B0000] uppercase tracking-wider">Diet Filters</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { id: 'all',          label: 'All Diets' },
-                    { id: 'veg',          label: '🌱 Vegetarian' },
-                    { id: 'spicy',        label: '🔥 Spicy' },
-                    { id: 'chef-special', label: '⭐ Chef Special' },
-                  ].map((diet) => (
-                    <button
-                      key={diet.id}
-                      onClick={() => {
-                        setDietFilter(diet.id);
-                      }}
-                      className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
-                        dietFilter === diet.id
-                          ? 'bg-[#8B0000] text-white shadow-md'
-                          : 'bg-white text-[#6b5840] border border-[#8B0000]/20 hover:bg-[#FFF0EB]'
-                      }`}
-                    >
-                      {diet.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Category Filters Section */}
-              <div className="flex flex-col gap-2 pt-2 border-t border-[#8B0000]/10">
-                <h3 className="text-xs font-extrabold text-[#8B0000] uppercase tracking-wider">Categories</h3>
-                <div className="flex flex-col gap-2">
-                  {INITIAL_CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        setActiveCategory(cat.id);
-                      }}
-                      className={`px-3 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-left ${
-                        activeCategory === cat.id
-                          ? 'bg-gradient-to-r from-[#8B0000] to-[#C8102E] text-white shadow-md'
-                          : 'bg-white text-[#4a3820] border border-[#8B0000]/10 hover:bg-[#FFF0EB]'
-                      }`}
-                    >
-                      <span className="text-lg">{cat.icon}</span> 
-                      <span>{cat.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Close Button */}
-              <button
+            <>
+              {/* Backdrop Listener */}
+              <div
+                className="fixed inset-0 z-40"
                 onClick={() => setShowFilterMenu(false)}
-                className="px-4 py-2.5 rounded-lg bg-[#8B0000] text-white font-bold text-sm mt-2"
-              >
-                Done
-              </button>
-            </div>
-          )}
-        </div>
+              />
 
-        {/* Category Pills - Desktop Only */}
-        <div className="hidden sm:block mb-6 sm:mb-8">
-          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
-            {INITIAL_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 sm:px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap sm:whitespace-normal transition-all shrink-0 sm:shrink ${
-                  activeCategory === cat.id
-                    ? 'bg-gradient-to-r from-[#8B0000] to-[#C8102E] text-white shadow-md'
-                    : 'bg-[#F8F5F0] text-[#4a3820] hover:bg-[#FFF0EB] border border-[#8B0000]/10'
-                }`}
-              >
-                <span className="text-lg">{cat.icon}</span> 
-                <span>{cat.name}</span>
-              </button>
-            ))}
-          </div>
+              <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#8B0000]/20 shadow-2xl z-50 p-4 space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-[80vh] overflow-y-auto">
+                
+                {/* Categories Section */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between border-b border-[#8B0000]/10 pb-1.5">
+                    <span className="text-[11px] font-extrabold text-[#8B0000] uppercase tracking-wider flex items-center gap-1.5">
+                      <Menu className="w-3.5 h-3.5" /> Menu Categories
+                    </span>
+                    {activeCategory !== 'all' && (
+                      <button
+                        onClick={() => setActiveCategory('all')}
+                        className="text-[10px] text-[#8B0000] font-bold hover:underline cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-1">
+                    {INITIAL_CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => {
+                          setActiveCategory(cat.id);
+                          setShowFilterMenu(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                          activeCategory === cat.id
+                            ? 'bg-[#8B0000] text-white font-extrabold shadow-sm'
+                            : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="text-base">{cat.icon}</span>
+                          <span>{cat.name}</span>
+                        </span>
+                        {activeCategory === cat.id && <span className="text-white font-extrabold text-xs">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Dietary Filters Section */}
+                <div className="space-y-2 pt-2 border-t border-[#8B0000]/10">
+                  <div className="flex items-center justify-between pb-1.5">
+                    <span className="text-[11px] font-extrabold text-[#8B0000] uppercase tracking-wider">
+                      Dietary Preferences
+                    </span>
+                    {dietFilter !== 'all' && (
+                      <button
+                        onClick={() => setDietFilter('all')}
+                        className="text-[10px] text-[#8B0000] font-bold hover:underline cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[
+                      { id: 'all',          label: 'All Diets' },
+                      { id: 'veg',          label: '🌱 Vegetarian' },
+                      { id: 'spicy',        label: '🔥 Spicy' },
+                      { id: 'chef-special', label: '⭐ Special' },
+                    ].map((diet) => (
+                      <button
+                        key={diet.id}
+                        onClick={() => {
+                          setDietFilter(diet.id);
+                          setShowFilterMenu(false);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold text-center transition-colors cursor-pointer ${
+                          dietFilter === diet.id
+                            ? 'bg-[#8B0000] text-white shadow-xs'
+                            : 'bg-[#F8F5F0] text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                        }`}
+                      >
+                        {diet.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowFilterMenu(false)}
+                  className="w-full py-2 bg-[#F8F5F0] hover:bg-[#8B0000]/10 text-[#8B0000] font-extrabold text-xs rounded-xl transition-colors cursor-pointer text-center"
+                >
+                  Close Menu
+                </button>
+
+              </div>
+            </>
+          )}
         </div>
 
         {/* Dish Grid - Mobile Optimized */}
@@ -191,7 +213,7 @@ export default function MenuPage() {
                   </div>
                   <div className="flex items-center justify-between mt-auto gap-2 sm:gap-3">
                     <div className="flex flex-col">
-                      <span className="text-lg sm:text-xl font-extrabold text-[#8B0000]">${dish.price.toFixed(2)}</span>
+                      <span className="text-lg sm:text-xl font-extrabold text-[#8B0000]">{formatCurrency(dish.price)}</span>
                       <span className="text-xs text-[#a09070]">{dish.prepTime} min</span>
                     </div>
                     <AddButton dish={dish} variant="sm" />
