@@ -36,10 +36,9 @@ export default function LoginPage() {
 
     try {
       const loggedUser = await login({ email, password, role: selectedRole });
-      redirectByRole(loggedUser.role);
+      redirectByRole(loggedUser?.role || selectedRole);
     } catch (err: any) {
       setErrorMsg(err.message || 'Invalid credentials. Please try again.');
-    } finally {
       setSubmitting(false);
     }
   };
@@ -49,38 +48,32 @@ export default function LoginPage() {
     setPassword('password123');
     setSelectedRole(demo.role);
     setSubmitting(true);
+    setErrorMsg('');
 
     try {
       const loggedUser = await login({ email: demo.email, password: 'password123', role: demo.role });
-      redirectByRole(loggedUser.role);
+      redirectByRole(loggedUser?.role || demo.role);
     } catch (err) {
       setErrorMsg('Failed quick demo login.');
-    } finally {
       setSubmitting(false);
     }
   };
 
-  const redirectByRole = (role: UserRole) => {
-    switch (role) {
-      case 'Admin':
-      case 'Manager':
-        router.push('/admin/dashboard');
-        break;
-      case 'Chef':
-        router.push('/admin/kitchen');
-        break;
-      case 'Waiter':
-        router.push('/admin/tables');
-        break;
-      case 'Cashier':
-        router.push('/admin/orders');
-        break;
-      case 'Delivery Boy':
-        router.push('/track');
-        break;
-      default:
-        router.push('/');
-        break;
+  const redirectByRole = (role: UserRole | string) => {
+    const r = (role || '').toString().toLowerCase();
+
+    if (r.includes('admin') || r.includes('manager')) {
+      window.location.href = '/admin/dashboard';
+    } else if (r.includes('chef')) {
+      window.location.href = '/admin/kitchen';
+    } else if (r.includes('waiter')) {
+      window.location.href = '/admin/tables';
+    } else if (r.includes('cashier')) {
+      window.location.href = '/admin/orders';
+    } else if (r.includes('delivery')) {
+      window.location.href = '/track';
+    } else {
+      window.location.href = '/';
     }
   };
 

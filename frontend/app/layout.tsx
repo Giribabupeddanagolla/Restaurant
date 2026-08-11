@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Navbar  from '@/components/Navbar';
-import Footer  from '@/components/Footer';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import FloatingCartButton from '@/components/FloatingCartButton';
 import { CartProvider } from '@/context/CartContext';
@@ -16,7 +16,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* Preload system fonts for faster first paint */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -31,7 +30,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="pt-[64px]">
               <main>{children}</main>
             </div>
-            {/* Footer */}
             <Footer />
             <FloatingCartButton />
             <CartDrawer />

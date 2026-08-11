@@ -4,8 +4,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig = {
+  reactStrictMode: true,
   images: {
-    domains: ['images.unsplash.com'],
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 3600,
     remotePatterns: [
@@ -13,18 +14,16 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
   distDir: process.env.NEXT_BUILD_DIR || '.next',
-  outputFileTracing: false,
-  // Ensure static optimization for better Vercel deployment
   productionBrowserSourceMaps: false,
   compress: true,
   swcMinify: true,
-  // Optimize for serverless deployment
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
-  },
 }
 
 module.exports = withBundleAnalyzer(nextConfig)

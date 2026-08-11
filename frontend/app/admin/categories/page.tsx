@@ -10,5 +10,9 @@ export default function AdminCategoriesPage() {
     router.replace('/admin/menu');
   }, [router]);
 
-  return null;
+  return (
+    <div className="p-4 text-xs font-bold text-gray-500">
+      Redirecting to Menu Management...
+    </div>
+  );
 }

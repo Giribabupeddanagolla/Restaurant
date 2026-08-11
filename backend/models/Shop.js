@@ -13,6 +13,8 @@ const shopSchema = new mongoose.Schema({
   isOpen: { type: Boolean, default: true },
   isFeatured: { type: Boolean, default: true },
   mapUrl: { type: String, default: '' },
+  diningImages: [{ type: String }],
+  kitchenImages: [{ type: String }],
 }, { timestamps: true });
 
 shopSchema.index({ name: 'text', city: 'text', address: 'text' });

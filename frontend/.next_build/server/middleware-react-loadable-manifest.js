@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST='{"app\\\\page.tsx -> @/components/DishModal":{"id":8961,"files":["static/chunks/961.ec87a06b844144f8.js"]}}';

@@ -97,8 +97,9 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarPr
             <Link
               key={link.href}
               href={link.href}
+              prefetch={true}
               onClick={onCloseMobile}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all active:scale-95 ${
                 isActive
                   ? 'bg-gradient-to-r from-[#8B0000] to-[#C8102E] text-white font-bold shadow-md'
                   : 'text-[#c0b090] hover:bg-white/5 hover:text-white'

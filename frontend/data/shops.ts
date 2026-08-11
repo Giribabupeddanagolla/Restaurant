@@ -6,7 +6,7 @@ export const INITIAL_SHOPS: Shop[] = [
     name: 'Giri Fine Dining',
     tagline: 'Signature Experience',
     tag: 'Signature Experience',
-    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
     rating: 4.9,
     deliveryTime: '30–40 min',
     time: '30–40 min',
@@ -16,13 +16,26 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '12:00 PM – 11:00 PM',
     isOpen: true,
     isFeatured: true,
+    avgPrice: '₹1,200 for two',
+    diningImages: [
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581299894007-aaa50297cf16?w=800&auto=format&fit=crop&q=80'
+    ],
   },
   {
     id: 'shop-2',
     name: 'Giri Kitchen',
     tagline: 'Home Comfort Food',
     tag: 'Home Comfort Food',
-    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
     rating: 4.7,
     deliveryTime: '20–30 min',
     time: '20–30 min',
@@ -32,13 +45,24 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '11:00 AM – 10:30 PM',
     isOpen: true,
     isFeatured: true,
+    avgPrice: '₹600 for two',
+    diningImages: [
+      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1525610553991-2bede1a236e2?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1514986888952-8cd320577b68?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1583394293214-28ded15ee548?w=800&auto=format&fit=crop&q=80'
+    ],
   },
   {
     id: 'shop-3',
     name: 'Giri Bakery',
     tagline: 'Pastries & Desserts',
     tag: 'Pastries & Desserts',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80',
     rating: 4.8,
     deliveryTime: '15–20 min',
     time: '15–20 min',
@@ -48,13 +72,22 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '08:00 AM – 09:00 PM',
     isOpen: true,
     isFeatured: true,
+    avgPrice: '₹350 for two',
+    diningImages: [
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1608198093002-ad4e005484ec?w=800&auto=format&fit=crop&q=80'
+    ],
   },
   {
     id: 'shop-4',
     name: 'Giri Grill',
     tagline: 'BBQ & Mains',
     tag: 'BBQ & Mains',
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80',
     rating: 4.6,
     deliveryTime: '25–35 min',
     time: '25–35 min',
@@ -64,13 +97,22 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '12:00 PM – 11:30 PM',
     isOpen: true,
     isFeatured: true,
+    avgPrice: '₹850 for two',
+    diningImages: [
+      'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&auto=format&fit=crop&q=80'
+    ],
   },
   {
     id: 'shop-5',
     name: 'Giri Spice Garden',
     tagline: 'Indian & Asian',
     tag: 'Indian & Asian',
-    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&auto=format&fit=crop&q=80',
     rating: 4.7,
     deliveryTime: '20–30 min',
     time: '20–30 min',
@@ -80,13 +122,22 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '11:30 AM – 10:30 PM',
     isOpen: true,
     isFeatured: true,
+    avgPrice: '₹750 for two',
+    diningImages: [
+      'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581299894007-aaa50297cf16?w=800&auto=format&fit=crop&q=80'
+    ],
   },
   {
     id: 'shop-6',
     name: 'Giri Café',
     tagline: 'Coffee & Snacks',
     tag: 'Coffee & Snacks',
-    image: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&auto=format&fit=crop&q=80',
     rating: 4.5,
     deliveryTime: '10–15 min',
     time: '10–15 min',
@@ -96,13 +147,22 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '07:00 AM – 08:00 PM',
     isOpen: true,
     isFeatured: true,
+    avgPrice: '₹400 for two',
+    diningImages: [
+      'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80'
+    ],
   },
   {
     id: 'shop-7',
     name: 'Giri Seafood & Lounge',
     tagline: 'Coastal Delicacies & Cocktails',
     tag: 'Coastal Delicacies & Cocktails',
-    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800&auto=format&fit=crop&q=80',
     rating: 4.9,
     deliveryTime: '25–35 min',
     time: '25–35 min',
@@ -112,13 +172,22 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '12:00 PM – 12:00 AM',
     isOpen: true,
     isFeatured: true,
+    avgPrice: '₹1,100 for two',
+    diningImages: [
+      'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80'
+    ],
   },
   {
     id: 'shop-8',
     name: 'Giri Express & Bistro',
     tagline: 'Quick Gourmet Eats',
     tag: 'Quick Gourmet Eats',
-    image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&h=360&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80',
     rating: 4.8,
     deliveryTime: '10–20 min',
     time: '10–20 min',
@@ -128,6 +197,14 @@ export const INITIAL_SHOPS: Shop[] = [
     openingHours: '08:00 AM – 10:00 PM',
     isOpen: true,
     isFeatured: true,
+    diningImages: [
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&auto=format&fit=crop&q=80'
+    ],
+    kitchenImages: [
+      'https://images.unsplash.com/photo-1581299894007-aaa50297cf16?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1514986888952-8cd320577b68?w=800&auto=format&fit=crop&q=80'
+    ],
   },
 ];
 

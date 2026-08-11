@@ -2,14 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { INITIAL_DISHES, INITIAL_CATEGORIES, getStoredDishes, saveStoredDishes } from '@/data/mockData';
+import { INITIAL_CATEGORIES, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from '@/data/mockData';
+import { Search, Plus, Edit2, Trash2, CheckCircle, XCircle, Utensils, RefreshCw, Sparkles, Clock, Leaf, Filter, Store } from 'lucide-react';
 import { MenuItem } from '@/types';
 import { menuApi } from '@/services/restaurantService';
 import { formatCurrency } from '@/utils/formatters';
-import {
-  Plus, Search, Edit2, Trash2, Clock, Star, Leaf, Utensils,
-  CheckCircle, XCircle, RefreshCw, Sparkles, Filter, ShieldAlert, Menu, X
-} from 'lucide-react';
 
 const PRESET_DISH_IMAGES = [
   { label: '🍕 Pizza',    url: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=600&h=600&auto=format&fit=crop&q=85' },
@@ -20,12 +17,14 @@ const PRESET_DISH_IMAGES = [
   { label: '🍰 Dessert',  url: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&h=600&auto=format&fit=crop&q=85' },
   { label: '🍹 Drink',    url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&h=600&auto=format&fit=crop&q=85' },
   { label: '🥗 Caprese',  url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&h=600&auto=format&fit=crop&q=85' },
+  { label: '🍝 Pasta',    url: 'https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=600&h=600&auto=format&fit=crop&q=85' },
 ];
 
 export default function AdminMenuPage() {
-  const [dishes, setDishes] = useState<MenuItem[]>(getStoredDishes);
+  const [dishes, setDishes] = useState<MenuItem[]>(INITIAL_DISHES);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedRestaurant, setSelectedRestaurant] = useState<string>('all');
   const [dietaryFilter, setDietaryFilter] = useState<string>('all');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -38,6 +37,8 @@ export default function AdminMenuPage() {
   const [formData, setFormData] = useState<Partial<MenuItem>>({
     name: '',
     category: 'mains',
+    shopSlug: 'giri-fine-dining',
+    shopName: 'Giri Fine Dining',
     price: 450,
     description: '',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=600&auto=format&fit=crop&q=85',
@@ -53,16 +54,21 @@ export default function AdminMenuPage() {
       if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
         setDishes(res.data);
         saveStoredDishes(res.data);
+      } else {
+        const stored = getStoredDishes();
+        if (stored && stored.length > 0) setDishes(stored);
       }
     } catch (err) {
-      console.log('Using stored dishes fallback');
-      setDishes(getStoredDishes());
+      const stored = getStoredDishes();
+      if (stored && stored.length > 0) setDishes(stored);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const stored = getStoredDishes();
+    if (stored && stored.length > 0) setDishes(stored);
     fetchDishes();
   }, []);
 
@@ -83,6 +89,8 @@ export default function AdminMenuPage() {
     setFormData({
       name: '',
       category: 'mains',
+      shopSlug: selectedRestaurant !== 'all' ? selectedRestaurant : 'giri-fine-dining',
+      shopName: selectedRestaurant !== 'all' ? (RESTAURANT_OUTLETS.find((r) => r.slug === selectedRestaurant)?.name || 'Giri Fine Dining') : 'Giri Fine Dining',
       price: 450,
       description: '',
       image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=600&auto=format&fit=crop&q=85',
@@ -98,6 +106,8 @@ export default function AdminMenuPage() {
     setFormData({
       name: dish.name,
       category: dish.category,
+      shopSlug: dish.shopSlug || 'giri-fine-dining',
+      shopName: dish.shopName || 'Giri Fine Dining',
       price: dish.price,
       description: dish.description,
       image: dish.image,
@@ -132,32 +142,61 @@ export default function AdminMenuPage() {
         }
         setMessage({ type: 'success', text: `New dish "${formData.name}" created successfully!` });
       }
-      setIsModalOpen(false);
-      await fetchDishes();
-    } catch (err: any) {
-      // Local fallback
+
+      // Update local state and localStorage
+      const newDishObj: MenuItem = {
+        id: editingDish?.id || `dish-${Date.now()}`,
+        name: formData.name || '',
+        category: formData.category || 'mains',
+        shopSlug: formData.shopSlug || 'giri-fine-dining',
+        shopName: formData.shopName || 'Giri Fine Dining',
+        price: Number(formData.price) || 0,
+        description: formData.description || '',
+        image: formData.image || '',
+        prepTime: Number(formData.prepTime) || 15,
+        available: formData.available !== false,
+        dietary: formData.dietary || ['veg'],
+      };
+
       if (editingDish) {
         updatedList = dishes.map((d) =>
-          d.id === editingDish.id || (d as any)._id === (editingDish as any)._id ? { ...d, ...formData } as MenuItem : d
+          d.id === editingDish.id || (d as any)._id === (editingDish as any)._id ? newDishObj : d
         );
-      } else {
-        const newDish: MenuItem = {
-          id: `dish-${Date.now()}`,
-          name: formData.name!,
-          category: formData.category || 'mains',
-          price: Number(formData.price),
-          description: formData.description!,
-          image: formData.image!,
-          dietary: formData.dietary || ['veg'],
-          prepTime: Number(formData.prepTime) || 15,
-          available: formData.available !== false,
-        };
-        updatedList = [newDish, ...dishes];
+      } else if (updatedList.length === 0) {
+        updatedList = [newDishObj, ...dishes];
       }
+
       setDishes(updatedList);
       saveStoredDishes(updatedList);
       setIsModalOpen(false);
-      setMessage({ type: 'success', text: `Dish "${formData.name}" saved successfully!` });
+    } catch (err) {
+      console.log('API save failed, fallback to localStorage update');
+      const newDishObj: MenuItem = {
+        id: editingDish?.id || `dish-${Date.now()}`,
+        name: formData.name || '',
+        category: formData.category || 'mains',
+        shopSlug: formData.shopSlug || 'giri-fine-dining',
+        shopName: formData.shopName || 'Giri Fine Dining',
+        price: Number(formData.price) || 0,
+        description: formData.description || '',
+        image: formData.image || '',
+        prepTime: Number(formData.prepTime) || 15,
+        available: formData.available !== false,
+        dietary: formData.dietary || ['veg'],
+      };
+
+      if (editingDish) {
+        updatedList = dishes.map((d) =>
+          d.id === editingDish.id || (d as any)._id === (editingDish as any)._id ? newDishObj : d
+        );
+      } else {
+        updatedList = [newDishObj, ...dishes];
+      }
+
+      setDishes(updatedList);
+      saveStoredDishes(updatedList);
+      setMessage({ type: 'success', text: `Dish "${formData.name}" saved locally!` });
+      setIsModalOpen(false);
     } finally {
       setSaving(false);
     }
@@ -166,31 +205,29 @@ export default function AdminMenuPage() {
   const handleDeleteDish = async (dish: MenuItem) => {
     if (!confirm(`Are you sure you want to delete "${dish.name}"?`)) return;
 
-    const id = dish.id || (dish as any)._id;
-    const updated = dishes.filter((d) => (d.id || (d as any)._id) !== id && d.name !== dish.name);
+    try {
+      const id = dish.id || (dish as any)._id;
+      if (id) await menuApi.deleteDish(id);
+    } catch (err) {
+      console.log('Local delete fallback');
+    }
+
+    const updated = dishes.filter((d) => d.id !== dish.id && (d as any)._id !== (dish as any)._id);
     setDishes(updated);
     saveStoredDishes(updated);
-
-    try {
-      if (id) {
-        await menuApi.deleteDish(id);
-      }
-      setMessage({ type: 'success', text: `Dish "${dish.name}" deleted!` });
-    } catch (err) {
-      setMessage({ type: 'success', text: `Dish "${dish.name}" removed!` });
-    }
+    setMessage({ type: 'success', text: `Dish "${dish.name}" deleted successfully!` });
   };
 
   const handleToggleAvailability = async (dish: MenuItem) => {
-    const newStatus = !(dish.available !== false);
-    const id = dish.id || (dish as any)._id;
+    const newStatus = dish.available === false;
     const updated = dishes.map((d) =>
-      ((d.id || (d as any)._id) === id || d.name === dish.name) ? { ...d, available: newStatus } : d
+      d.id === dish.id || (d as any)._id === (dish as any)._id ? { ...d, available: newStatus } : d
     );
     setDishes(updated);
     saveStoredDishes(updated);
 
     try {
+      const id = dish.id || (dish as any)._id;
       if (id) {
         await menuApi.updateDish(id, { available: newStatus });
       }
@@ -204,6 +241,8 @@ export default function AdminMenuPage() {
       search === '' ||
       dish.name.toLowerCase().includes(search.toLowerCase()) ||
       dish.description.toLowerCase().includes(search.toLowerCase());
+
+    const matchesRestaurant = selectedRestaurant === 'all' || dish.shopSlug === selectedRestaurant;
 
     const matchesCategory = selectedCategory === 'all' || dish.category === selectedCategory;
 
@@ -220,8 +259,15 @@ export default function AdminMenuPage() {
       matchesDietary = dish.available === false;
     }
 
-    return matchesSearch && matchesCategory && matchesDietary;
+    return matchesSearch && matchesRestaurant && matchesCategory && matchesDietary;
   });
+
+  const handleResetMenu = () => {
+    if (!confirm('Reset menu catalog to full default gourmet items?')) return;
+    setDishes(INITIAL_DISHES);
+    saveStoredDishes(INITIAL_DISHES);
+    setMessage({ type: 'success', text: 'Menu catalog reset to full gourmet dish selection!' });
+  };
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
@@ -236,17 +282,25 @@ export default function AdminMenuPage() {
             Menu Item Catalog
           </h1>
           <p className="text-xs text-[#6b5840] mt-1">
-            Manage prices, descriptions, prep time, dietary tags, and stock availability for all dishes.
+            Manage prices, descriptions, restaurant assignments, dietary tags, and stock availability for all dishes.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={fetchDishes}
-            className="p-2.5 rounded-xl bg-white border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-all shadow-xs cursor-pointer"
+            className="p-2.5 rounded-xl bg-white border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000]/10 transition-all cursor-pointer shadow-xs"
             title="Refresh List"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            onClick={handleResetMenu}
+            className="px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100 transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+            title="Reset Menu Catalog to Default Gourmet Dishes"
+          >
+            <Sparkles className="w-3.5 h-3.5" /> Reset Catalog
           </button>
           <button
             onClick={handleOpenAddModal}
@@ -269,65 +323,83 @@ export default function AdminMenuPage() {
         </div>
       )}
 
-      {/* Search Bar with 3-Lines Filter Dropdown */}
-      <div className="glass-card p-3 md:p-4 rounded-2xl bg-white border border-[#8B0000]/10 flex items-center justify-between gap-3 relative z-30 w-full">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#a09070] z-10 pointer-events-none" />
+      {/* Search & Restaurant Filter Bar */}
+      <div className="flex flex-col sm:flex-row items-center gap-3 w-full z-30">
+        {/* Search Input */}
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B0000] z-10 pointer-events-none" />
+          
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search dish by name or description..."
-            className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl pl-9 pr-11 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]"
+            className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-10 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
           />
 
-          {/* Vertical Divider */}
-          <div className="absolute right-10 top-1/2 -translate-y-1/2 w-[1px] h-4 bg-[#8B0000]/20 z-10 pointer-events-none" />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-[#8B0000] cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
 
-          {/* Three Lines Menu / Filter Button */}
+        {/* Restaurant Outlet Selector Dropdown */}
+        <div className="relative shrink-0 w-full sm:w-64">
+          <div className="relative">
+            <Store className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B0000] pointer-events-none" />
+            <select
+              value={selectedRestaurant}
+              onChange={(e) => setSelectedRestaurant(e.target.value)}
+              className="w-full bg-white border border-[#8B0000]/15 text-[#1a1008] rounded-2xl pl-10 pr-4 py-3 text-xs md:text-sm font-extrabold outline-none focus:ring-2 focus:ring-[#8B0000]/30 shadow-md cursor-pointer appearance-none"
+            >
+              <option value="all">🏪 All Restaurants & Outlets</option>
+              {RESTAURANT_OUTLETS.map((r) => (
+                <option key={r.slug} value={r.slug}>
+                  {r.icon} {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Category & Filter Dropdown Toggle Button */}
+        <div className="relative shrink-0">
           <button
             onClick={() => setShowFilterMenu(!showFilterMenu)}
-            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors z-20 flex items-center justify-center cursor-pointer ${
-              showFilterMenu ? 'bg-[#8B0000] text-white' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
+            className={`p-3 rounded-2xl transition-all cursor-pointer flex items-center justify-center border border-[#8B0000]/15 shadow-md ${
+              showFilterMenu ? 'text-white bg-[#8B0000]' : 'text-[#8B0000] bg-white hover:bg-[#8B0000]/10'
             }`}
-            title="Toggle Filter Dropdown"
-            aria-label="Toggle Filter Dropdown"
+            title="Toggle Categories & Dietary Filters"
+            aria-label="Toggle Categories & Dietary Filters"
           >
-            {showFilterMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            <Filter className="w-4 h-4" />
           </button>
 
-          {/* Floating Dropdown Menu attached right under 3-lines button */}
+          {/* Floating Filter Menu Dropdown */}
           {showFilterMenu && (
             <>
-              {/* Backdrop listener to close when clicking outside */}
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowFilterMenu(false)}
-              />
+              <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setShowFilterMenu(false)} />
+              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-[#8B0000]/15 rounded-2xl p-4 shadow-xl z-50 animate-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between border-b border-[#8B0000]/10 pb-2 mb-3">
+                  <span className="text-xs font-extrabold text-[#1a1008] uppercase tracking-wider">Food Category & Filter</span>
+                  <button onClick={() => setShowFilterMenu(false)} className="text-gray-400 hover:text-[#8B0000]">
+                    ✕
+                  </button>
+                </div>
 
-              <div className="absolute right-0 top-full mt-2 w-64 sm:w-72 bg-white rounded-2xl border border-[#8B0000]/20 shadow-2xl z-50 p-3 space-y-3 animate-in fade-in zoom-in-95 duration-150 max-h-[80vh] overflow-y-auto">
-                
-                {/* Categories Section */}
-                <div className="space-y-1">
-                  <div className="px-2 py-1 text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider border-b border-[#8B0000]/10 flex items-center justify-between">
-                    <span>Categories</span>
-                    {selectedCategory !== 'all' && (
-                      <span
-                        onClick={() => setSelectedCategory('all')}
-                        className="text-[9px] text-[#8B0000] hover:underline font-bold cursor-pointer"
-                      >
-                        Reset
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="space-y-0.5 pt-1">
+                {/* Categories */}
+                <div className="space-y-1.5 mb-4">
+                  <span className="text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider block">Dish Category</span>
+                  <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
                     {INITIAL_CATEGORIES.map((cat) => (
                       <button
                         key={cat.id}
                         onClick={() => {
                           setSelectedCategory(cat.id);
-                          setDietaryFilter('all');
                           setShowFilterMenu(false);
                         }}
                         className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
@@ -346,20 +418,9 @@ export default function AdminMenuPage() {
                   </div>
                 </div>
 
-                {/* Dietary & Stock Filters Section */}
+                {/* Dietary & Stock Filters */}
                 <div className="space-y-1 pt-2 border-t border-[#8B0000]/10">
-                  <div className="px-2 py-1 text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider flex items-center justify-between">
-                    <span>Filter Options</span>
-                    {dietaryFilter !== 'all' && (
-                      <span
-                        onClick={() => setDietaryFilter('all')}
-                        className="text-[9px] text-[#8B0000] hover:underline font-bold cursor-pointer"
-                      >
-                        Reset
-                      </span>
-                    )}
-                  </div>
-
+                  <span className="text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider block">Dietary & Availability</span>
                   <div className="space-y-0.5 pt-1">
                     {[
                       { id: 'all',          label: 'All Items',         icon: '🔍' },
@@ -390,98 +451,125 @@ export default function AdminMenuPage() {
                     ))}
                   </div>
                 </div>
-
               </div>
             </>
           )}
         </div>
       </div>
 
+      {/* Restaurant Header Badge Title when filtering */}
+      {selectedRestaurant !== 'all' && (
+        <div className="flex items-center justify-between bg-[#FFF8F0] border border-[#8B0000]/20 px-4 py-2.5 rounded-2xl">
+          <div className="flex items-center gap-2 text-xs font-extrabold text-[#8B0000]">
+            <Store className="w-4 h-4" />
+            <span>Showing menu items for: {RESTAURANT_OUTLETS.find((r) => r.slug === selectedRestaurant)?.name}</span>
+          </div>
+          <button
+            onClick={() => setSelectedRestaurant('all')}
+            className="text-xs font-bold text-[#8B0000] hover:underline cursor-pointer"
+          >
+            Show All Outlets
+          </button>
+        </div>
+      )}
+
       {/* Dishes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        {filteredDishes.map((dish, idx) => (
-          <div
-            key={dish.id || (dish as any)._id || idx}
-            className="glass-card bg-white border border-[#8B0000]/15 rounded-2xl overflow-hidden hover:shadow-lg transition-all flex flex-col"
-          >
-            {/* Dish Image */}
-            <div className="relative h-44 w-full bg-[#F8F5F0]">
-              <Image src={dish.image} alt={dish.name} fill className="object-cover" sizes="300px" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {filteredDishes.map((dish, idx) => {
+          const outletInfo = RESTAURANT_OUTLETS.find((r) => r.slug === dish.shopSlug) || { name: dish.shopName || 'Giri Fine Dining', icon: '🏪' };
+          return (
+            <div
+              key={dish.id || (dish as any)._id || idx}
+              className="glass-card bg-white border border-[#8B0000]/15 rounded-2xl overflow-hidden hover:shadow-lg transition-all flex flex-col"
+            >
+              {/* Dish Image */}
+              <div className="relative h-44 w-full bg-[#F8F5F0]">
+                <Image src={dish.image} alt={dish.name} fill className="object-cover" sizes="300px" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-              {/* Status Badge */}
-              <button
-                onClick={() => handleToggleAvailability(dish)}
-                className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-md transition-all ${
-                  dish.available !== false
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                    : 'bg-red-600 text-white hover:bg-red-700'
-                }`}
-              >
-                {dish.available !== false ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                {dish.available !== false ? 'IN STOCK' : 'SOLD OUT'}
-              </button>
+                {/* Status Badge */}
+                <button
+                  onClick={() => handleToggleAvailability(dish)}
+                  className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-extrabold flex items-center gap-1 shadow-md transition-all cursor-pointer ${
+                    dish.available !== false
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      : 'bg-red-600 text-white hover:bg-red-700'
+                  }`}
+                >
+                  {dish.available !== false ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                  {dish.available !== false ? 'IN STOCK' : 'SOLD OUT'}
+                </button>
 
-              {/* Category Pill */}
-              <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-0.5 rounded-lg text-white font-extrabold text-[10px] capitalize border border-white/20">
-                {dish.category}
+                {/* Restaurant Outlet Badge */}
+                <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-lg text-white font-extrabold text-[10px] flex items-center gap-1 border border-white/20">
+                  <span>{outletInfo.icon}</span>
+                  <span className="truncate max-w-[110px]">{outletInfo.name}</span>
+                </div>
+
+                {/* Dietary Tags */}
+                <div className="absolute bottom-2.5 left-3 flex items-center gap-1">
+                  {dish.dietary?.includes('chef-special') && (
+                    <span className="bg-[#C8A055] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-md shadow-xs">
+                      ★ Chef Special
+                    </span>
+                  )}
+                  {dish.dietary?.includes('veg') && (
+                    <span className="bg-emerald-700 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-md shadow-xs flex items-center gap-0.5">
+                      <Leaf className="w-2.5 h-2.5" /> Veg
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Dietary Tags */}
-              <div className="absolute bottom-3 left-3 flex gap-1">
-                {dish.dietary?.includes('chef-special') && (
-                  <span className="bg-[#8B0000] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">⭐ Chef Special</span>
-                )}
-                {dish.dietary?.includes('veg') && (
-                  <span className="bg-white/90 text-[#16603A] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#16603A]/20">
-                    <Leaf className="w-2.5 h-2.5 inline" /> Veg
+              {/* Content */}
+              <div className="p-4 flex flex-col flex-1 gap-2">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-extrabold text-[#1a1008] text-sm line-clamp-1">{dish.name}</h3>
+                  <span className="text-sm font-extrabold text-[#8B0000] shrink-0">{formatCurrency(dish.price)}</span>
+                </div>
+
+                <p className="text-xs text-[#6b5840] line-clamp-2 leading-relaxed">{dish.description}</p>
+
+                <div className="text-[11px] text-[#a09070] font-semibold flex items-center justify-between pt-1">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-[#8B0000]" /> Prep: {dish.prepTime || 15} mins
                   </span>
-                )}
+                  <span className="text-[10px] font-bold text-[#8B0000] uppercase bg-[#FFF0EB] px-2 py-0.5 rounded-md">
+                    {dish.category}
+                  </span>
+                </div>
+
+                {/* Actions */}
+                <div className="mt-auto pt-3 border-t border-[#8B0000]/10 flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => handleOpenEditModal(dish)}
+                    className="flex-1 py-2 px-3 bg-[#F8F5F0] border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000] hover:text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" /> Edit Dish
+                  </button>
+                  <button
+                    onClick={() => handleDeleteDish(dish)}
+                    className="p-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all cursor-pointer"
+                    title="Delete Dish"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* Content */}
-            <div className="p-4 flex flex-col flex-1 gap-2">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-extrabold text-[#1a1008] text-sm line-clamp-1">{dish.name}</h3>
-                <span className="text-sm font-extrabold text-[#8B0000] shrink-0">{formatCurrency(dish.price)}</span>
-              </div>
-
-              <p className="text-xs text-[#6b5840] line-clamp-2 leading-relaxed">{dish.description}</p>
-
-              <div className="text-[11px] text-[#a09070] font-semibold flex items-center gap-1 pt-1">
-                <Clock className="w-3 h-3 text-[#8B0000]" /> Prep time: {dish.prepTime || 15} mins
-              </div>
-
-              {/* Actions */}
-              <div className="mt-auto pt-3 border-t border-[#8B0000]/10 flex items-center justify-between gap-2">
-                <button
-                  onClick={() => handleOpenEditModal(dish)}
-                  className="flex-1 py-2 px-3 bg-[#F8F5F0] border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000] hover:text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
-                >
-                  <Edit2 className="w-3.5 h-3.5" /> Edit Dish
-                </button>
-                <button
-                  onClick={() => handleDeleteDish(dish)}
-                  className="p-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all"
-                  title="Delete Dish"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredDishes.length === 0 && (
         <div className="text-center py-16 glass-card bg-white rounded-2xl border border-[#8B0000]/10 flex flex-col items-center justify-center">
           <Utensils className="w-10 h-10 text-[#8B0000] mx-auto mb-2 opacity-50" />
           <h3 className="text-base font-bold text-[#1a1008]">No dishes found</h3>
-          <p className="text-xs text-[#6b5840] mt-1 mb-4">Try adjusting your search criteria or category filter.</p>
+          <p className="text-xs text-[#6b5840] mt-1 mb-4">Try adjusting your search criteria, restaurant selection, or category filter.</p>
           <button
             onClick={() => {
               setSearch('');
+              setSelectedRestaurant('all');
               setSelectedCategory('all');
               setDietaryFilter('all');
             }}
@@ -505,14 +593,14 @@ export default function AdminMenuPage() {
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-[#a09070] hover:text-[#8B0000] font-bold text-sm"
+                className="text-[#a09070] hover:text-[#8B0000] font-bold text-sm cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {/* Scrollable Form Body */}
-            <form onSubmit={handleSaveDish} className="flex-1 overflow-y-auto pr-1 text-xs flex flex-col">
+            <form onSubmit={handleSaveDish} className="flex-1 overflow-y-auto pr-1 text-xs flex flex-col pt-4">
               <div className="space-y-4 pb-4">
                 <div>
                   <label className="block text-[#1a1008] font-bold mb-1">Dish Name *</label>
@@ -526,21 +614,47 @@ export default function AdminMenuPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                {/* Restaurant Outlet & Category Selection */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[#1a1008] font-bold mb-1">Category *</label>
+                    <label className="block text-[#1a1008] font-bold mb-1">Restaurant / Outlet *</label>
+                    <select
+                      value={formData.shopSlug || 'giri-fine-dining'}
+                      onChange={(e) => {
+                        const selectedOutlet = RESTAURANT_OUTLETS.find((r) => r.slug === e.target.value);
+                        setFormData({
+                          ...formData,
+                          shopSlug: e.target.value,
+                          shopName: selectedOutlet?.name || 'Giri Fine Dining',
+                        });
+                      }}
+                      className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-bold outline-none focus:ring-2 focus:ring-[#8B0000]"
+                    >
+                      {RESTAURANT_OUTLETS.map((r) => (
+                        <option key={r.slug} value={r.slug}>
+                          {r.icon} {r.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[#1a1008] font-bold mb-1">Food Category *</label>
                     <select
                       value={formData.category || 'mains'}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-bold outline-none focus:ring-2 focus:ring-[#8B0000]"
                     >
-                      {INITIAL_CATEGORIES.map((cat) => (
+                      {INITIAL_CATEGORIES.filter((c) => c.id !== 'all').map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.icon} {cat.name}
                         </option>
                       ))}
                     </select>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[#1a1008] font-bold mb-1">Price (₹) *</label>
                     <input
@@ -550,6 +664,17 @@ export default function AdminMenuPage() {
                       value={formData.price || ''}
                       onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                       placeholder="e.g. 590"
+                      className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[#1a1008] font-bold mb-1">Prep Time (mins)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={formData.prepTime || 15}
+                      onChange={(e) => setFormData({ ...formData, prepTime: Number(e.target.value) })}
+                      placeholder="15"
                       className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
                     />
                   </div>
@@ -567,13 +692,12 @@ export default function AdminMenuPage() {
                   />
                   {/* Photo Presets */}
                   <div className="flex gap-1.5 flex-wrap mt-2">
-                    <span className="text-[10px] text-[#6b5840] font-bold self-center">Presets:</span>
                     {PRESET_DISH_IMAGES.map((preset) => (
                       <button
                         key={preset.label}
                         type="button"
                         onClick={() => setFormData({ ...formData, image: preset.url })}
-                        className="px-2 py-0.5 bg-[#F8F5F0] hover:bg-[#8B0000] hover:text-white border border-[#8B0000]/20 rounded-md text-[10px] font-bold text-[#8B0000] transition-colors"
+                        className="px-2 py-1 bg-[#F8F5F0] hover:bg-[#FFF0EB] border border-[#8B0000]/15 rounded-lg text-[10px] font-bold text-[#8B0000] cursor-pointer"
                       >
                         {preset.label}
                       </button>
@@ -584,93 +708,94 @@ export default function AdminMenuPage() {
                 <div>
                   <label className="block text-[#1a1008] font-bold mb-1">Description *</label>
                   <textarea
-                    rows={3}
                     required
+                    rows={2}
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe flavor profile, ingredients, and key highlights..."
+                    placeholder="Describe ingredients, cooking style, and key highlights..."
                     className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
                   />
                 </div>
 
+                {/* Dietary Tags */}
                 <div>
-                  <label className="block text-[#1a1008] font-bold mb-1">Preparation Time (minutes)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.prepTime || 15}
-                    onChange={(e) => setFormData({ ...formData, prepTime: Number(e.target.value) })}
-                    className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
-                  />
+                  <label className="block text-[#1a1008] font-bold mb-1.5">Dietary & Special Tags</label>
+                  <div className="flex gap-3 flex-wrap">
+                    {[
+                      { id: 'veg',          label: '🌱 Veg' },
+                      { id: 'non-veg',      label: '🍖 Non-Veg' },
+                      { id: 'spicy',        label: '🔥 Spicy' },
+                      { id: 'chef-special', label: '⭐ Chef Special' },
+                    ].map((tag) => {
+                      const isSelected = formData.dietary?.includes(tag.id);
+                      return (
+                        <button
+                          key={tag.id}
+                          type="button"
+                          onClick={() => {
+                            const current = formData.dietary || [];
+                            const next = isSelected
+                              ? current.filter((t) => t !== tag.id)
+                              : [...current, tag.id];
+                            setFormData({ ...formData, dietary: next });
+                          }}
+                          className={`px-3 py-1.5 rounded-xl font-bold transition-all text-xs cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#8B0000] text-white shadow-xs'
+                              : 'bg-[#F8F5F0] text-[#6b5840] border border-[#8B0000]/10 hover:border-[#8B0000]/30'
+                          }`}
+                        >
+                          {tag.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-6 pt-2 flex-wrap">
-                  <label className="flex items-center gap-2 text-[#1a1008] font-bold cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.available !== false}
-                      onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
-                      className="w-4 h-4 accent-[#8B0000] rounded"
-                    />
-                    <span>Available / In Stock</span>
-                  </label>
-
-                  <label className="flex items-center gap-2 text-[#1a1008] font-bold cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.dietary?.includes('veg') || false}
-                      onChange={(e) => {
-                        const current = formData.dietary || [];
-                        const updated = e.target.checked
-                          ? [...current.filter((d) => d !== 'non-veg'), 'veg']
-                          : current.filter((d) => d !== 'veg');
-                        setFormData({ ...formData, dietary: updated });
-                      }}
-                      className="w-4 h-4 accent-emerald-600 rounded"
-                    />
-                    <span>Vegetarian</span>
-                  </label>
-
-                  <label className="flex items-center gap-2 text-[#1a1008] font-bold cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.dietary?.includes('chef-special') || false}
-                      onChange={(e) => {
-                        const current = formData.dietary || [];
-                        const updated = e.target.checked
-                          ? [...current, 'chef-special']
-                          : current.filter((d) => d !== 'chef-special');
-                        setFormData({ ...formData, dietary: updated });
-                      }}
-                      className="w-4 h-4 accent-[#8B0000] rounded"
-                    />
-                    <span>Chef Special ⭐</span>
+                {/* In Stock Toggle */}
+                <div className="flex items-center gap-3 pt-1">
+                  <input
+                    type="checkbox"
+                    id="available"
+                    checked={formData.available !== false}
+                    onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
+                    className="w-4 h-4 accent-[#8B0000] rounded cursor-pointer"
+                  />
+                  <label htmlFor="available" className="text-[#1a1008] font-bold cursor-pointer">
+                    Available / In Stock for Ordering
                   </label>
                 </div>
               </div>
 
-              {/* Sticky Action Footer */}
-              <div className="pt-4 mt-auto border-t border-[#8B0000]/10 bg-white sticky bottom-0 z-10 flex gap-3 shrink-0">
+              {/* Form Footer */}
+              <div className="pt-4 border-t border-[#8B0000]/10 flex gap-3 shrink-0 mt-auto">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-[#8B0000]/20 text-[#6b5840] font-bold hover:bg-[#F8F5F0]"
+                  className="flex-1 py-3 bg-[#F8F5F0] text-[#6b5840] hover:bg-[#EFE8DD] rounded-xl font-bold transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 btn-crimson py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                  className="flex-1 py-3 btn-crimson text-white rounded-xl font-bold shadow-md hover:bg-[#A00000] transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Save Dish to Menu'}
+                  {saving ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" /> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" /> {editingDish ? 'Update Dish' : 'Save Dish to Menu'}
+                    </>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -13,6 +13,8 @@ export interface MenuItem {
   dietary: string[];
   prepTime: number;
   available: boolean;
+  shopSlug?: string;
+  shopName?: string;
   customizations?: CustomizationOption[];
 }
 
@@ -141,5 +143,8 @@ export interface Shop {
   isOpen?: boolean;
   isFeatured?: boolean;
   mapUrl?: string;
+  avgPrice?: string;
+  diningImages?: string[];
+  kitchenImages?: string[];
 }
 

@@ -2,7 +2,7 @@
 // Exports are organized for tree-shaking and lazy loading
 
 export { INITIAL_CATEGORIES } from './categories';
-export { INITIAL_DISHES, getStoredDishes, saveStoredDishes } from './dishes';
+export { INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from './dishes';
 export { BLOG_POSTS } from './blog';
 export { PUBLIC_OFFERS } from './offers';
 export { PUBLIC_REVIEWS, getStoredReviews, saveStoredReviews } from './reviews';

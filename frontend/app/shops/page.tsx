@@ -6,16 +6,25 @@ import Link from 'next/link';
 import { INITIAL_SHOPS, getStoredShops, saveStoredShops } from '@/data/mockData';
 import { Shop } from '@/types';
 import { shopApi } from '@/services/restaurantService';
-import { MapPin, Phone, Clock, Star, Search, ExternalLink, Utensils, CheckCircle, XCircle, Menu, X } from 'lucide-react';
+import ShopGalleryModal from '@/components/ShopGalleryModal';
+import { MapPin, Phone, Clock, Star, Search, ExternalLink, Utensils, CheckCircle, XCircle, Menu, X, Camera, Eye, Images } from 'lucide-react';
 
 export default function ShopsPage() {
-  const [shops, setShops] = useState<Shop[]>(getStoredShops);
+  const [shops, setShops] = useState<Shop[]>(INITIAL_SHOPS);
   const [search, setSearch] = useState('');
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Photo Gallery Modal State
+  const [selectedGalleryShop, setSelectedGalleryShop] = useState<Shop | null>(null);
+  const [galleryTab, setGalleryTab] = useState<'all' | 'dining' | 'kitchen'>('all');
+
   useEffect(() => {
+    const stored = getStoredShops();
+    if (stored && stored.length > 0) {
+      setShops(stored);
+    }
     shopApi.getShops()
       .then((res) => {
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
@@ -23,12 +32,14 @@ export default function ShopsPage() {
           saveStoredShops(res.data);
         }
       })
-      .catch((err) => {
-        console.log('Using initial fallback shops:', err);
-        setShops(getStoredShops());
-      })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const openGallery = (shop: Shop, tab: 'all' | 'dining' | 'kitchen' = 'all') => {
+    setSelectedGalleryShop(shop);
+    setGalleryTab(tab);
+  };
 
   const cities = ['all', ...Array.from(new Set(shops.map((s) => s.city || 'Metropolitan City')))];
 
@@ -57,7 +68,7 @@ export default function ShopsPage() {
             Best Shops & Locations
           </h1>
           <p className="text-red-100 text-sm md:text-base leading-relaxed">
-            Find a Giri Restaurant outlet near you. Experience gourmet dining, signature recipes, and lightning-fast delivery from our nearest branch.
+            Find a Giri Restaurant outlet near you. Click on any shop image to view rich photo galleries of our dining halls, live kitchens, and master chef setups!
           </p>
         </div>
       </div>
@@ -65,30 +76,42 @@ export default function ShopsPage() {
       {/* Search Bar with 3-Lines City & Location Filter Dropdown */}
       <div className="relative w-full mb-2 z-30">
         <div className="relative w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-5 h-5 z-10 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-4 h-4 pointer-events-none" />
 
           <input
             type="text"
             placeholder="Search by shop name, tagline, or address..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white border border-[#8B0000]/20 text-[#1a1008] rounded-full pl-12 pr-14 py-3 text-sm font-semibold placeholder:text-[#a09070]/70 outline-none focus:ring-2 focus:ring-[#8B0000] shadow-sm"
+            className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-24 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
           />
 
-          {/* Vertical Divider */}
-          <div className="absolute right-12 top-1/2 -translate-y-1/2 w-[1px] h-5 bg-[#8B0000]/20 z-10 pointer-events-none" />
+          {/* Right Action Icons: Clear & Three-Lines Filter Button */}
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-20">
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="p-1 rounded-full text-gray-400 hover:text-[#8B0000] hover:bg-black/5 transition-colors cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
 
-          {/* Three Lines Menu / Filter Button */}
-          <button
-            onClick={() => setShowFilterMenu(!showFilterMenu)}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors z-20 flex items-center justify-center cursor-pointer ${
-              showFilterMenu ? 'bg-[#8B0000] text-white shadow-md' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
-            }`}
-            title="Toggle Location & City Filters"
-            aria-label="Toggle location and city filters"
-          >
-            {showFilterMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+            {/* Frameless 3-Lines Icon Button */}
+            <button
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                showFilterMenu
+                  ? 'text-[#8B0000] bg-[#8B0000]/15'
+                  : 'text-[#8B0000] hover:bg-[#8B0000]/10'
+              }`}
+              title="Toggle Location & City Filters"
+              aria-label="Toggle location and city filters"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Floating City & Location Popover Dropdown Menu */}
@@ -144,110 +167,172 @@ export default function ShopsPage() {
 
       {/* Shops Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredShops.map((shop, idx) => (
-          <div
-            key={shop._id || shop.id || idx}
-            className="glass-card rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group border border-[#8B0000]/10"
-          >
-            {/* Image & Badges */}
-            <div className="relative h-48 w-full bg-[#F8F5F0]">
-              <Image
-                src={shop.image}
-                alt={shop.name}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+        {filteredShops.map((shop, idx) => {
+          const shopName = (shop.name || '').toLowerCase();
+          let categoryUrl = '/menu';
+          if (shopName.includes('fine dining')) categoryUrl = '/menu?shop=giri-fine-dining';
+          else if (shopName.includes('kitchen')) categoryUrl = '/menu?shop=giri-kitchen';
+          else if (shopName.includes('bakery')) categoryUrl = '/menu?shop=giri-bakery';
+          else if (shopName.includes('grill')) categoryUrl = '/menu?shop=giri-grill';
+          else if (shopName.includes('spice')) categoryUrl = '/menu?shop=giri-spice-garden';
+          else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=giri-cafe';
+          else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=giri-seafood';
 
-              {/* Status Badge */}
-              <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                {shop.isOpen !== false ? (
-                  <span className="bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
-                    <CheckCircle className="w-3 h-3" /> Open Now
+          const diningCount = shop.diningImages ? shop.diningImages.length : 1;
+          const kitchenCount = shop.kitchenImages ? shop.kitchenImages.length : 1;
+          const totalPhotos = diningCount + kitchenCount;
+
+          return (
+            <div
+              key={shop._id || shop.id || idx}
+              className="glass-card rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group border border-[#8B0000]/10"
+            >
+              {/* Image & Clickable Lightbox Overlay */}
+              <div
+                onClick={() => openGallery(shop, 'all')}
+                className="relative h-52 w-full bg-[#F8F5F0] block overflow-hidden cursor-pointer group/img"
+                title={`Click image to view photos of ${shop.name}`}
+              >
+                <Image
+                  src={shop.image}
+                  alt={shop.name}
+                  fill
+                  className="object-cover group-hover/img:scale-108 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 group-hover/img:from-black/80 transition-all" />
+
+                {/* Hover Center Badge: "Click to View Gallery" */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px] p-4 text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#8B0000] flex items-center justify-center shadow-xl mb-2 group-hover/img:scale-110 transition-transform">
+                    <Camera className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/40">
+                    📷 Click to View Photos
                   </span>
-                ) : (
-                  <span className="bg-red-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
-                    <XCircle className="w-3 h-3" /> Closed
+                  <span className="text-[11px] font-semibold text-amber-200 mt-1">
+                    Dining Room ({diningCount}) • Live Kitchen ({kitchenCount})
                   </span>
-                )}
-                {shop.isFeatured && (
-                  <span className="bg-[#C8A055]/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
-                    ⭐ Featured
-                  </span>
-                )}
-              </div>
-
-              {/* Rating & Delivery Time Badge */}
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-bold">
-                <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 border border-white/20">
-                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> {shop.rating}
-                </span>
-                <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 border border-white/20">
-                  <Clock className="w-3.5 h-3.5 text-red-300" /> {shop.deliveryTime || shop.time || '20-30 min'}
-                </span>
-              </div>
-            </div>
-
-            {/* Shop Details */}
-            <div className="p-5 flex flex-col flex-1 gap-3">
-              <div>
-                <h3 className="font-extrabold text-lg text-[#1a1008] group-hover:text-[#8B0000] transition-colors">
-                  {shop.name}
-                </h3>
-                <p className="text-xs font-semibold text-[#8B0000] mt-0.5">
-                  {shop.tagline || shop.tag || 'Fine Dining & Takeaway'}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2 text-xs text-[#6b5840] pt-2 border-t border-[#8B0000]/10">
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-[#8B0000] shrink-0 mt-0.5" />
-                  <span>{shop.address || 'Central District, Metropolitan City'}</span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-[#C8A055] shrink-0" />
-                  <span>{shop.phone || '+1 (555) 987-6543'}</span>
+                {/* Status Badge Top Left */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
+                  {shop.isOpen !== false ? (
+                    <span className="bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
+                      <CheckCircle className="w-3 h-3" /> Open Now
+                    </span>
+                  ) : (
+                    <span className="bg-red-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
+                      <XCircle className="w-3 h-3" /> Closed
+                    </span>
+                  )}
+                  {shop.isFeatured && (
+                    <span className="bg-[#C8A055]/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
+                      ⭐ Featured
+                    </span>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#16603A] shrink-0" />
-                  <span>Hours: {shop.openingHours || '11:00 AM – 11:00 PM'}</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="mt-auto pt-3 flex gap-2">
-                <Link
-                  href="/menu"
-                  className="flex-1 btn-crimson py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md"
+                {/* Camera Gallery Counter Top Right */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openGallery(shop, 'all');
+                  }}
+                  className="absolute top-3 right-3 bg-black/75 hover:bg-[#8B0000] backdrop-blur-md text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-white/30 shadow-md transition-colors z-10"
                 >
-                  <Utensils className="w-3.5 h-3.5" /> Order Menu
-                </Link>
-                {shop.mapUrl ? (
-                  <a
-                    href={shop.mapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-2.5 border border-[#8B0000]/30 text-[#8B0000] rounded-xl text-xs font-bold hover:bg-[#8B0000]/10 flex items-center justify-center gap-1 transition-all"
+                  <Camera className="w-3.5 h-3.5 text-amber-300" /> {totalPhotos} Photos
+                </button>
+
+                {/* Rating & Delivery Time Badge */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-bold z-10">
+                  <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 border border-white/20">
+                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> {shop.rating}
+                  </span>
+                  <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 border border-white/20">
+                    <Clock className="w-3.5 h-3.5 text-red-300" /> {shop.deliveryTime || shop.time || '20-30 min'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Shop Details */}
+              <div className="p-5 flex flex-col flex-1 gap-3">
+                <div className="flex justify-between items-start">
+                  <Link href={categoryUrl} className="block cursor-pointer">
+                    <h3 className="font-extrabold text-lg text-[#1a1008] group-hover:text-[#8B0000] transition-colors">
+                      {shop.name}
+                    </h3>
+                    <p className="text-xs font-semibold text-[#8B0000] mt-0.5">
+                      {shop.tagline || shop.tag || 'Fine Dining & Takeaway'}
+                    </p>
+                  </Link>
+                </div>
+
+                {/* Quick Photo Category Pills: Click to view Dining or Kitchen Photos directly */}
+                <div className="flex items-center gap-2 pt-1 flex-wrap">
+                  <button
+                    onClick={() => openGallery(shop, 'dining')}
+                    className="px-2.5 py-1 bg-[#FFF0EB] hover:bg-[#8B0000] hover:text-white border border-[#8B0000]/20 rounded-lg text-[11px] font-bold text-[#8B0000] flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" /> Maps
-                  </a>
-                ) : (
-                  <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(`${shop.name} ${shop.address}`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-2.5 border border-[#8B0000]/30 text-[#8B0000] rounded-xl text-xs font-bold hover:bg-[#8B0000]/10 flex items-center justify-center gap-1 transition-all"
+                    🍷 Dining Photos ({diningCount})
+                  </button>
+                  <button
+                    onClick={() => openGallery(shop, 'kitchen')}
+                    className="px-2.5 py-1 bg-[#F0FAF4] hover:bg-[#16603A] hover:text-white border border-[#16603A]/20 rounded-lg text-[11px] font-bold text-[#16603A] flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" /> Map
-                  </a>
-                )}
+                    🍳 Kitchen Photos ({kitchenCount})
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-2 text-xs text-[#6b5840] pt-2 border-t border-[#8B0000]/10">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 text-[#8B0000] shrink-0 mt-0.5" />
+                    <span>{shop.address || 'Central District, Metropolitan City'}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-[#C8A055] shrink-0" />
+                    <span>{shop.phone || '+1 (555) 987-6543'}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#16603A] shrink-0" />
+                    <span>Hours: {shop.openingHours || '11:00 AM – 11:00 PM'}</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-auto pt-3 flex gap-2">
+                  <Link
+                    href={categoryUrl}
+                    className="flex-1 btn-crimson py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md"
+                  >
+                    <Utensils className="w-3.5 h-3.5" /> View Category Menu
+                  </Link>
+                  {shop.mapUrl ? (
+                    <a
+                      href={shop.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2.5 border border-[#8B0000]/30 text-[#8B0000] rounded-xl text-xs font-bold hover:bg-[#8B0000]/10 flex items-center justify-center gap-1 transition-all"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> Map
+                    </a>
+                  ) : (
+                    <a
+                      href={`https://maps.google.com/?q=${encodeURIComponent(`${shop.name} ${shop.address}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2.5 border border-[#8B0000]/30 text-[#8B0000] rounded-xl text-xs font-bold hover:bg-[#8B0000]/10 flex items-center justify-center gap-1 transition-all"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> Map
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredShops.length === 0 && (
@@ -257,6 +342,16 @@ export default function ShopsPage() {
           <p className="text-xs text-[#6b5840] mt-1">Try adjusting your search criteria or city filter.</p>
         </div>
       )}
+
+      {/* Render Image Gallery Lightbox Modal when selected */}
+      {selectedGalleryShop && (
+        <ShopGalleryModal
+          shop={selectedGalleryShop}
+          initialTab={galleryTab}
+          onClose={() => setSelectedGalleryShop(null)}
+        />
+      )}
     </div>
   );
 }
+

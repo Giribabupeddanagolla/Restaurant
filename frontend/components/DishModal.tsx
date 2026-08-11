@@ -19,7 +19,9 @@ export default function DishModal({ dish, onClose }: Props) {
 
   if (!dish) return null;
 
-  const inCart = items.find((i) => i.dish.id === dish.id);
+  const dishId = dish.id || (dish as any)._id || dish.name;
+  const inCart = items.find((i) => (i.dish.id || (i.dish as any)._id || i.dish.name) === dishId);
+  const dietary = Array.isArray(dish.dietary) ? dish.dietary : [];
 
   const handleAdd = () => {
     for (let i = 0; i < qty; i++) addItem(dish);
@@ -60,18 +62,18 @@ export default function DishModal({ dish, onClose }: Props) {
             {/* Badges on image bottom left */}
             <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 z-10 pr-4">
               <span className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold shadow-md ${
-                dish.dietary.includes('veg')
+                dietary.includes('veg')
                   ? 'bg-white text-[#16603A] border border-[#16603A]/20'
                   : 'bg-white text-[#8B0000] border border-[#8B0000]/20'
               }`}>
-                {dish.dietary.includes('veg') ? '🌱 Vegetarian' : '🥩 Non-Veg'}
+                {dietary.includes('veg') ? '🌱 Vegetarian' : '🥩 Non-Veg'}
               </span>
-              {dish.dietary.includes('chef-special') && (
+              {dietary.includes('chef-special') && (
                 <span className="bg-[#8B0000] text-white text-xs font-extrabold px-3.5 py-1.5 rounded-full shadow-md">
                   ⭐ Chef Special
                 </span>
               )}
-              {dish.dietary.includes('spicy') && (
+              {dietary.includes('spicy') && (
                 <span className="bg-amber-600 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-full shadow-md">
                   🔥 Spicy
                 </span>
@@ -128,7 +130,7 @@ export default function DishModal({ dish, onClose }: Props) {
 
               {/* Dietary Tags */}
               <div className="flex flex-wrap gap-2 pt-1">
-                {dish.dietary.map((tag) => (
+                {dietary.map((tag) => (
                   <span key={tag} className="px-3.5 py-1.5 bg-[#F8F5F0] border border-[#8B0000]/10 rounded-full text-xs sm:text-sm font-semibold text-[#6b5840] capitalize">
                     {tag === 'veg' ? '🌱 Vegetarian' : tag === 'spicy' ? '🔥 Spicy' : tag === 'chef-special' ? '⭐ Chef Special' : tag}
                   </span>
@@ -137,7 +139,7 @@ export default function DishModal({ dish, onClose }: Props) {
 
               {inCart && (
                 <p className="text-xs sm:text-sm text-[#16603A] font-semibold bg-[#F0FAF4] px-4 py-3 rounded-xl border border-[#16603A]/10">
-                  ✓ You already have {inCart.qty} of this in your cart
+                  ✓ You already have {inCart.qty || (inCart as any).quantity || 1} of this in your cart
                 </p>
               )}
             </div>

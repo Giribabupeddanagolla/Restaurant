@@ -27,11 +27,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
+  const getDishId = (dish: MenuItem) => dish.id || (dish as any)._id || dish.name;
+
   const addItem = useCallback((dish: MenuItem) => {
+    const dishId = getDishId(dish);
     setItems((prev) => {
-      const existing = prev.find((i) => i.dish.id === dish.id);
+      const existing = prev.find((i) => getDishId(i.dish) === dishId);
       if (existing) {
-        return prev.map((i) => i.dish.id === dish.id ? { ...i, qty: i.qty + 1 } : i);
+        return prev.map((i) => getDishId(i.dish) === dishId ? { ...i, qty: i.qty + 1 } : i);
       }
       return [...prev, { dish, qty: 1 }];
     });
@@ -39,14 +42,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const removeItem = useCallback((id: string) => {
-    setItems((prev) => prev.filter((i) => i.dish.id !== id));
+    setItems((prev) => prev.filter((i) => getDishId(i.dish) !== id));
   }, []);
 
   const updateQty = useCallback((id: string, qty: number) => {
     if (qty < 1) {
-      setItems((prev) => prev.filter((i) => i.dish.id !== id));
+      setItems((prev) => prev.filter((i) => getDishId(i.dish) !== id));
     } else {
-      setItems((prev) => prev.map((i) => i.dish.id === id ? { ...i, qty } : i));
+      setItems((prev) => prev.map((i) => getDishId(i.dish) === id ? { ...i, qty } : i));
     }
   }, []);
 

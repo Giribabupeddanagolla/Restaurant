@@ -18,7 +18,9 @@ interface AddButtonProps {
 function AddButtonComponent({ dish, variant = 'sm' }: AddButtonProps) {
   const { addItem, items } = useCart();
   const [flashed, setFlashed] = useState(false);
-  const inCart = items.find((i) => i.dish.id === dish.id);
+  
+  const dishId = dish.id || (dish as any)._id || dish.name;
+  const inCart = items.find((i) => (i.dish.id || (i.dish as any)._id || i.dish.name) === dishId);
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -36,6 +38,7 @@ function AddButtonComponent({ dish, variant = 'sm' }: AddButtonProps) {
   return (
     <button
       onClick={handleAdd}
+      type="button"
       className={`flex items-center gap-1 rounded-lg font-bold transition-all ${sizeClasses[variant]} ${
         flashed ? 'bg-[#16603A] text-white scale-95' : 'btn-primary'
       }`}
@@ -48,7 +51,7 @@ function AddButtonComponent({ dish, variant = 'sm' }: AddButtonProps) {
       ) : (
         <>
           <Plus className={variant === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
-          {inCart ? `Add (${inCart.qty})` : 'Add'}
+          {inCart ? `Add (${inCart.qty || (inCart as any).quantity || 1})` : 'Add'}
         </>
       )}
     </button>

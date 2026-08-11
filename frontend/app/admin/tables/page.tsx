@@ -164,7 +164,15 @@ export default function AdminTablesPage() {
   };
 
   useEffect(() => {
-    fetchTables();
+    // 1. Instant 0ms load from localStorage
+    loadStoredTables();
+    // 2. Silent background sync
+    tableApi.getTables().then((res) => {
+      if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+        setTables(res.data);
+        localStorage.setItem('giri_restaurant_tables', JSON.stringify(res.data));
+      }
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   // Lock body scroll when modal is open
@@ -417,32 +425,44 @@ export default function AdminTablesPage() {
       </div>
 
       {/* Search Bar with 3-Lines Floor Zone Filter Dropdown */}
-      <div className="glass-card p-3 md:p-4 rounded-2xl bg-white border border-[#8B0000]/10 relative z-30 w-full">
+      {/* Search Bar with 3-Lines Floor Zone Filter Dropdown */}
+      <div className="relative w-full z-30">
         <div className="relative w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a09070] z-10 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B0000] z-10 pointer-events-none" />
           
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search table number or guest name..."
-            className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl pl-10 pr-12 py-2.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]"
+            className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-24 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
           />
 
-          {/* Vertical Divider */}
-          <div className="absolute right-11 top-1/2 -translate-y-1/2 w-[1px] h-4 bg-[#8B0000]/20 z-10 pointer-events-none" />
+          {/* Right Action Icons: Clear & Three-Lines Filter Menu */}
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-20">
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="p-1 rounded-full text-gray-400 hover:text-[#8B0000] hover:bg-black/5 transition-colors cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
 
-          {/* Three Lines Menu / Filter Button */}
-          <button
-            onClick={() => setShowFilterMenu(!showFilterMenu)}
-            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors z-20 flex items-center justify-center cursor-pointer ${
-              showFilterMenu ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
-            }`}
-            title="Toggle Floor Zone Filters"
-            aria-label="Toggle Floor Zone Filters"
-          >
-            {showFilterMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
+            {/* Frameless 3-Lines Icon Button */}
+            <button
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                showFilterMenu ? 'text-[#8B0000] bg-[#8B0000]/15' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
+              }`}
+              title="Toggle Floor Zone Filters"
+              aria-label="Toggle Floor Zone Filters"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
           {/* Floating Dropdown Menu */}
           {showFilterMenu && (
@@ -547,7 +567,6 @@ export default function AdminTablesPage() {
             </>
           )}
         </div>
-      </div>
 
       {/* Floor Plan Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

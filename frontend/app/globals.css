@@ -1,8 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 
 :root {
@@ -55,6 +54,17 @@ body {
   box-shadow: 0 8px 24px rgba(200, 160, 85, 0.55);
   transform: translateY(-1px);
 }
+.btn-primary:active,
+button:active,
+.btn-crimson:active {
+  transform: scale(0.97) translateY(0px) !important;
+  transition: transform 0.05s ease-out !important;
+}
+
+button, a, input, select, textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 
 /* ── Crimson Button ────────────────────── */
 .btn-crimson {
@@ -62,7 +72,7 @@ body {
   color: #fff;
   font-weight: 700;
   box-shadow: 0 4px 14px rgba(139, 0, 0, 0.30);
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 .btn-crimson:hover {
   box-shadow: 0 8px 24px rgba(139, 0, 0, 0.50);
@@ -119,4 +129,19 @@ body {
 .input-light.pr-14,
 .input-light[class*="pr-14"] {
   padding-right: 3.5rem !important;
+}
+
+/* ── Hardware Accelerated Fast Transitions ── */
+*, ::before, ::after {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.animate-in {
+  animation-duration: 100ms !important;
+  will-change: transform, opacity;
+}
+
+.transition-all {
+  transition-duration: 150ms !important;
 }

@@ -97,14 +97,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (credentials: { email: string; password?: string; role?: UserRole }) => {
+    const lowerEmail = credentials.email.toLowerCase();
+    const demoUser = DEMO_USERS[lowerEmail];
+
     try {
-      const res = await authApi.login(credentials);
+      const res = await Promise.race([
+        authApi.login(credentials),
+        new Promise<null>((_, reject) => setTimeout(() => reject(new Error('timeout')), 400))
+      ]);
       if (res && res.user) {
         const loggedInUser: User = {
           id: res.user.id || res.user._id,
           name: res.user.name,
           email: res.user.email,
-          role: res.user.role || 'Customer',
+          role: res.user.role || credentials.role || 'Customer',
           phone: res.user.phone,
           avatar: res.user.avatar,
         };
@@ -120,13 +126,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Demo role fallback
-    const matchedUser = DEMO_USERS[credentials.email.toLowerCase()] || {
-      id: `usr-${Date.now()}`,
-      name: credentials.email.split('@')[0].toUpperCase(),
-      email: credentials.email,
-      role: credentials.role || 'Customer',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-    };
+    const matchedUser: User = demoUser
+      ? { ...demoUser, role: credentials.role || demoUser.role }
+      : {
+          id: `usr-${Date.now()}`,
+          name: credentials.email.split('@')[0].toUpperCase(),
+          email: credentials.email,
+          role: credentials.role || 'Customer',
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        };
 
     const demoToken = `demo-token-${Date.now()}`;
     setUser(matchedUser);

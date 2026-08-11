@@ -3,25 +3,29 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import { INITIAL_DISHES, INITIAL_CATEGORIES, INITIAL_SHOPS, getStoredShops, saveStoredShops } from '@/data/mockData';
+import { INITIAL_DISHES, INITIAL_CATEGORIES, INITIAL_SHOPS, getStoredShops, saveStoredShops, getStoredDishes, saveStoredDishes } from '@/data/mockData';
 import { Search, ChevronLeft, ChevronRight, Star, Clock, Leaf, MapPin } from 'lucide-react';
 import { MenuItem, Shop } from '@/types';
-import dynamic from 'next/dynamic';
 import AddButton from '@/components/AddButton';
+import DishModal from '@/components/DishModal';
 import { formatCurrency } from '@/utils/formatters';
-import { shopApi } from '@/services/restaurantService';
-
-// Lazy load modal - improves page transition speed
-const DishModal = dynamic(() => import('@/components/DishModal'), { ssr: false });
+import { shopApi, menuApi } from '@/services/restaurantService';
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  all:      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=80',
-  specials: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&auto=format&fit=crop&q=80',
-  starters: 'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=400&h=300&auto=format&fit=crop&q=80',
-  mains:    'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
-  pizzas:   'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=300&auto=format&fit=crop&q=80',
-  desserts: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&auto=format&fit=crop&q=80',
-  drinks:   'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&auto=format&fit=crop&q=80',
+  all:                 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=80',
+  'fine-dining':        'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
+  'giri-kitchen':       'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&auto=format&fit=crop&q=80',
+  'giri-bakery':        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&auto=format&fit=crop&q=80',
+  'giri-grill':         'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
+  'giri-spice-garden':  'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=300&auto=format&fit=crop&q=80',
+  'giri-cafe':          'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=300&auto=format&fit=crop&q=80',
+  'giri-seafood':       'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=300&auto=format&fit=crop&q=80',
+  specials:            'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&auto=format&fit=crop&q=80',
+  starters:            'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=400&h=300&auto=format&fit=crop&q=80',
+  mains:               'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
+  pizzas:              'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=300&auto=format&fit=crop&q=80',
+  desserts:            'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&auto=format&fit=crop&q=80',
+  drinks:              'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&auto=format&fit=crop&q=80',
 };
 
 function ScrollRow({ children }: { children: React.ReactNode }) {
@@ -55,9 +59,14 @@ function ScrollRow({ children }: { children: React.ReactNode }) {
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
-  const [shops, setShops] = useState<Shop[]>(getStoredShops);
+  const [shops, setShops] = useState<Shop[]>(INITIAL_SHOPS);
+  const [allDishes, setAllDishes] = useState<MenuItem[]>(INITIAL_DISHES);
 
   useEffect(() => {
+    const stored = getStoredShops();
+    if (stored && stored.length > 0) {
+      setShops(stored);
+    }
     shopApi.getShops()
       .then((res) => {
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
@@ -65,13 +74,23 @@ export default function HomePage() {
           saveStoredShops(res.data);
         }
       })
-      .catch((err) => {
-        console.log('Using stored initial shops:', err);
-        setShops(getStoredShops());
-      });
+      .catch(() => {});
+
+    const storedDishes = getStoredDishes();
+    if (storedDishes && storedDishes.length > 0) {
+      setAllDishes(storedDishes);
+    }
+    menuApi.getDishes()
+      .then((res) => {
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setAllDishes(res.data);
+          saveStoredDishes(res.data);
+        }
+      })
+      .catch(() => {});
   }, []);
 
-  const filteredDishes = INITIAL_DISHES.filter(
+  const filteredDishes = allDishes.filter(
     (d) => search === '' ||
       d.name.toLowerCase().includes(search.toLowerCase()) ||
       d.description.toLowerCase().includes(search.toLowerCase())
@@ -211,9 +230,20 @@ export default function HomePage() {
             </Link>
           </div>
           <ScrollRow>
-            {shops.map((shop, idx) => (
-              <Link key={shop._id || shop.id || idx} href="/shops" className="shrink-0 w-60 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
-                <div className="relative h-36 w-full bg-[#F8F5F0]">
+            {shops.map((shop, idx) => {
+              const shopName = (shop.name || '').toLowerCase();
+              let categoryUrl = '/menu';
+              if (shopName.includes('fine dining')) categoryUrl = '/menu?shop=giri-fine-dining';
+              else if (shopName.includes('kitchen')) categoryUrl = '/menu?shop=giri-kitchen';
+              else if (shopName.includes('bakery')) categoryUrl = '/menu?shop=giri-bakery';
+              else if (shopName.includes('grill')) categoryUrl = '/menu?shop=giri-grill';
+              else if (shopName.includes('spice')) categoryUrl = '/menu?shop=giri-spice-garden';
+              else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=giri-cafe';
+              else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=giri-seafood';
+
+              return (
+                <Link key={shop._id || shop.id || idx} href={categoryUrl} className="shrink-0 w-60 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
+                  <div className="relative h-36 w-full bg-[#F8F5F0]">
                   <Image 
                     src={shop.image} 
                     alt={shop.name} 
@@ -247,7 +277,8 @@ export default function HomePage() {
                   </div>
                 </div>
               </Link>
-            ))}
+            );
+          })}
           </ScrollRow>
         </section>
       )}
@@ -260,7 +291,7 @@ export default function HomePage() {
             <Link href="/menu" className="text-sm font-bold text-[#8B0000] hover:underline">View full menu →</Link>
           </div>
           <ScrollRow>
-            {INITIAL_DISHES.map((dish) => (
+            {allDishes.map((dish, idx) => (
               <div
                 key={dish.id}
                 onClick={() => setSelectedDish(dish)}
@@ -271,6 +302,7 @@ export default function HomePage() {
                     src={dish.image} 
                     alt={dish.name} 
                     fill 
+                    loading={idx < 5 ? 'eager' : 'lazy'}
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="208px"
                   />

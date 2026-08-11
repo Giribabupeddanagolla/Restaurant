@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export default function AdminShopsPage() {
-  const [shops, setShops] = useState<Shop[]>(getStoredShops);
+  const [shops, setShops] = useState<Shop[]>(INITIAL_SHOPS);
   const [search, setSearch] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
@@ -43,16 +43,21 @@ export default function AdminShopsPage() {
       if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
         setShops(res.data);
         saveStoredShops(res.data);
+      } else {
+        const stored = getStoredShops();
+        if (stored && stored.length > 0) setShops(stored);
       }
     } catch (err) {
-      console.log('Error fetching shops from API, using stored shops');
-      setShops(getStoredShops());
+      const stored = getStoredShops();
+      if (stored && stored.length > 0) setShops(stored);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const stored = getStoredShops();
+    if (stored && stored.length > 0) setShops(stored);
     fetchShops();
   }, []);
 
@@ -73,7 +78,7 @@ export default function AdminShopsPage() {
     setFormData({
       name: '',
       tagline: '',
-      image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=360&auto=format&fit=crop&q=80',
+      image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
       rating: 4.8,
       deliveryTime: '20-30 min',
       address: '',
@@ -82,6 +87,14 @@ export default function AdminShopsPage() {
       openingHours: '11:00 AM - 11:00 PM',
       isOpen: true,
       isFeatured: true,
+      diningImages: [
+        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&auto=format&fit=crop&q=80'
+      ],
+      kitchenImages: [
+        'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&auto=format&fit=crop&q=80'
+      ],
     });
     setIsModalOpen(true);
   };
@@ -98,8 +111,11 @@ export default function AdminShopsPage() {
       city: shop.city || 'Metropolitan City',
       phone: shop.phone || '+1 (555) 987-6543',
       openingHours: shop.openingHours || '11:00 AM - 11:00 PM',
+      avgPrice: shop.avgPrice || '₹600 for two',
       isOpen: shop.isOpen !== false,
       isFeatured: shop.isFeatured !== false,
+      diningImages: shop.diningImages || [shop.image],
+      kitchenImages: shop.kitchenImages || ['https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80'],
     });
     setIsModalOpen(true);
   };
@@ -243,32 +259,43 @@ export default function AdminShopsPage() {
       )}
 
       {/* Search Bar with 3-Lines Filter Dropdown */}
-      <div className="glass-card p-3 md:p-4 rounded-2xl bg-white border border-[#8B0000]/10 relative z-30 w-full">
+      <div className="relative w-full z-30">
         <div className="relative w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a09070] z-10 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B0000] z-10 pointer-events-none" />
           
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by shop name, tagline, or address..."
-            className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl pl-10 pr-12 py-2.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]"
+            placeholder="Search by shop outlet name, city, or address..."
+            className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-24 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
           />
 
-          {/* Vertical Divider */}
-          <div className="absolute right-11 top-1/2 -translate-y-1/2 w-[1px] h-4 bg-[#8B0000]/20 z-10 pointer-events-none" />
+          {/* Right Action Icons: Clear & Three-Lines Filter Menu */}
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-20">
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="p-1 rounded-full text-gray-400 hover:text-[#8B0000] hover:bg-black/5 transition-colors cursor-pointer"
+                title="Clear Search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
 
-          {/* Three Lines Menu / Filter Button */}
-          <button
-            onClick={() => setShowFilterMenu(!showFilterMenu)}
-            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors z-20 flex items-center justify-center cursor-pointer ${
-              showFilterMenu ? 'bg-[#8B0000] text-white shadow-sm' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
-            }`}
-            title="Toggle Shop Filters"
-            aria-label="Toggle Shop Filters"
-          >
-            {showFilterMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
+            {/* Frameless 3-Lines Icon Button */}
+            <button
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                showFilterMenu ? 'text-[#8B0000] bg-[#8B0000]/15' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
+              }`}
+              title="Toggle City Filters"
+              aria-label="Toggle City Filters"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
           {/* Floating Dropdown Menu */}
           {showFilterMenu && (
@@ -325,7 +352,6 @@ export default function AdminShopsPage() {
             </>
           )}
         </div>
-      </div>
 
       {/* Grid of Shops */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -532,8 +558,90 @@ export default function AdminShopsPage() {
                     value={formData.openingHours || ''}
                     onChange={(e) => setFormData({ ...formData, openingHours: e.target.value })}
                     placeholder="11:00 AM - 11:00 PM"
-                    className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:border-[#C8A055]"
+                    className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 text-[#1a1008] rounded-xl px-3.5 py-2.5 font-medium outline-none focus:ring-2 focus:ring-[#8B0000]"
                   />
+                </div>
+
+                {/* 🍷 Dining Images (Comma/Line separated URLs) */}
+                <div className="p-3 bg-[#FFF0EB] border border-[#8B0000]/20 rounded-2xl space-y-2">
+                  <label className="block text-[#8B0000] font-extrabold text-xs flex items-center justify-between">
+                    <span>🍷 Dining Room & Ambience Images (URLs)</span>
+                    <span className="text-[10px] text-[#6b5840] font-normal">Comma or newline separated</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={(formData.diningImages || []).join('\n')}
+                    onChange={(e) => {
+                      const urls = e.target.value.split(/[\n,]+/).map((u) => u.trim()).filter(Boolean);
+                      setFormData({ ...formData, diningImages: urls });
+                    }}
+                    placeholder="https://images.unsplash.com/dining-1&#10;https://images.unsplash.com/dining-2"
+                    className="w-full bg-white border border-[#8B0000]/20 text-[#1a1008] rounded-xl p-2.5 text-xs font-mono outline-none focus:ring-2 focus:ring-[#8B0000]"
+                  />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold text-[#6b5840]">Quick Add:</span>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({
+                        ...formData,
+                        diningImages: Array.from(new Set([...(formData.diningImages || []), 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&auto=format&fit=crop&q=80']))
+                      })}
+                      className="px-2 py-0.5 bg-white border border-[#8B0000]/30 rounded text-[10px] font-bold text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-colors"
+                    >
+                      + Dining Lounge
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({
+                        ...formData,
+                        diningImages: Array.from(new Set([...(formData.diningImages || []), 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&auto=format&fit=crop&q=80']))
+                      })}
+                      className="px-2 py-0.5 bg-white border border-[#8B0000]/30 rounded text-[10px] font-bold text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-colors"
+                    >
+                      + VIP Booth
+                    </button>
+                  </div>
+                </div>
+
+                {/* 🍳 Kitchen Images (Comma/Line separated URLs) */}
+                <div className="p-3 bg-[#F0FAF4] border border-[#16603A]/20 rounded-2xl space-y-2">
+                  <label className="block text-[#16603A] font-extrabold text-xs flex items-center justify-between">
+                    <span>🍳 Live Kitchen & Chef Images (URLs)</span>
+                    <span className="text-[10px] text-[#6b5840] font-normal">Comma or newline separated</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={(formData.kitchenImages || []).join('\n')}
+                    onChange={(e) => {
+                      const urls = e.target.value.split(/[\n,]+/).map((u) => u.trim()).filter(Boolean);
+                      setFormData({ ...formData, kitchenImages: urls });
+                    }}
+                    placeholder="https://images.unsplash.com/kitchen-1&#10;https://images.unsplash.com/kitchen-2"
+                    className="w-full bg-white border border-[#16603A]/20 text-[#1a1008] rounded-xl p-2.5 text-xs font-mono outline-none focus:ring-2 focus:ring-[#16603A]"
+                  />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold text-[#6b5840]">Quick Add:</span>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({
+                        ...formData,
+                        kitchenImages: Array.from(new Set([...(formData.kitchenImages || []), 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80']))
+                      })}
+                      className="px-2 py-0.5 bg-white border border-[#16603A]/30 rounded text-[10px] font-bold text-[#16603A] hover:bg-[#16603A] hover:text-white transition-colors"
+                    >
+                      + Chef Counter
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({
+                        ...formData,
+                        kitchenImages: Array.from(new Set([...(formData.kitchenImages || []), 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&auto=format&fit=crop&q=80']))
+                      })}
+                      className="px-2 py-0.5 bg-white border border-[#16603A]/30 rounded text-[10px] font-bold text-[#16603A] hover:bg-[#16603A] hover:text-white transition-colors"
+                    >
+                      + Live Cooking
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-6 pt-2">

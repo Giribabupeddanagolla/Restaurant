@@ -44,7 +44,7 @@ export default function ReviewsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !comment) return;
+    if (!name.trim() || !comment.trim()) return;
 
     const newReview: Review = {
       id: `rev-${Date.now()}`,
@@ -58,13 +58,14 @@ export default function ReviewsPage() {
 
     const updated = [newReview, ...reviews];
     setReviews(updated);
-    saveStoredReviews(updated);
-
     setName('');
     setComment('');
     setRating(5);
     setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
+
+    // Non-blocking async persistence for zero-delay UI response
+    setTimeout(() => saveStoredReviews(updated), 0);
+    setTimeout(() => setSubmitted(false), 4000);
   };
 
   const avg = reviews.length > 0
@@ -204,12 +205,17 @@ export default function ReviewsPage() {
 
             <div>
               <label className="block text-xs font-bold text-[#4a3820] mb-1.5">Rating *</label>
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <button type="button" key={s} onClick={() => setRating(s)}>
+                  <button
+                    type="button"
+                    key={s}
+                    onClick={() => setRating(s)}
+                    className="p-1 rounded-lg hover:bg-amber-50 active:scale-125 transition-transform cursor-pointer"
+                  >
                     <Star
-                      className={`w-6 h-6 transition-colors ${
-                        s <= rating ? 'fill-[#C8A055] text-[#C8A055]' : 'text-[#e0d8cc]'
+                      className={`w-6 h-6 transition-all duration-150 ${
+                        s <= rating ? 'fill-[#C8A055] text-[#C8A055] scale-105' : 'text-[#e0d8cc]'
                       }`}
                     />
                   </button>
