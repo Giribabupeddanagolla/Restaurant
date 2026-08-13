@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { INITIAL_CATEGORIES, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from '@/data/mockData';
-import { Search, Plus, Edit2, Trash2, CheckCircle, XCircle, Utensils, RefreshCw, Sparkles, Clock, Leaf, Filter, Store } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, CheckCircle, XCircle, Utensils, RefreshCw, Clock, Leaf, Filter, Store, Menu, X, Sparkles } from 'lucide-react';
 import { MenuItem } from '@/types';
 import { menuApi } from '@/services/restaurantService';
 import { formatCurrency } from '@/utils/formatters';
@@ -270,7 +270,7 @@ export default function AdminMenuPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-5">
 
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -296,13 +296,6 @@ export default function AdminMenuPage() {
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
-            onClick={handleResetMenu}
-            className="px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100 transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
-            title="Reset Menu Catalog to Default Gourmet Dishes"
-          >
-            <Sparkles className="w-3.5 h-3.5" /> Reset Catalog
-          </button>
-          <button
             onClick={handleOpenAddModal}
             className="btn-crimson px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md cursor-pointer"
           >
@@ -323,155 +316,192 @@ export default function AdminMenuPage() {
         </div>
       )}
 
-      {/* Search & Restaurant Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 w-full z-30">
-        {/* Search Input */}
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B0000] z-10 pointer-events-none" />
-          
+      {/* Search & Outlets / Filter Bar */}
+      <div className="relative w-full mb-6 z-30">
+        <div className="relative w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-4 h-4 pointer-events-none" />
+
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search dish by name or description..."
-            className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-10 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
+            placeholder={selectedRestaurant !== 'all' 
+              ? `Search within ${RESTAURANT_OUTLETS.find((r) => r.slug === selectedRestaurant)?.name}...` 
+              : "Search dish by name, description, or outlet..."}
+            className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-24 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
           />
 
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-[#8B0000] cursor-pointer"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+          {/* Right Action Icons: Clear Search & Frameless 3-Lines Menu Icon */}
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-20">
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="p-1 rounded-full text-gray-400 hover:text-[#8B0000] hover:bg-black/5 transition-colors cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
 
-        {/* Restaurant Outlet Selector Dropdown */}
-        <div className="relative shrink-0 w-full sm:w-64">
-          <div className="relative">
-            <Store className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B0000] pointer-events-none" />
-            <select
-              value={selectedRestaurant}
-              onChange={(e) => setSelectedRestaurant(e.target.value)}
-              className="w-full bg-white border border-[#8B0000]/15 text-[#1a1008] rounded-2xl pl-10 pr-4 py-3 text-xs md:text-sm font-extrabold outline-none focus:ring-2 focus:ring-[#8B0000]/30 shadow-md cursor-pointer appearance-none"
+            {/* Frameless 3-Lines Menu Icon Button */}
+            <button
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                showFilterMenu ? 'text-[#8B0000] bg-[#8B0000]/15' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
+              }`}
+              title="Toggle Outlets & Categories"
+              aria-label="Toggle Outlets & Categories"
             >
-              <option value="all">🏪 All Restaurants & Outlets</option>
-              {RESTAURANT_OUTLETS.map((r) => (
-                <option key={r.slug} value={r.slug}>
-                  {r.icon} {r.name}
-                </option>
-              ))}
-            </select>
+              <Menu className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        {/* Category & Filter Dropdown Toggle Button */}
-        <div className="relative shrink-0">
-          <button
-            onClick={() => setShowFilterMenu(!showFilterMenu)}
-            className={`p-3 rounded-2xl transition-all cursor-pointer flex items-center justify-center border border-[#8B0000]/15 shadow-md ${
-              showFilterMenu ? 'text-white bg-[#8B0000]' : 'text-[#8B0000] bg-white hover:bg-[#8B0000]/10'
-            }`}
-            title="Toggle Categories & Dietary Filters"
-            aria-label="Toggle Categories & Dietary Filters"
-          >
-            <Filter className="w-4 h-4" />
-          </button>
+        {/* Active Outlet Pill Indicator */}
+        {selectedRestaurant !== 'all' && (
+          <div className="mt-2.5 flex items-center gap-2">
+            <button
+              onClick={() => setSelectedRestaurant('all')}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#8B0000]/40 text-[#1a1008] text-xs font-extrabold shadow-xs hover:bg-[#FFF0EB] hover:border-[#8B0000] transition-all cursor-pointer group"
+              title="Click to reset outlet filter"
+            >
+              <Store className="w-3.5 h-3.5 text-[#8B0000]" />
+              <span className="flex items-center gap-1">
+                <span>{RESTAURANT_OUTLETS.find((r) => r.slug === selectedRestaurant)?.icon || '🍷'}</span>
+                <span>{RESTAURANT_OUTLETS.find((r) => r.slug === selectedRestaurant)?.name}</span>
+              </span>
+              <X className="w-3.5 h-3.5 text-[#a09070] group-hover:text-[#8B0000] ml-1" />
+            </button>
+          </div>
+        )}
 
-          {/* Floating Filter Menu Dropdown */}
-          {showFilterMenu && (
-            <>
-              <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setShowFilterMenu(false)} />
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-[#8B0000]/15 rounded-2xl p-4 shadow-xl z-50 animate-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between border-b border-[#8B0000]/10 pb-2 mb-3">
-                  <span className="text-xs font-extrabold text-[#1a1008] uppercase tracking-wider">Food Category & Filter</span>
-                  <button onClick={() => setShowFilterMenu(false)} className="text-gray-400 hover:text-[#8B0000]">
-                    ✕
+        {/* Floating Filter & Outlet Menu Dropdown */}
+        {showFilterMenu && (
+          <>
+            <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setShowFilterMenu(false)} />
+            <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-[#8B0000]/15 rounded-2xl p-4 shadow-xl z-50 animate-in zoom-in-95 duration-150 max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-[#8B0000]/10 pb-2 mb-3">
+                <span className="text-xs font-extrabold text-[#1a1008] uppercase tracking-wider">Filter Outlets & Menu</span>
+                <button onClick={() => setShowFilterMenu(false)} className="text-gray-400 hover:text-[#8B0000]">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Restaurant Outlets Section */}
+              <div className="space-y-2 mb-4">
+                <span className="text-[10px] font-bold text-[#a09070] uppercase tracking-wider block">Restaurant Outlets</span>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                  <button
+                    onClick={() => {
+                      setSelectedRestaurant('all');
+                      setShowFilterMenu(false);
+                    }}
+                    className={`w-full text-left px-3.5 py-2 rounded-full text-xs font-extrabold flex items-center justify-between border transition-all cursor-pointer ${
+                      selectedRestaurant === 'all'
+                        ? 'bg-[#8B0000] text-white border-[#8B0000] shadow-xs'
+                        : 'bg-white text-[#4a3820] border-[#8B0000]/30 hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Store className="w-3.5 h-3.5 text-[#8B0000]" />
+                      <span>All Outlets</span>
+                    </span>
+                    {selectedRestaurant === 'all' && <span>✓</span>}
                   </button>
-                </div>
-
-                {/* Categories */}
-                <div className="space-y-1.5 mb-4">
-                  <span className="text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider block">Dish Category</span>
-                  <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
-                    {INITIAL_CATEGORIES.map((cat) => (
+                  {RESTAURANT_OUTLETS.map((outlet) => {
+                    const isActive = selectedRestaurant === outlet.slug;
+                    return (
                       <button
-                        key={cat.id}
+                        key={outlet.slug}
                         onClick={() => {
-                          setSelectedCategory(cat.id);
+                          setSelectedRestaurant(outlet.slug);
+                          setSelectedCategory('all');
                           setShowFilterMenu(false);
                         }}
-                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
-                          selectedCategory === cat.id
-                            ? 'bg-[#8B0000] text-white font-extrabold shadow-xs'
-                            : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                        className={`w-full text-left px-3.5 py-2 rounded-full text-xs font-extrabold flex items-center justify-between border transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-[#8B0000] text-white border-[#8B0000] shadow-xs'
+                            : 'bg-white text-[#1a1008] border-[#8B0000]/30 hover:bg-[#FFF0EB] hover:border-[#8B0000]'
                         }`}
                       >
                         <span className="flex items-center gap-2">
-                          <span>{cat.icon}</span>
-                          <span>{cat.name}</span>
+                          <Store className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#8B0000]'}`} />
+                          <span className="flex items-center gap-1">
+                            <span>{outlet.icon}</span>
+                            <span>{outlet.name}</span>
+                          </span>
                         </span>
-                        {selectedCategory === cat.id && <CheckCircle className="w-3.5 h-3.5 text-white" />}
+                        {isActive && <span>✓</span>}
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Dietary & Stock Filters */}
-                <div className="space-y-1 pt-2 border-t border-[#8B0000]/10">
-                  <span className="text-[10px] font-extrabold text-[#8B0000] uppercase tracking-wider block">Dietary & Availability</span>
-                  <div className="space-y-0.5 pt-1">
-                    {[
-                      { id: 'all',          label: 'All Items',         icon: '🔍' },
-                      { id: 'veg',          label: 'Veg Only',          icon: '🌱' },
-                      { id: 'non-veg',      label: 'Non-Veg Only',      icon: '🥩' },
-                      { id: 'special',      label: 'Chef Specials',     icon: '⭐' },
-                      { id: 'available',    label: 'In Stock',          icon: '✅' },
-                      { id: 'out-of-stock', label: 'Out of Stock',      icon: '⚠️' },
-                    ].map((f) => (
-                      <button
-                        key={f.id}
-                        onClick={() => {
-                          setDietaryFilter(f.id);
-                          setShowFilterMenu(false);
-                        }}
-                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
-                          dietaryFilter === f.id
-                            ? 'bg-[#8B0000] text-white font-extrabold shadow-xs'
-                            : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{f.icon}</span>
-                          <span>{f.label}</span>
-                        </span>
-                        {dietaryFilter === f.id && <CheckCircle className="w-3.5 h-3.5 text-white" />}
-                      </button>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
-            </>
-          )}
-        </div>
-      </div>
 
-      {/* Restaurant Header Badge Title when filtering */}
-      {selectedRestaurant !== 'all' && (
-        <div className="flex items-center justify-between bg-[#FFF8F0] border border-[#8B0000]/20 px-4 py-2.5 rounded-2xl">
-          <div className="flex items-center gap-2 text-xs font-extrabold text-[#8B0000]">
-            <Store className="w-4 h-4" />
-            <span>Showing menu items for: {RESTAURANT_OUTLETS.find((r) => r.slug === selectedRestaurant)?.name}</span>
-          </div>
-          <button
-            onClick={() => setSelectedRestaurant('all')}
-            className="text-xs font-bold text-[#8B0000] hover:underline cursor-pointer"
-          >
-            Show All Outlets
-          </button>
-        </div>
-      )}
+              {/* Categories Section */}
+              <div className="space-y-1.5 mb-4 border-t border-[#8B0000]/10 pt-3">
+                <span className="text-[10px] font-bold text-[#a09070] uppercase tracking-wider block">Dish Category</span>
+                <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
+                  {INITIAL_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        setSelectedCategory(cat.id);
+                        setShowFilterMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                        selectedCategory === cat.id
+                          ? 'bg-[#8B0000] text-white font-extrabold shadow-xs'
+                          : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>{cat.icon}</span>
+                        <span>{cat.name}</span>
+                      </span>
+                      {selectedCategory === cat.id && <span>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dietary & Stock Filters */}
+              <div className="space-y-1 pt-3 border-t border-[#8B0000]/10">
+                <span className="text-[10px] font-bold text-[#a09070] uppercase tracking-wider block">Dietary & Availability</span>
+                <div className="space-y-0.5 pt-1">
+                  {[
+                    { id: 'all',          label: 'All Items',         icon: '🔍' },
+                    { id: 'veg',          label: 'Veg Only',          icon: '🌱' },
+                    { id: 'non-veg',      label: 'Non-Veg Only',      icon: '🥩' },
+                    { id: 'special',      label: 'Chef Specials',     icon: '⭐' },
+                    { id: 'available',    label: 'In Stock',          icon: '✅' },
+                    { id: 'out-of-stock', label: 'Out of Stock',      icon: '⚠️' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => {
+                        setDietaryFilter(f.id);
+                        setShowFilterMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                        dietaryFilter === f.id
+                          ? 'bg-[#8B0000] text-white font-extrabold shadow-xs'
+                          : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>{f.icon}</span>
+                        <span>{f.label}</span>
+                      </span>
+                      {dietaryFilter === f.id && <span>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Dishes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

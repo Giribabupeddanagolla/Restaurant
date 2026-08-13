@@ -60,8 +60,8 @@ function CartDrawerComponent() {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[70] shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[70] shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-full opacity-0 pointer-events-none'
         }`}
       >
         {/* Header */}
@@ -130,7 +130,14 @@ function CartDrawerComponent() {
                 <div key={dish.id} className="flex gap-3 p-3 rounded-2xl bg-[#F8F5F0] border border-[#C8A055]/10">
                   {/* Image */}
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-white">
-                    <Image src={dish.image} alt={dish.name} fill className="object-cover" />
+                    <img
+                      src={dish.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85'}
+                      alt={dish.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
+                      }}
+                    />
                   </div>
 
                   {/* Info */}

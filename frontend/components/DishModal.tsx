@@ -51,11 +51,13 @@ export default function DishModal({ dish, onClose }: Props) {
 
           {/* Left Side: Image Container (50% width of large card) */}
           <div className="relative h-64 sm:h-full sm:w-1/2 w-full bg-[#F8F5F0] shrink-0 overflow-hidden self-stretch min-h-[260px]">
-            <Image
-              src={dish.image}
+            <img
+              src={dish.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85'}
               alt={dish.name}
-              fill
               className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:hidden" />
 
@@ -92,7 +94,7 @@ export default function DishModal({ dish, onClose }: Props) {
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1a1008] leading-tight">{dish.name}</h2>
                 <div className="flex flex-wrap items-center gap-3 mt-3">
                   <span className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#6b5840] bg-[#F8F5F0] px-3 py-1.5 rounded-lg">
-                    <Clock className="w-4 h-4 text-[#C8A055]" /> {dish.prepTime} min prep
+                    <Clock className="w-4 h-4 text-[#C8A055]" /> {dish.prepTime} {['giri-fine-dining', 'giri-kitchen', 'giri-grill', 'giri-cafe'].includes(dish.shopSlug || '') || dish.shopName?.toLowerCase().includes('dining') || dish.shopName?.toLowerCase().includes('kitchen') || dish.shopName?.toLowerCase().includes('grill') || dish.shopName?.toLowerCase().includes('caf') ? 'mins slot' : 'min prep'}
                   </span>
                   <span className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#6b5840] bg-[#F8F5F0] px-3 py-1.5 rounded-lg">
                     <Star className="w-4 h-4 text-[#C8A055] fill-[#C8A055]" /> 4.8

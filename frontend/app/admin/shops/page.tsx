@@ -499,7 +499,7 @@ export default function AdminShopsPage() {
                     <span className="text-[10px] text-[#6b5840] font-bold self-center">Presets:</span>
                     {[
                       { label: '🍷 Dining', url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=360&auto=format&fit=crop&q=80' },
-                      { label: '🍳 Bistro', url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&h=360&auto=format&fit=crop&q=80' },
+                      { label: '🍳 Bistro', url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=360&auto=format&fit=crop&q=80' },
                       { label: '🥐 Bakery', url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=360&auto=format&fit=crop&q=80' },
                       { label: '🔥 Grill',  url: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&h=360&auto=format&fit=crop&q=80' },
                       { label: '🍤 Seafood',url: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&h=360&auto=format&fit=crop&q=80' },

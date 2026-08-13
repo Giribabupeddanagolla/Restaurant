@@ -89,7 +89,7 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarPr
       )}
 
       {/* Nav links */}
-      <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-1">
         {visibleLinks.map((link) => {
           const Icon = link.icon;
           const isActive = pathname === link.href;

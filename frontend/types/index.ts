@@ -12,7 +12,7 @@ export interface MenuItem {
   image: string;
   dietary: string[];
   prepTime: number;
-  available: boolean;
+  available?: boolean;
   shopSlug?: string;
   shopName?: string;
   customizations?: CustomizationOption[];

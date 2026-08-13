@@ -14,7 +14,7 @@ import { shopApi, menuApi } from '@/services/restaurantService';
 const CATEGORY_IMAGES: Record<string, string> = {
   all:                 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=80',
   'fine-dining':        'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
-  'giri-kitchen':       'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&auto=format&fit=crop&q=80',
+  'giri-kitchen':       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=80',
   'giri-bakery':        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&auto=format&fit=crop&q=80',
   'giri-grill':         'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
   'giri-spice-garden':  'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=300&auto=format&fit=crop&q=80',
@@ -197,7 +197,11 @@ export default function HomePage() {
           </div>
           <ScrollRow>
             {INITIAL_CATEGORIES.map((cat) => (
-              <Link key={cat.id} href="/menu" className="shrink-0 flex flex-col items-center gap-2 group">
+              <Link
+                key={cat.id}
+                href={cat.id === 'all' ? '/menu' : `/menu?category=${cat.id}`}
+                className="shrink-0 flex flex-col items-center gap-2 group"
+              >
                 <div className="relative w-24 h-20 sm:w-36 sm:h-28 rounded-2xl overflow-hidden border-2 border-transparent group-hover:border-[#8B0000] transition-all shadow-sm">
                   <Image 
                     src={CATEGORY_IMAGES[cat.id] || CATEGORY_IMAGES.all} 
@@ -240,16 +244,18 @@ export default function HomePage() {
               else if (shopName.includes('spice')) categoryUrl = '/menu?shop=giri-spice-garden';
               else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=giri-cafe';
               else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=giri-seafood';
+              else if (shopName.includes('express') || shopName.includes('bistro')) categoryUrl = '/menu?shop=giri-express-bistro';
 
               return (
                 <Link key={shop._id || shop.id || idx} href={categoryUrl} className="shrink-0 w-60 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
                   <div className="relative h-36 w-full bg-[#F8F5F0]">
-                  <Image 
-                    src={shop.image} 
+                  <img 
+                    src={shop.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85'} 
                     alt={shop.name} 
-                    fill 
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="240px"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85';
+                    }}
                   />
                   {shop.isOpen === false && (
                     <span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">

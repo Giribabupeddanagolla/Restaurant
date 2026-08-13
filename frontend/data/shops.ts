@@ -6,7 +6,7 @@ export const INITIAL_SHOPS: Shop[] = [
     name: 'Giri Fine Dining',
     tagline: 'Signature Experience',
     tag: 'Signature Experience',
-    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=1200&auto=format&fit=crop&q=85',
     rating: 4.9,
     deliveryTime: '30–40 min',
     time: '30–40 min',
@@ -18,16 +18,15 @@ export const INITIAL_SHOPS: Shop[] = [
     isFeatured: true,
     avgPrice: '₹1,200 for two',
     diningImages: [
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=800&auto=format&fit=crop&q=85'
     ],
     kitchenImages: [
       'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1581299894007-aaa50297cf16?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?w=800&auto=format&fit=crop&q=80'
     ],
   },
   {
@@ -35,7 +34,7 @@ export const INITIAL_SHOPS: Shop[] = [
     name: 'Giri Kitchen',
     tagline: 'Home Comfort Food',
     tag: 'Home Comfort Food',
-    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop&q=85',
     rating: 4.7,
     deliveryTime: '20–30 min',
     time: '20–30 min',
@@ -47,9 +46,9 @@ export const INITIAL_SHOPS: Shop[] = [
     isFeatured: true,
     avgPrice: '₹600 for two',
     diningImages: [
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1525610553991-2bede1a236e2?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&auto=format&fit=crop&q=85'
     ],
     kitchenImages: [
       'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&auto=format&fit=crop&q=80',
@@ -87,7 +86,7 @@ export const INITIAL_SHOPS: Shop[] = [
     name: 'Giri Grill',
     tagline: 'BBQ & Mains',
     tag: 'BBQ & Mains',
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&auto=format&fit=crop&q=85',
     rating: 4.6,
     deliveryTime: '25–35 min',
     time: '25–35 min',
@@ -99,12 +98,12 @@ export const INITIAL_SHOPS: Shop[] = [
     isFeatured: true,
     avgPrice: '₹850 for two',
     diningImages: [
-      'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&auto=format&fit=crop&q=85'
     ],
     kitchenImages: [
-      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&auto=format&fit=crop&q=85'
     ],
   },
   {
@@ -112,7 +111,7 @@ export const INITIAL_SHOPS: Shop[] = [
     name: 'Giri Spice Garden',
     tagline: 'Indian & Asian',
     tag: 'Indian & Asian',
-    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1200&auto=format&fit=crop&q=85',
     rating: 4.7,
     deliveryTime: '20–30 min',
     time: '20–30 min',
@@ -124,12 +123,11 @@ export const INITIAL_SHOPS: Shop[] = [
     isFeatured: true,
     avgPrice: '₹750 for two',
     diningImages: [
-      'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&auto=format&fit=crop&q=85'
     ],
     kitchenImages: [
-      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1581299894007-aaa50297cf16?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop&q=85'
     ],
   },
   {
@@ -137,7 +135,7 @@ export const INITIAL_SHOPS: Shop[] = [
     name: 'Giri Café',
     tagline: 'Coffee & Snacks',
     tag: 'Coffee & Snacks',
-    image: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&auto=format&fit=crop&q=85',
     rating: 4.5,
     deliveryTime: '10–15 min',
     time: '10–15 min',
@@ -149,8 +147,8 @@ export const INITIAL_SHOPS: Shop[] = [
     isFeatured: true,
     avgPrice: '₹400 for two',
     diningImages: [
-      'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&auto=format&fit=crop&q=80'
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&auto=format&fit=crop&q=85',
+      'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=85'
     ],
     kitchenImages: [
       'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&auto=format&fit=crop&q=80',
@@ -214,11 +212,25 @@ export const getStoredShops = (): Shop[] => {
     const saved = localStorage.getItem('giri_shops');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const validParsed = parsed.filter(
+          (s: Shop) => s.id !== 'shop-9' && !(s.name || '').toLowerCase().includes('ice cream')
+        );
+        const map = new Map(validParsed.map((s: Shop) => [s.id || s.name, s]));
+        INITIAL_SHOPS.forEach((s) => {
+          map.set(s.id || s.name, s);
+        });
+        const combined = Array.from(map.values()).filter(
+          (s: Shop) => s.id !== 'shop-9' && !(s.name || '').toLowerCase().includes('ice cream')
+        );
+        saveStoredShops(combined);
+        return combined;
+      }
     }
   } catch (e) {
     console.error('Error reading stored shops:', e);
   }
+  saveStoredShops(INITIAL_SHOPS);
   return INITIAL_SHOPS;
 };
 

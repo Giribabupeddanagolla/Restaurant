@@ -177,6 +177,7 @@ export default function ShopsPage() {
           else if (shopName.includes('spice')) categoryUrl = '/menu?shop=giri-spice-garden';
           else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=giri-cafe';
           else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=giri-seafood';
+          else if (shopName.includes('express') || shopName.includes('bistro')) categoryUrl = '/menu?shop=giri-express-bistro';
 
           const diningCount = shop.diningImages ? shop.diningImages.length : 1;
           const kitchenCount = shop.kitchenImages ? shop.kitchenImages.length : 1;
@@ -193,12 +194,13 @@ export default function ShopsPage() {
                 className="relative h-52 w-full bg-[#F8F5F0] block overflow-hidden cursor-pointer group/img"
                 title={`Click image to view photos of ${shop.name}`}
               >
-                <Image
-                  src={shop.image}
+                <img
+                  src={shop.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85'}
                   alt={shop.name}
-                  fill
-                  className="object-cover group-hover/img:scale-108 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-500"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85';
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 group-hover/img:from-black/80 transition-all" />
 

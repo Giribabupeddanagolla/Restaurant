@@ -108,6 +108,7 @@ export default function ShopGalleryModal({ shop, onClose, initialTab = 'all' }: 
   else if (shopNameLower.includes('spice')) categoryUrl = '/menu?shop=giri-spice-garden';
   else if (shopNameLower.includes('café') || shopNameLower.includes('cafe')) categoryUrl = '/menu?shop=giri-cafe';
   else if (shopNameLower.includes('seafood')) categoryUrl = '/menu?shop=giri-seafood';
+  else if (shopNameLower.includes('express') || shopNameLower.includes('bistro')) categoryUrl = '/menu?shop=giri-express-bistro';
 
   return (
     <>

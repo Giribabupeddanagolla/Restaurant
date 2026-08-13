@@ -32,8 +32,8 @@ export default function AboutPage() {
 
         <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg">
           <Image
-            src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop"
-            alt="Giri Restaurant Dining Area"
+            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop&q=85"
+            alt="Giri Restaurant Gourmet Dining"
             fill className="object-cover"
           />
           <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow border border-[#C8A055]/30">
