@@ -6,7 +6,7 @@ export const BLOG_POSTS: BlogPost[] = [
     slug: 'art-of-truffle-cuisine',
     title: 'The Art of Truffle Cuisine: A Chef\'s Journey',
     excerpt: 'Discover how our executive chef sources and prepares the finest black truffles to craft dishes that awaken the senses.',
-    content: `Truffles are among the most prized ingredients in fine dining — earthy, aromatic, and intensely flavourful. At Giri Restaurant, our love for truffle cuisine began with a single dish: the Truffle Mushroom Risotto.
+    content: `Truffles are among the most prized ingredients in fine dining — earthy, aromatic, and intensely flavourful. At Royal Restaurant, our love for truffle cuisine began with a single dish: the Truffle Mushroom Risotto.
 
 Our executive chef travels to the markets of southern France each season to hand-select the finest black truffles. The aroma alone — a deep, woody perfume with hints of chocolate and earth — tells you everything about quality.
 
@@ -18,9 +18,9 @@ The secret lies in restraint. Truffle oil is added at the very end of cooking, n
 
 A light Burgundy Pinot Noir or a crisp Chablis Premier Cru complements truffle dishes beautifully — the mineral notes of the wine echo the earthiness of the fungi.
 
-We invite you to visit Giri Restaurant and experience truffle cuisine as it was meant to be — simple, honest, and extraordinary.`,
+We invite you to visit Royal Restaurant and experience truffle cuisine as it was meant to be — simple, honest, and extraordinary.`,
     category: 'Chef Stories',
-    author: 'Chef Rajiv Giri',
+    author: 'Chef Rajiv Royal',
     authorRole: 'Executive Chef',
     authorAvatar: 'https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=150&auto=format&fit=crop&q=80',
     image: 'https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=800&auto=format&fit=crop&q=80',
@@ -33,7 +33,7 @@ We invite you to visit Giri Restaurant and experience truffle cuisine as it was 
     slug: 'farm-to-table-philosophy',
     title: 'Our Farm-to-Table Philosophy',
     excerpt: 'Learn how we partner with local organic farms to bring the freshest seasonal produce straight to your plate every single day.',
-    content: `At Giri Restaurant, "farm-to-table" isn't a marketing phrase — it's a daily commitment. Every morning, our kitchen team receives fresh deliveries directly from certified organic farms within 50 kilometres of our restaurant.
+    content: `At Royal Restaurant, "farm-to-table" isn't a marketing phrase — it's a daily commitment. Every morning, our kitchen team receives fresh deliveries directly from certified organic farms within 50 kilometres of our restaurant.
 
 **Why Local Sourcing Matters**
 
@@ -62,7 +62,7 @@ Come dine with us and taste the difference that real ingredients make.`,
     slug: 'perfect-wagyu-burger',
     title: 'What Makes the Perfect Wagyu Burger?',
     excerpt: 'From the grade of beef to the brioche bun and truffle fries — a deep dive into our most popular signature dish.',
-    content: `The Smoked Wagyu Beef Burger is Giri Restaurant's most-ordered dish, and for good reason. Every element has been obsessively refined over dozens of iterations to achieve what we believe is the perfect burger.
+    content: `The Smoked Wagyu Beef Burger is Royal Restaurant's most-ordered dish, and for good reason. Every element has been obsessively refined over dozens of iterations to achieve what we believe is the perfect burger.
 
 **The Beef**
 
@@ -82,7 +82,7 @@ No Wagyu burger is complete without our truffle fries: hand-cut, double-fried fo
 
 Order yours today — available Tuesday evenings with our WAGYU2FOR1 deal.`,
     category: 'Recipes & Tips',
-    author: 'Chef Rajiv Giri',
+    author: 'Chef Rajiv Royal',
     authorRole: 'Executive Chef',
     authorAvatar: 'https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=150&auto=format&fit=crop&q=80',
     image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80',
@@ -122,7 +122,7 @@ Visit us and end your meal on a high note.`,
   {
     id: 'blog-5',
     slug: 'hosting-the-perfect-dinner-party',
-    title: 'Hosting the Perfect Dinner Party: Tips from Giri',
+    title: 'Hosting the Perfect Dinner Party: Tips from Royal',
     excerpt: 'Planning a dinner gathering at home? Our team shares professional hosting tips to impress your guests effortlessly.',
     content: `Hosting a dinner party doesn't have to be stressful. With the right preparation and a few professional tricks, you can create an evening your guests will talk about for months.
 
@@ -146,7 +146,7 @@ Greet guests with a signature cocktail or mocktail as they arrive. It sets the t
 
 Professional restaurants have entire teams. For a dinner party, it's perfectly fine to ask a friend to help serve or clear plates. Delegate and enjoy the evening yourself.
 
-If you'd rather leave the cooking to us, Giri Restaurant offers private dining and catering for all occasions. Get in touch today.`,
+If you'd rather leave the cooking to us, Royal Restaurant offers private dining and catering for all occasions. Get in touch today.`,
     category: 'Dining Tips',
     author: 'Meena Krishnan',
     authorRole: 'Head of Sourcing',
@@ -181,7 +181,7 @@ Fish sauce (or soy sauce for the vegan version), palm sugar, and fresh Thai basi
 
 Order it with jasmine rice — the gentle floral fragrance of the rice is the perfect complement.`,
     category: 'Recipes & Tips',
-    author: 'Chef Rajiv Giri',
+    author: 'Chef Rajiv Royal',
     authorRole: 'Executive Chef',
     authorAvatar: 'https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=150&auto=format&fit=crop&q=80',
     image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&auto=format&fit=crop&q=80',

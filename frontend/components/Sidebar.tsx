@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, ShoppingBag, Utensils, Table, Calendar,
-  Flame, Boxes, Users, UserCheck, BarChart3, Settings, ArrowLeft, Store, LogOut, X
+  Flame, Boxes, Users, UserCheck, BarChart3, Settings, ArrowLeft, Store, LogOut, X, Building2
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types';
@@ -17,17 +17,19 @@ interface LinkItem {
 }
 
 const ALL_LINKS: LinkItem[] = [
-  { href: '/admin/dashboard',    label: 'Dashboard',      icon: LayoutDashboard, roles: ['Admin', 'Manager'] },
-  { href: '/admin/shops',        label: 'Shops & Outlets',icon: Store,           roles: ['Admin', 'Manager'] },
-  { href: '/admin/orders',       label: 'Orders',         icon: ShoppingBag,     roles: ['Admin', 'Manager', 'Cashier', 'Waiter', 'Chef'] },
-  { href: '/admin/menu',         label: 'Menu Items',     icon: Utensils,        roles: ['Admin', 'Manager', 'Chef'] },
+  { href: '/admin/dashboard',    label: 'Dashboard',      icon: LayoutDashboard, roles: ['Admin', 'Manager', 'Merchant'] },
+  { href: '/merchant/dashboard', label: 'Merchant Portal',icon: Building2,       roles: ['Merchant', 'Admin'] },
+  { href: '/admin/merchants',    label: 'Merchants',      icon: Building2,       roles: ['Admin', 'Manager', 'Merchant'] },
+  { href: '/admin/shops',        label: 'Shops & Outlets',icon: Store,           roles: ['Admin', 'Manager', 'Merchant'] },
+  { href: '/admin/orders',       label: 'Orders',         icon: ShoppingBag,     roles: ['Admin', 'Manager', 'Cashier', 'Waiter', 'Chef', 'Merchant'] },
+  { href: '/admin/menu',         label: 'Menu Items',     icon: Utensils,        roles: ['Admin', 'Manager', 'Chef', 'Merchant'] },
   { href: '/admin/tables',       label: 'Tables',         icon: Table,           roles: ['Admin', 'Manager', 'Waiter', 'Cashier'] },
   { href: '/admin/reservations', label: 'Reservations',   icon: Calendar,        roles: ['Admin', 'Manager', 'Waiter'] },
   { href: '/admin/kitchen',      label: 'Kitchen KDS',    icon: Flame,           roles: ['Admin', 'Manager', 'Chef'] },
-  { href: '/admin/inventory',    label: 'Inventory',      icon: Boxes,           roles: ['Admin', 'Manager', 'Chef'] },
+  { href: '/admin/inventory',    label: 'Inventory',      icon: Boxes,           roles: ['Admin', 'Manager', 'Chef', 'Merchant'] },
   { href: '/admin/customers',    label: 'Customers',      icon: Users,           roles: ['Admin', 'Manager'] },
   { href: '/admin/employees',    label: 'Employees',      icon: UserCheck,       roles: ['Admin'] },
-  { href: '/admin/reports',      label: 'Reports',        icon: BarChart3,       roles: ['Admin', 'Manager', 'Cashier'] },
+  { href: '/admin/reports',      label: 'Reports',        icon: BarChart3,       roles: ['Admin', 'Manager', 'Cashier', 'Merchant'] },
   { href: '/admin/settings',     label: 'Settings',       icon: Settings,        roles: ['Admin'] },
 ];
 
@@ -52,10 +54,10 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarPr
       <div className="p-5 border-b border-[#C8A055]/20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#8B0000] to-[#C8102E] flex items-center justify-center text-white font-extrabold text-lg shadow-md shrink-0">
-            G
+            R
           </div>
           <div>
-            <h2 className="font-extrabold text-sm text-white tracking-wide">GIRI ERP</h2>
+            <h2 className="font-extrabold text-sm text-white tracking-wide">ROYAL ERP</h2>
             <p className="text-[10px] text-[#C8A055] font-bold uppercase">{userRole} Console</p>
           </div>
         </div>
@@ -128,7 +130,7 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarPr
   return (
     <>
       {/* Desktop Sidebar (Permanent on md+) */}
-      <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 border-r border-[#C8A055]/20 shrink-0">
+      <aside className="hidden md:flex flex-col w-64 h-full border-r border-[#C8A055]/20 shrink-0 bg-[#1a1008]">
         {sidebarContent}
       </aside>
 

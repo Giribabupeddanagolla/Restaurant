@@ -1,15 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
-import FloatingCartButton from '@/components/FloatingCartButton';
+import MainLayoutWrapper from '@/components/MainLayoutWrapper';
 import { CartProvider } from '@/context/CartContext';
 import { Providers } from '@/components/Providers';
 
 export const metadata: Metadata = {
-  title: 'Giri Restaurant | Good Food, Great Experience',
-  description: 'Giri Restaurant — fine dining with artisanal recipes, farm-fresh ingredients, and seamless mobile ordering.',
+  title: 'Royal Restaurant | Good Food, Great Experience',
+  description: 'Royal Restaurant — fine dining with artisanal recipes, farm-fresh ingredients, and seamless mobile ordering.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -23,16 +20,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-white text-[#1a1008] flex flex-col justify-between">
+      <body className="min-h-screen bg-[#F8F5F0] text-[#1a1008]">
         <Providers>
           <CartProvider>
-            <Navbar />
-            <div className="pt-[64px]">
-              <main>{children}</main>
-            </div>
-            <Footer />
-            <FloatingCartButton />
-            <CartDrawer />
+            <MainLayoutWrapper>{children}</MainLayoutWrapper>
           </CartProvider>
         </Providers>
       </body>

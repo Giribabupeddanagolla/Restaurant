@@ -15,70 +15,149 @@ export interface CategoryGroup {
 
 export const CATEGORY_GROUPS: CategoryGroup[] = [
   {
-    id: 'biryani',
-    name: 'Biryani Special',
-    icon: '🍲',
-    subcategories: [
-      { id: 'chicken-biryani', name: 'Chicken Biryani', icon: '🍗' },
-      { id: 'mutton-biryani', name: 'Mutton Biryani', icon: '🥩' },
-      { id: 'egg-biryani', name: 'Egg Biryani', icon: '🥚' },
-      { id: 'veg-biryani', name: 'Veg Biryani', icon: '🥦' },
-      { id: 'paneer-biryani', name: 'Paneer Biryani', icon: '🧀' },
-      { id: 'special-biryani', name: 'Special Biryani', icon: '⭐' },
-    ]
-  },
-  {
-    id: 'indian',
-    name: 'Indian Cuisines',
-    icon: '🍛',
-    subcategories: [
-      { id: 'north-indian', name: 'North Indian', icon: '🫓' },
-      { id: 'south-indian', name: 'South Indian', icon: '🍌' },
-      { id: 'andhra', name: 'Andhra', icon: '🌶️' },
-      { id: 'telangana', name: 'Telangana', icon: '🔥' },
-      { id: 'punjabi', name: 'Punjabi', icon: '🥘' },
-      { id: 'gujarati', name: 'Gujarati', icon: '🍲' },
-      { id: 'bengali', name: 'Bengali', icon: '🐟' },
-      { id: 'kerala', name: 'Kerala', icon: '🥥' },
-    ]
-  },
-  {
-    id: 'starters',
-    name: 'Starters',
-    icon: '🥗',
-    subcategories: [
-      { id: 'chicken-starters', name: 'Chicken Starters', icon: '🍗' },
-      { id: 'mutton-starters', name: 'Mutton Starters', icon: '🥩' },
-      { id: 'fish-starters', name: 'Fish Starters', icon: '🐟' },
-      { id: 'paneer-starters', name: 'Paneer Starters', icon: '🧀' },
-      { id: 'veg-starters', name: 'Veg Starters', icon: '🥦' },
-    ]
-  },
-  {
-    id: 'mains',
-    name: 'Main Course',
-    icon: '🥘',
-    subcategories: [
-      { id: 'chicken-main', name: 'Chicken', icon: '🍗' },
-      { id: 'mutton-main', name: 'Mutton', icon: '🥩' },
-      { id: 'fish-main', name: 'Fish', icon: '🐟' },
-      { id: 'paneer-main', name: 'Paneer', icon: '🧀' },
-      { id: 'veg-curries', name: 'Veg Curries', icon: '🥦' },
-      { id: 'dal', name: 'Dal', icon: '🥣' },
-    ]
-  },
-  {
-    id: 'tiffins',
-    name: 'Tiffins / Breakfast',
+    id: 'breakfast',
+    name: 'Breakfast',
     icon: '🥞',
     subcategories: [
-      { id: 'idly', name: 'Idly', icon: '⚪' },
+      { id: 'idli', name: 'Idli', icon: '⚪' },
       { id: 'dosa', name: 'Dosa', icon: '🥞' },
       { id: 'vada', name: 'Vada', icon: '🍩' },
       { id: 'poori', name: 'Poori', icon: '🫓' },
       { id: 'upma', name: 'Upma', icon: '🍚' },
       { id: 'pongal', name: 'Pongal', icon: '🥣' },
-      { id: 'pesarattu', name: 'Pesarattu', icon: '🥬' },
+      { id: 'omelette', name: 'Omelette', icon: '🍳' },
+    ]
+  },
+  {
+    id: 'soups',
+    name: 'Soups',
+    icon: '🥣',
+    subcategories: [
+      { id: 'tomato-soup', name: 'Tomato Soup', icon: '🍅' },
+      { id: 'sweet-corn-soup', name: 'Sweet Corn Soup', icon: '🌽' },
+      { id: 'hot-sour-soup', name: 'Hot & Sour Soup', icon: '🌶️' },
+      { id: 'manchow-soup', name: 'Manchow Soup', icon: '🍜' },
+      { id: 'chicken-soup', name: 'Chicken Soup', icon: '🍗' },
+    ]
+  },
+  {
+    id: 'veg-starters',
+    name: 'Veg Starters',
+    icon: '🥦',
+    subcategories: [
+      { id: 'paneer-tikka', name: 'Paneer Tikka', icon: '🧀' },
+      { id: 'gobi-65', name: 'Gobi 65', icon: '🥦' },
+      { id: 'crispy-corn', name: 'Crispy Corn', icon: '🌽' },
+      { id: 'chilli-paneer', name: 'Chilli Paneer', icon: '🫑' },
+      { id: 'baby-corn-manchurian', name: 'Baby Corn Manchurian', icon: '🧆' },
+    ]
+  },
+  {
+    id: 'non-veg-starters',
+    name: 'Non-Veg Starters',
+    icon: '🍗',
+    subcategories: [
+      { id: 'chicken-65', name: 'Chicken 65', icon: '🍗' },
+      { id: 'chicken-lollipop', name: 'Chicken Lollipop', icon: '🍖' },
+      { id: 'chilli-chicken', name: 'Chilli Chicken', icon: '🌶️' },
+      { id: 'mutton-kebab', name: 'Mutton Kebab', icon: '🥩' },
+      { id: 'fish-fry', name: 'Fish Fry', icon: '🐟' },
+    ]
+  },
+  {
+    id: 'tandoor',
+    name: 'Tandoor',
+    icon: '🏺',
+    subcategories: [
+      { id: 'tandoori-chicken', name: 'Tandoori Chicken', icon: '🍗' },
+      { id: 'chicken-tikka-tandoor', name: 'Chicken Tikka', icon: '🍢' },
+      { id: 'paneer-tikka-tandoor', name: 'Paneer Tikka', icon: '🧀' },
+      { id: 'tandoori-fish', name: 'Tandoori Fish', icon: '🐟' },
+      { id: 'tandoori-prawns', name: 'Tandoori Prawns', icon: '🍤' },
+    ]
+  },
+  {
+    id: 'grill',
+    name: 'Grill',
+    icon: '🔥',
+    subcategories: [
+      { id: 'grilled-chicken', name: 'Grilled Chicken', icon: '🍗' },
+      { id: 'chicken-wings', name: 'Chicken Wings', icon: '🪽' },
+      { id: 'mutton-chops', name: 'Mutton Chops', icon: '🥩' },
+      { id: 'grilled-fish', name: 'Grilled Fish', icon: '🐟' },
+      { id: 'grilled-prawns', name: 'Grilled Prawns', icon: '🍤' },
+    ]
+  },
+  {
+    id: 'kebabs',
+    name: 'Kebabs',
+    icon: '🍢',
+    subcategories: [
+      { id: 'chicken-seekh-kebab', name: 'Chicken Seekh Kebab', icon: '🍢' },
+      { id: 'reshmi-kebab', name: 'Reshmi Kebab', icon: '🍗' },
+      { id: 'hariyali-kebab', name: 'Hariyali Kebab', icon: '🌿' },
+      { id: 'mutton-seekh-kebab', name: 'Mutton Seekh Kebab', icon: '🥩' },
+      { id: 'paneer-kebab', name: 'Paneer Kebab', icon: '🧀' },
+    ]
+  },
+  {
+    id: 'biryani',
+    name: 'Biryani',
+    icon: '🍲',
+    subcategories: [
+      { id: 'chicken-biryani', name: 'Chicken Biryani', icon: '🍗' },
+      { id: 'mutton-biryani', name: 'Mutton Biryani', icon: '🥩' },
+      { id: 'prawn-biryani', name: 'Prawn Biryani', icon: '🍤' },
+      { id: 'egg-biryani', name: 'Egg Biryani', icon: '🥚' },
+      { id: 'veg-biryani', name: 'Veg Biryani', icon: '🥦' },
+    ]
+  },
+  {
+    id: 'rice-pulao',
+    name: 'Rice & Pulao',
+    icon: '🍚',
+    subcategories: [
+      { id: 'jeera-rice', name: 'Jeera Rice', icon: '🍚' },
+      { id: 'ghee-rice', name: 'Ghee Rice', icon: '🧈' },
+      { id: 'veg-pulao', name: 'Veg Pulao', icon: '🥕' },
+      { id: 'chicken-pulao', name: 'Chicken Pulao', icon: '🍗' },
+      { id: 'fried-rice-sub', name: 'Fried Rice', icon: '🍚' },
+    ]
+  },
+  {
+    id: 'south-indian-curries',
+    name: 'South Indian Curries',
+    icon: '🍛',
+    subcategories: [
+      { id: 'andhra-chicken', name: 'Andhra Chicken', icon: '🌶️' },
+      { id: 'gongura-chicken', name: 'Gongura Chicken', icon: '🌿' },
+      { id: 'chicken-curry-si', name: 'Chicken Curry', icon: '🍗' },
+      { id: 'mutton-curry-si', name: 'Mutton Curry', icon: '🥩' },
+      { id: 'fish-curry-si', name: 'Fish Curry', icon: '🐟' },
+    ]
+  },
+  {
+    id: 'north-indian-curries',
+    name: 'North Indian Curries',
+    icon: '🥘',
+    subcategories: [
+      { id: 'butter-chicken', name: 'Butter Chicken', icon: '🧈' },
+      { id: 'kadai-chicken', name: 'Kadai Chicken', icon: '🥘' },
+      { id: 'rogan-josh', name: 'Rogan Josh', icon: '🥩' },
+      { id: 'dal-makhani', name: 'Dal Makhani', icon: '🥣' },
+      { id: 'kadai-paneer', name: 'Kadai Paneer', icon: '🧀' },
+    ]
+  },
+  {
+    id: 'seafood',
+    name: 'Seafood',
+    icon: '🍤',
+    subcategories: [
+      { id: 'fish-curry-sf', name: 'Fish Curry', icon: '🐟' },
+      { id: 'fish-fry-sf', name: 'Fish Fry', icon: '🐠' },
+      { id: 'prawn-curry-sf', name: 'Prawn Curry', icon: '🍤' },
+      { id: 'crab-masala', name: 'Crab Masala', icon: '🦀' },
+      { id: 'squid-fry', name: 'Squid Fry', icon: '🦑' },
     ]
   },
   {
@@ -86,11 +165,23 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     name: 'Chinese',
     icon: '🥢',
     subcategories: [
-      { id: 'noodles', name: 'Noodles', icon: '🍜' },
-      { id: 'fried-rice', name: 'Fried Rice', icon: '🍚' },
-      { id: 'manchurian', name: 'Manchurian', icon: '🧆' },
-      { id: 'chinese-starters', name: 'Chinese Starters', icon: '🥟' },
-      { id: 'soups', name: 'Soups', icon: '🥣' },
+      { id: 'hakka-noodles', name: 'Hakka Noodles', icon: '🍜' },
+      { id: 'fried-rice-cn', name: 'Fried Rice', icon: '🍚' },
+      { id: 'veg-manchurian', name: 'Veg Manchurian', icon: '🧆' },
+      { id: 'chicken-manchurian', name: 'Chicken Manchurian', icon: '🍗' },
+      { id: 'chilli-chicken-cn', name: 'Chilli Chicken', icon: '🌶️' },
+    ]
+  },
+  {
+    id: 'breads',
+    name: 'Breads',
+    icon: '🫓',
+    subcategories: [
+      { id: 'butter-naan', name: 'Butter Naan', icon: '🧈' },
+      { id: 'garlic-naan', name: 'Garlic Naan', icon: '🧄' },
+      { id: 'tandoori-roti', name: 'Tandoori Roti', icon: '🫓' },
+      { id: 'laccha-paratha', name: 'Laccha Paratha', icon: '🥐' },
+      { id: 'cheese-naan', name: 'Cheese Naan', icon: '🧀' },
     ]
   },
   {
@@ -98,88 +189,47 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     name: 'Fast Food',
     icon: '🍔',
     subcategories: [
-      { id: 'burgers', name: 'Burgers', icon: '🍔' },
+      { id: 'burger', name: 'Burger', icon: '🍔' },
       { id: 'pizza', name: 'Pizza', icon: '🍕' },
-      { id: 'sandwiches', name: 'Sandwiches', icon: '🥪' },
-      { id: 'french-fries', name: 'French Fries', icon: '🍟' },
-      { id: 'wraps', name: 'Wraps', icon: '🌯' },
-      { id: 'nuggets', name: 'Nuggets', icon: '🍗' },
-    ]
-  },
-  {
-    id: 'rice-meals',
-    name: 'Rice & Meals',
-    icon: '🍚',
-    subcategories: [
-      { id: 'veg-meals', name: 'Veg Meals', icon: '🍱' },
-      { id: 'non-veg-meals', name: 'Non-Veg Meals', icon: '🍱' },
-      { id: 'fried-rice-meals', name: 'Fried Rice', icon: '🍚' },
-      { id: 'lemon-rice', name: 'Lemon Rice', icon: '🍋' },
-      { id: 'jeera-rice', name: 'Jeera Rice', icon: '🌿' },
-      { id: 'curd-rice', name: 'Curd Rice', icon: '🥛' },
-    ]
-  },
-  {
-    id: 'italian',
-    name: 'Pizza & Italian',
-    icon: '🍕',
-    subcategories: [
-      { id: 'veg-pizza', name: 'Veg Pizza', icon: '🍕' },
-      { id: 'chicken-pizza', name: 'Chicken Pizza', icon: '🍕' },
       { id: 'pasta', name: 'Pasta', icon: '🍝' },
-      { id: 'garlic-bread', name: 'Garlic Bread', icon: '🥖' },
-      { id: 'lasagna', name: 'Lasagna', icon: '🧀' },
+      { id: 'sandwich', name: 'Sandwich', icon: '🥪' },
+      { id: 'wrap', name: 'Wrap', icon: '🌯' },
+    ]
+  },
+  {
+    id: 'bakery',
+    name: 'Bakery',
+    icon: '🥐',
+    subcategories: [
+      { id: 'cakes', name: 'Cakes', icon: '🎂' },
+      { id: 'pastries', name: 'Pastries', icon: '🍰' },
+      { id: 'muffins', name: 'Muffins', icon: '🧁' },
+      { id: 'donuts', name: 'Donuts', icon: '🍩' },
+      { id: 'cookies', name: 'Cookies', icon: '🍪' },
     ]
   },
   {
     id: 'desserts',
     name: 'Desserts',
-    icon: '🍰',
+    icon: '🍨',
     subcategories: [
-      { id: 'ice-cream', name: 'Ice Cream', icon: '🍨' },
-      { id: 'gulab-jamun', name: 'Gulab Jamun', icon: '🍩' },
-      { id: 'brownie', name: 'Brownie', icon: '🍫' },
-      { id: 'cake', name: 'Cake', icon: '🎂' },
+      { id: 'gulab-jamun', name: 'Gulab Jamun', icon: '🍯' },
       { id: 'rasmalai', name: 'Rasmalai', icon: '🥛' },
-      { id: 'kheer', name: 'Kheer', icon: '🥣' },
+      { id: 'brownie', name: 'Brownie', icon: '🍫' },
+      { id: 'cheesecake', name: 'Cheesecake', icon: '🍰' },
+      { id: 'ice-cream', name: 'Ice Cream', icon: '🍨' },
     ]
   },
   {
-    id: 'drinks',
+    id: 'beverages',
     name: 'Beverages',
-    icon: '🍹',
+    icon: '🥤',
     subcategories: [
       { id: 'tea', name: 'Tea', icon: '☕' },
       { id: 'coffee', name: 'Coffee', icon: '☕' },
-      { id: 'fresh-juices', name: 'Fresh Juices', icon: '🧃' },
-      { id: 'milkshakes', name: 'Milkshakes', icon: '🥤' },
-      { id: 'soft-drinks', name: 'Soft Drinks', icon: '🥤' },
-      { id: 'lassi', name: 'Lassi', icon: '🥛' },
-      { id: 'mocktails', name: 'Mocktails', icon: '🍸' },
-    ]
-  },
-  {
-    id: 'bakery',
-    name: 'Bakery & Sweets',
-    icon: '🥐',
-    subcategories: [
-      { id: 'cakes-pastries', name: 'Cakes & Pastries', icon: '🎂' },
-      { id: 'croissants-breads', name: 'Breads & Croissants', icon: '🥐' },
-      { id: 'puffs-savories', name: 'Puffs & Savories', icon: '🥧' },
-      { id: 'cookies-biscuits', name: 'Cookies & Biscuits', icon: '🍪' },
-      { id: 'brownies-donuts', name: 'Brownies & Donuts', icon: '🍩' },
-      { id: 'sweets-mithai', name: 'Indian Sweets & Mithai', icon: '🍨' },
-    ]
-  },
-  {
-    id: 'healthy',
-    name: 'Healthy Food',
-    icon: '🥗',
-    subcategories: [
-      { id: 'salads', name: 'Salads', icon: '🥗' },
-      { id: 'fresh-fruits', name: 'Fresh Fruits', icon: '🍎' },
-      { id: 'healthy-soups', name: 'Soups', icon: '🥣' },
-      { id: 'diet-meals', name: 'Diet Meals', icon: '🥑' },
+      { id: 'milkshake', name: 'Milkshake', icon: '🥤' },
+      { id: 'fresh-juice', name: 'Fresh Juice', icon: '🍹' },
+      { id: 'mocktail', name: 'Mocktail', icon: '🍸' },
     ]
   }
 ];
@@ -546,6 +596,44 @@ export const GRILL_EXCLUSIVE_CATEGORY_GROUPS: CategoryGroup[] = [
       { id: 'grilled-paneer-sandwich', name: 'Grilled Paneer Sandwich', icon: '🥪' },
       { id: 'grilled-vegetable-sandwich', name: 'Grilled Vegetable Sandwich', icon: '🥪' },
     ]
+  },
+  {
+    id: 'breakfast',
+    name: 'Breakfast',
+    icon: '🥞',
+    subcategories: [
+      { id: 'idli', name: 'Idli', icon: '⚪' },
+      { id: 'dosa', name: 'Dosa', icon: '🥞' },
+      { id: 'vada', name: 'Vada', icon: '🍩' },
+      { id: 'poori', name: 'Poori', icon: '🫓' },
+      { id: 'upma', name: 'Upma', icon: '🍚' },
+      { id: 'pongal', name: 'Pongal', icon: '🥣' },
+      { id: 'omelette', name: 'Omelette', icon: '🍳' },
+    ]
+  },
+  {
+    id: 'veg-starters',
+    name: 'Veg Starters',
+    icon: '🥦',
+    subcategories: [
+      { id: 'paneer-tikka', name: 'Paneer Tikka', icon: '🧀' },
+      { id: 'gobi-65', name: 'Gobi 65', icon: '🥦' },
+      { id: 'crispy-corn', name: 'Crispy Corn', icon: '🌽' },
+      { id: 'chilli-paneer', name: 'Chilli Paneer', icon: '🫑' },
+      { id: 'baby-corn-manchurian', name: 'Baby Corn Manchurian', icon: '🧆' },
+    ]
+  },
+  {
+    id: 'biryani',
+    name: 'Biryani',
+    icon: '🍲',
+    subcategories: [
+      { id: 'chicken-biryani', name: 'Chicken Biryani', icon: '🍗' },
+      { id: 'mutton-biryani', name: 'Mutton Biryani', icon: '🥩' },
+      { id: 'prawn-biryani', name: 'Prawn Biryani', icon: '🍤' },
+      { id: 'egg-biryani', name: 'Egg Biryani', icon: '🥚' },
+      { id: 'veg-biryani', name: 'Veg Biryani', icon: '🥦' },
+    ]
   }
 ];
 
@@ -783,7 +871,7 @@ export const CAFE_EXCLUSIVE_CATEGORY_GROUPS: CategoryGroup[] = [
       { id: 'vanilla-latte-cf', name: 'Vanilla Latte', icon: '🍦' },
       { id: 'irish-cream-coffee-cf', name: 'Irish Cream Coffee', icon: '🍷' },
       { id: 'cinnamon-coffee-cf', name: 'Cinnamon Coffee', icon: '🌿' },
-      { id: 'giri-special-coffee-cf', name: 'Giri Special Coffee', icon: '👑' },
+      { id: 'royal-special-coffee-cf', name: 'Royal Special Coffee', icon: '👑' },
     ]
   },
   {
@@ -1216,7 +1304,7 @@ export const SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS: CategoryGroup[] = [
       { id: 'family-seafood-platter-sf', name: 'Family Seafood Platter', icon: '👨‍👩‍👧‍👦' },
       { id: 'mixed-grill-platter-sf', name: 'Mixed Grill Platter', icon: '🔥' },
       { id: 'coastal-family-feast-sf', name: 'Coastal Family Feast', icon: '🏖️' },
-      { id: 'giri-special-seafood-feast-sf', name: 'Giri Special Seafood Feast', icon: '👑' },
+      { id: 'royal-special-seafood-feast-sf', name: 'Royal Special Seafood Feast', icon: '👑' },
     ]
   },
   {
@@ -1527,6 +1615,128 @@ export const EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS: CategoryGroup[] = [
       { id: 'sandwich-combo-eb', name: 'Sandwich Combo', icon: '🥪' },
       { id: 'pizza-combo-eb', name: 'Pizza Combo', icon: '🍕' },
       { id: 'family-combo-eb', name: 'Family Combo', icon: '👨‍👩‍👧‍👦' },
+    ]
+  }
+];
+
+export const FINE_DINING_EXCLUSIVE_CATEGORY_GROUPS: CategoryGroup[] = [
+  {
+    id: 'amuse-bouche',
+    name: 'Amuse-Bouche',
+    icon: '🥂',
+    subcategories: [
+      { id: 'chefs-welcome-bite', name: "Chef's Welcome Bite", icon: '✨' },
+      { id: 'paneer-canape', name: 'Paneer Canapé', icon: '🧀' },
+      { id: 'chicken-canape', name: 'Chicken Canapé', icon: '🍗' },
+      { id: 'seafood-bite', name: 'Seafood Bite', icon: '🍤' },
+      { id: 'seasonal-special-ab', name: 'Seasonal Special', icon: '🌿' },
+    ]
+  },
+  {
+    id: 'fine-dining-starters',
+    name: 'Fine Dining Starters',
+    icon: '🍷',
+    subcategories: [
+      { id: 'truffle-paneer-fds', name: 'Truffle Paneer', icon: '🧀' },
+      { id: 'tandoori-mushroom-fds', name: 'Tandoori Mushroom', icon: '🍄' },
+      { id: 'chicken-galouti-kebab-fds', name: 'Chicken Galouti Kebab', icon: '🍗' },
+      { id: 'mutton-shikampuri-fds', name: 'Mutton Shikampuri', icon: '🥩' },
+      { id: 'smoked-fish-fds', name: 'Smoked Fish', icon: '🐟' },
+    ]
+  },
+  {
+    id: 'premium-vegetarian',
+    name: 'Premium Vegetarian',
+    icon: '🥦',
+    subcategories: [
+      { id: 'truffle-paneer-pv', name: 'Truffle Paneer', icon: '🧀' },
+      { id: 'dal-bukhara-pv', name: 'Dal Bukhara', icon: '🥣' },
+      { id: 'subz-kofta-pv', name: 'Subz Kofta', icon: '🧆' },
+      { id: 'kashmiri-dum-aloo-pv', name: 'Kashmiri Dum Aloo', icon: '🥔' },
+      { id: 'wild-mushroom-curry-pv', name: 'Wild Mushroom Curry', icon: '🍄' },
+    ]
+  },
+  {
+    id: 'premium-chicken',
+    name: 'Premium Chicken',
+    icon: '🍗',
+    subcategories: [
+      { id: 'chicken-roulade-pc', name: 'Chicken Roulade', icon: '🍗' },
+      { id: 'butter-chicken-supreme-pc', name: 'Butter Chicken Supreme', icon: '🧈' },
+      { id: 'chicken-malai-pc', name: 'Chicken Malai', icon: '🥛' },
+      { id: 'smoked-chicken-pc', name: 'Smoked Chicken', icon: '🔥' },
+      { id: 'chicken-chettinad-pc', name: 'Chicken Chettinad', icon: '🌶️' },
+    ]
+  },
+  {
+    id: 'premium-mutton',
+    name: 'Premium Mutton',
+    icon: '🥩',
+    subcategories: [
+      { id: 'mutton-rogan-josh-pm', name: 'Mutton Rogan Josh', icon: '🥩' },
+      { id: 'mutton-shank-pm', name: 'Mutton Shank', icon: '🍖' },
+      { id: 'mutton-galouti-pm', name: 'Mutton Galouti', icon: '🍢' },
+      { id: 'lamb-chops-pm', name: 'Lamb Chops', icon: '🥩' },
+      { id: 'mutton-korma-pm', name: 'Mutton Korma', icon: '🥘' },
+    ]
+  },
+  {
+    id: 'premium-seafood',
+    name: 'Premium Seafood',
+    icon: '🍤',
+    subcategories: [
+      { id: 'grilled-salmon-ps', name: 'Grilled Salmon', icon: '🐟' },
+      { id: 'butter-garlic-prawns-ps', name: 'Butter Garlic Prawns', icon: '🧄' },
+      { id: 'lobster-thermidor-ps', name: 'Lobster Thermidor', icon: '🦞' },
+      { id: 'seabass-fillet-ps', name: 'Seabass Fillet', icon: '🐟' },
+      { id: 'seafood-medley-ps', name: 'Seafood Medley', icon: '🦑' },
+    ]
+  },
+  {
+    id: 'tandoor-kebab-fd',
+    name: 'Tandoor & Kebab',
+    icon: '🏺',
+    subcategories: [
+      { id: 'galouti-kebab-tk', name: 'Galouti Kebab', icon: '🍢' },
+      { id: 'seekh-kebab-tk', name: 'Seekh Kebab', icon: '🍢' },
+      { id: 'reshmi-kebab-tk', name: 'Reshmi Kebab', icon: '🍗' },
+      { id: 'tandoori-prawns-tk', name: 'Tandoori Prawns', icon: '🍤' },
+      { id: 'paneer-tikka-tk', name: 'Paneer Tikka', icon: '🧀' },
+    ]
+  },
+  {
+    id: 'fine-dining-biryani',
+    name: 'Fine Dining Biryani',
+    icon: '🍲',
+    subcategories: [
+      { id: 'royal-chicken-biryani-fdb', name: 'Royal Chicken Biryani', icon: '🍗' },
+      { id: 'mutton-dum-biryani-fdb', name: 'Mutton Dum Biryani', icon: '🥩' },
+      { id: 'prawn-biryani-fdb', name: 'Prawn Biryani', icon: '🍤' },
+      { id: 'saffron-vegetable-biryani-fdb', name: 'Saffron Vegetable Biryani', icon: '🥦' },
+    ]
+  },
+  {
+    id: 'rice-accompaniments-fd',
+    name: 'Rice & Accompaniments',
+    icon: '🍚',
+    subcategories: [
+      { id: 'saffron-rice-ra', name: 'Saffron Rice', icon: '🌾' },
+      { id: 'truffle-rice-ra', name: 'Truffle Rice', icon: '🍚' },
+      { id: 'jeera-rice-ra', name: 'Jeera Rice', icon: '🌿' },
+      { id: 'kashmiri-pulao-ra', name: 'Kashmiri Pulao', icon: '🍒' },
+      { id: 'ghee-rice-ra', name: 'Ghee Rice', icon: '🧈' },
+    ]
+  },
+  {
+    id: 'indian-breads-fd',
+    name: 'Indian Breads',
+    icon: '🫓',
+    subcategories: [
+      { id: 'garlic-naan-ib', name: 'Garlic Naan', icon: '🧄' },
+      { id: 'truffle-naan-ib', name: 'Truffle Naan', icon: '🍞' },
+      { id: 'cheese-naan-ib', name: 'Cheese Naan', icon: '🧀' },
+      { id: 'roomali-roti-ib', name: 'Roomali Roti', icon: '🫓' },
+      { id: 'laccha-paratha-ib', name: 'Laccha Paratha', icon: '🥐' },
     ]
   }
 ];

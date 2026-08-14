@@ -63,17 +63,13 @@ export default function BlogPage() {
 
             <div className="w-[1px] h-4 bg-[#C8A055]/30 mx-0.5" />
 
-            {/* Frameless 3-Lines Icon Button */}
+            {/* Frameless Filter Toggle Button */}
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-                showFilterMenu
-                  ? 'text-[#8B0000] bg-[#8B0000]/15'
-                  : 'text-[#8B0000] hover:bg-[#8B0000]/10'
-              }`}
+              className="p-1.5 text-[#8B0000] hover:text-[#a00000] hover:scale-110 transition-all cursor-pointer flex items-center justify-center"
               title="Toggle Filters & Options"
             >
-              <Menu className="w-4 h-4" />
+              <SlidersHorizontal className="w-5 h-5" />
             </button>
           </div>
 

@@ -15,6 +15,6 @@ const server = http.createServer(app);
 initSocket(server);
 
 server.listen(PORT, () => {
-  console.log(`🚀 Giri Restaurant MERN Backend running on port ${PORT}`);
+  console.log(`🚀 Royal Restaurant MERN Backend running on port ${PORT}`);
   console.log(`🌐 Health Check: http://localhost:${PORT}/api/health`);
 });

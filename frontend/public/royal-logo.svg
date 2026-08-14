@@ -1,10 +1,21 @@
 <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle - dark crimson -->
   <circle cx="100" cy="100" r="95" stroke="#8B0000" stroke-width="4" fill="none"/>
+  
+  <!-- Inner circle - gold -->
   <circle cx="100" cy="100" r="88" stroke="#C8A055" stroke-width="3" fill="none"/>
+  
+  <!-- Crown / Chef hat - gold -->
   <path d="M70 50 Q70 40 80 40 Q85 35 90 35 Q95 35 100 38 Q105 35 110 35 Q115 35 120 40 Q130 40 130 50 Q130 55 125 55 L75 55 Q70 55 70 50Z" fill="#C8A055"/>
   <rect x="75" y="55" width="50" height="15" rx="2" fill="#C8A055"/>
+  
+  <!-- Text ROYAL -->
   <text x="100" y="115" font-family="Arial, sans-serif" font-size="38" font-weight="extrabold" fill="#8B0000" text-anchor="middle" letter-spacing="1">ROYAL</text>
+  
+  <!-- Text RESTAURANT -->
   <text x="100" y="135" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0D4A2D" text-anchor="middle" letter-spacing="2">RESTAURANT</text>
+  
+  <!-- Spoon and Fork crossed - gold -->
   <g transform="translate(100, 150)">
     <ellipse cx="-12" cy="-5" rx="4" ry="5" fill="#C8A055"/>
     <rect x="-13" y="0" width="2" height="25" fill="#C8A055" transform="rotate(-20, -12, 0)"/>

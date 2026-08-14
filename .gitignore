@@ -28,3 +28,7 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+# Scratch & Temporary
+scratch/
+*.tsbuildinfo

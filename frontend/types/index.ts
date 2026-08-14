@@ -7,11 +7,16 @@ export interface MenuItem {
   id: string;
   name: string;
   category: string;
+  subCategory?: string;
   price: number;
   description: string;
   image: string;
   dietary: string[];
   prepTime: number;
+  rating?: number;
+  reviewsCount?: number;
+  preparationTime?: string;
+  calories?: string;
   available?: boolean;
   shopSlug?: string;
   shopName?: string;
@@ -66,7 +71,7 @@ export interface BlogPost {
   tags: string[];
 }
 
-export type UserRole = 'Admin' | 'Manager' | 'Cashier' | 'Waiter' | 'Chef' | 'Delivery' | 'Delivery Boy' | 'Customer';
+export type UserRole = 'Admin' | 'Manager' | 'Merchant' | 'Cashier' | 'Waiter' | 'Chef' | 'Delivery' | 'Delivery Boy' | 'Customer';
 
 export interface User {
   id: string;

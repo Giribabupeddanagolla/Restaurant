@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard, Utensils, Table, ShoppingBag, Truck, User } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard, Utensils, Table, ShoppingBag, Truck, User, SlidersHorizontal } from 'lucide-react';
 import { useState, memo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -39,6 +39,10 @@ function NavbarComponent() {
         return { href: '/admin/orders', label: 'Cashier POS', icon: ShoppingBag };
       case 'Delivery Boy':
         return { href: '/track', label: 'Order Tracking', icon: Truck };
+      case 'Customer':
+        return { href: '/customer/dashboard', label: 'Customer Dashboard', icon: User };
+      case 'Merchant':
+        return { href: '/merchant/dashboard', label: 'Merchant Dashboard', icon: LayoutDashboard };
       default:
         return { href: '/profile', label: 'My Account', icon: User };
     }
@@ -54,8 +58,8 @@ function NavbarComponent() {
         {/* Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <Image
-            src="/giri-logo.svg"
-            alt="Giri Restaurant"
+            src="/royal-logo.svg"
+            alt="Royal Restaurant"
             width={40}
             height={40}
             className="rounded-full bg-white shadow ring-2 ring-[#C8A055]/30 shrink-0"
@@ -63,7 +67,7 @@ function NavbarComponent() {
           />
           <div>
             <div className="font-extrabold text-base text-[#1a1008] leading-tight whitespace-nowrap">
-              Giri Restaurant
+              Royal Restaurant
             </div>
             <div className="text-[9px] text-[#C8A055] font-bold tracking-widest uppercase">
               Good Food, Great Experience
@@ -122,10 +126,11 @@ function NavbarComponent() {
               {/* Logout Button */}
               <button
                 onClick={logout}
-                className="p-1.5 border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000] hover:text-white rounded-lg transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 border border-[#8B0000]/30 text-[#8B0000] hover:bg-[#8B0000] hover:text-white rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
                 title="Logout"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
               </button>
             </div>
           ) : (
@@ -145,13 +150,13 @@ function NavbarComponent() {
             </>
           )}
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Frameless Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden text-[#8B0000] p-2 hover:bg-[#8B0000]/10 rounded-lg transition-colors"
+            className="lg:hidden p-1.5 text-[#8B0000] hover:text-[#a00000] hover:scale-110 transition-all cursor-pointer flex items-center justify-center"
             aria-label="Toggle menu"
           >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileOpen ? <X className="w-6 h-6" /> : <SlidersHorizontal className="w-6 h-6" />}
           </button>
         </div>
       </div>

@@ -12,20 +12,55 @@ import { formatCurrency } from '@/utils/formatters';
 import { shopApi, menuApi } from '@/services/restaurantService';
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  all:                 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=80',
-  'fine-dining':        'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
-  'giri-kitchen':       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=80',
-  'giri-bakery':        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&auto=format&fit=crop&q=80',
-  'giri-grill':         'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
-  'giri-spice-garden':  'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=300&auto=format&fit=crop&q=80',
-  'giri-cafe':          'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=300&auto=format&fit=crop&q=80',
-  'giri-seafood':       'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=300&auto=format&fit=crop&q=80',
-  specials:            'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&auto=format&fit=crop&q=80',
-  starters:            'https://images.unsplash.com/photo-1626200419199-391ae4be7a41?w=400&h=300&auto=format&fit=crop&q=80',
-  mains:               'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=80',
-  pizzas:              'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=300&auto=format&fit=crop&q=80',
-  desserts:            'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&auto=format&fit=crop&q=80',
-  drinks:              'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&auto=format&fit=crop&q=80',
+  all:                     'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&auto=format&fit=crop&q=85',
+  breakfast:               'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&h=300&auto=format&fit=crop&q=85',
+  soups:                   'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&auto=format&fit=crop&q=85',
+  'veg-starters':          'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=300&auto=format&fit=crop&q=85',
+  'non-veg-starters':      'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=400&h=300&auto=format&fit=crop&q=85',
+  tandoor:                 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=300&auto=format&fit=crop&q=85',
+  grill:                   'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&auto=format&fit=crop&q=85',
+  kebabs:                  'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=85',
+  biryani:                 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&auto=format&fit=crop&q=85',
+  'rice-pulao':            'https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=400&h=300&auto=format&fit=crop&q=85',
+  'south-indian-curries':  'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=400&h=300&auto=format&fit=crop&q=85',
+  'north-indian-curries':  'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&auto=format&fit=crop&q=85',
+  seafood:                 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=300&auto=format&fit=crop&q=85',
+  chinese:                 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&auto=format&fit=crop&q=85',
+  breads:                  'https://images.unsplash.com/photo-1626074353765-517a681e40be?w=400&h=300&auto=format&fit=crop&q=85',
+  'fast-food':             'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&auto=format&fit=crop&q=85',
+  bakery:                  'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&auto=format&fit=crop&q=85',
+  desserts:                'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&auto=format&fit=crop&q=85',
+  beverages:               'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=300&auto=format&fit=crop&q=85',
+  'sea-food':              'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=300&auto=format&fit=crop&q=85',
+  'amuse-bouche':          'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=400&h=300&auto=format&fit=crop&q=85',
+  'fine-dining-starters':  'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=300&auto=format&fit=crop&q=85',
+  'premium-vegetarian':    'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&auto=format&fit=crop&q=85',
+  'premium-chicken':       'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=300&auto=format&fit=crop&q=85',
+  'premium-mutton':        'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=85',
+  'premium-seafood':       'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=400&h=300&auto=format&fit=crop&q=85',
+  'tandoor-kebab-fd':      'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=400&h=300&auto=format&fit=crop&q=85',
+  'fine-dining-biryani':   'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&auto=format&fit=crop&q=85',
+  'rice-accompaniments-fd':'https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=400&h=300&auto=format&fit=crop&q=85',
+  'indian-breads-fd':      'https://images.unsplash.com/photo-1626074353765-517a681e40be?w=400&h=300&auto=format&fit=crop&q=85',
+};
+
+const getCategoryPhoto = (catId: string, catName: string) => {
+  if (CATEGORY_IMAGES[catId]) return CATEGORY_IMAGES[catId];
+  const nameLower = (catName || '').toLowerCase();
+  if (nameLower.includes('rice') || nameLower.includes('pulao')) return 'https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('south')) return 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('north')) return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('sea') || nameLower.includes('fish') || nameLower.includes('prawn')) return 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('chin') || nameLower.includes('noodle')) return 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('biryani')) return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('bread') || nameLower.includes('naan') || nameLower.includes('roti')) return 'https://images.unsplash.com/photo-1626074353765-517a681e40be?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('kebab')) return 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('tandoor')) return 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('grill')) return 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('soup')) return 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('break')) return 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&h=300&auto=format&fit=crop&q=85';
+  if (nameLower.includes('veg')) return 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&h=300&auto=format&fit=crop&q=85';
+  return CATEGORY_IMAGES.all;
 };
 
 function ScrollRow({ children }: { children: React.ReactNode }) {
@@ -111,7 +146,7 @@ export default function HomePage() {
               Authentic Flavours,<br />Delivered Fresh to You
             </h1>
             <p className="text-xs sm:text-sm text-red-100 max-w-lg leading-relaxed">
-              Explore Giri Restaurant's full menu — from chef specials to desserts — all made with organic ingredients and served with genuine warmth.
+              Explore Royal Restaurant's full menu — from chef specials to desserts — all made with organic ingredients and served with genuine warmth.
             </p>
 
             <div className="relative w-full max-w-lg">
@@ -139,7 +174,7 @@ export default function HomePage() {
           <div className="relative w-60 h-60 sm:w-72 sm:h-72 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl shrink-0 hidden md:block">
             <Image 
               src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&auto=format&fit=crop&q=85" 
-              alt="Giri signature dish" 
+              alt="Royal signature dish" 
               fill 
               priority
               className="object-cover" 
@@ -204,7 +239,7 @@ export default function HomePage() {
               >
                 <div className="relative w-24 h-20 sm:w-36 sm:h-28 rounded-2xl overflow-hidden border-2 border-transparent group-hover:border-[#8B0000] transition-all shadow-sm">
                   <Image 
-                    src={CATEGORY_IMAGES[cat.id] || CATEGORY_IMAGES.all} 
+                    src={getCategoryPhoto(cat.id, cat.name)} 
                     alt={cat.name} 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -237,14 +272,14 @@ export default function HomePage() {
             {shops.map((shop, idx) => {
               const shopName = (shop.name || '').toLowerCase();
               let categoryUrl = '/menu';
-              if (shopName.includes('fine dining')) categoryUrl = '/menu?shop=giri-fine-dining';
-              else if (shopName.includes('kitchen')) categoryUrl = '/menu?shop=giri-kitchen';
-              else if (shopName.includes('bakery')) categoryUrl = '/menu?shop=giri-bakery';
-              else if (shopName.includes('grill')) categoryUrl = '/menu?shop=giri-grill';
-              else if (shopName.includes('spice')) categoryUrl = '/menu?shop=giri-spice-garden';
-              else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=giri-cafe';
-              else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=giri-seafood';
-              else if (shopName.includes('express') || shopName.includes('bistro')) categoryUrl = '/menu?shop=giri-express-bistro';
+              if (shopName.includes('fine dining')) categoryUrl = '/menu?shop=royal-fine-dining';
+              else if (shopName.includes('kitchen')) categoryUrl = '/menu?shop=royal-kitchen';
+              else if (shopName.includes('bakery')) categoryUrl = '/menu?shop=royal-bakery';
+              else if (shopName.includes('grill')) categoryUrl = '/menu?shop=royal-grill';
+              else if (shopName.includes('spice')) categoryUrl = '/menu?shop=royal-spice-garden';
+              else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=royal-cafe';
+              else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=royal-seafood';
+              else if (shopName.includes('express') || shopName.includes('bistro')) categoryUrl = '/menu?shop=royal-express-bistro';
 
               return (
                 <Link key={shop._id || shop.id || idx} href={categoryUrl} className="shrink-0 w-60 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
@@ -384,7 +419,7 @@ export default function HomePage() {
               <span className="section-label">Limited Time</span>
               <h2 className="text-2xl font-extrabold text-[#1a1008] mt-1 mb-2">Exclusive Offers Just for You</h2>
               <p className="text-sm text-[#6b5840] max-w-sm leading-relaxed">
-                Use code <span className="font-bold text-[#8B0000]">GIRI20</span> for 20% off your first order, or{' '}
+                Use code <span className="font-bold text-[#8B0000]">ROYAL20</span> for 20% off your first order, or{' '}
                 <span className="font-bold text-[#8B0000]">WAGYU2FOR1</span> for buy-1-get-1 Wagyu Burgers.
               </p>
             </div>

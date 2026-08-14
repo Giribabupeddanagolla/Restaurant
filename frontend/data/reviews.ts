@@ -16,7 +16,7 @@ export const PUBLIC_REVIEWS: Review[] = [
     role: 'Verified Diner',
     rating: 5,
     date: '5 days ago',
-    comment: 'Exceptional Wagyu Burger and unbelievable lava cake! The ambiance across all Giri branches is unmatched.',
+    comment: 'Exceptional Wagyu Burger and unbelievable lava cake! The ambiance across all Royal branches is unmatched.',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
   },
   {
@@ -33,7 +33,7 @@ export const PUBLIC_REVIEWS: Review[] = [
 export const getStoredReviews = (): Review[] => {
   if (typeof window === 'undefined') return PUBLIC_REVIEWS;
   try {
-    const saved = localStorage.getItem('giri_reviews');
+    const saved = localStorage.getItem('royal_reviews') || localStorage.getItem('giri_reviews');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -47,7 +47,7 @@ export const getStoredReviews = (): Review[] => {
 export const saveStoredReviews = (reviews: Review[]) => {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('giri_reviews', JSON.stringify(reviews));
+    localStorage.setItem('royal_reviews', JSON.stringify(reviews));
   } catch (e) {
     console.error('Error saving stored reviews:', e);
   }

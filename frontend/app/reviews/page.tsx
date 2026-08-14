@@ -82,7 +82,7 @@ export default function ReviewsPage() {
           Guest Testimonials & Reviews
         </h1>
         <p className="text-xs sm:text-sm text-[#6b5840] leading-relaxed">
-          Read real diner experiences or share your feedback on dining with Giri Restaurant.
+          Read real diner experiences or share your feedback on dining with Royal Restaurant.
         </p>
         <hr className="divider-gold mt-4" />
       </div>
@@ -106,7 +106,7 @@ export default function ReviewsPage() {
           </div>
           <div className="w-px h-14 bg-[#C8A055]/30" />
           <p className="text-xs sm:text-sm text-[#6b5840] max-w-[200px] leading-relaxed">
-            Based on verified diner ratings and reviews at Giri Restaurant.
+            Based on verified diner ratings and reviews at Royal Restaurant.
           </p>
         </div>
       </div>

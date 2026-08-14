@@ -3,20 +3,19 @@
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
 import FloatingCartButton from '@/components/FloatingCartButton';
-import { CartProvider } from '@/context/CartContext';
+import CartDrawer from '@/components/CartDrawer';
 
 export default function MainLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith('/admin');
 
   if (isAdmin) {
-    return <CartProvider>{children}</CartProvider>;
+    return <div className="min-h-screen bg-[#F8F5F0]">{children}</div>;
   }
 
   return (
-    <CartProvider>
+    <>
       <Navbar />
       <div className="pt-[64px]">
         <main>{children}</main>
@@ -24,6 +23,6 @@ export default function MainLayoutWrapper({ children }: { children: React.ReactN
       <Footer />
       <FloatingCartButton />
       <CartDrawer />
-    </CartProvider>
+    </>
   );
 }

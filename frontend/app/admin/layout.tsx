@@ -8,13 +8,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#F8F5F0]">
+    <div className="flex h-screen overflow-hidden bg-[#F8F5F0]">
       {/* Sidebar Component handling desktop & mobile drawer */}
       <Sidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 w-full">
-        <header className="h-12 bg-[#1a1008] border-b border-[#C8A055]/20 px-4 md:px-6 flex items-center justify-between shadow-md sticky top-0 z-30">
+      <div className="flex-1 flex flex-col h-full min-w-0 w-full overflow-hidden">
+        <header className="h-12 bg-[#1a1008] border-b border-[#C8A055]/20 px-4 md:px-6 flex items-center justify-between shadow-md shrink-0 z-50">
           <div className="flex items-center gap-3">
             {/* Hamburger Button for Mobile screens (<768px) */}
             <button
@@ -38,7 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <main className="flex-1 p-3 md:p-5 overflow-y-auto no-scrollbar w-full min-w-0">{children}</main>
+        <main className="flex-1 p-3 md:p-5 overflow-y-auto w-full min-w-0 bg-[#F8F5F0]">{children}</main>
       </div>
     </div>
   );

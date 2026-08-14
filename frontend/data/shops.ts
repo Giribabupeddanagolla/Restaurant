@@ -3,7 +3,7 @@ import { Shop } from '../types';
 export const INITIAL_SHOPS: Shop[] = [
   {
     id: 'shop-1',
-    name: 'Giri Fine Dining',
+    name: 'Royal Fine Dining',
     tagline: 'Signature Experience',
     tag: 'Signature Experience',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=1200&auto=format&fit=crop&q=85',
@@ -31,7 +31,7 @@ export const INITIAL_SHOPS: Shop[] = [
   },
   {
     id: 'shop-2',
-    name: 'Giri Kitchen',
+    name: 'Royal Kitchen',
     tagline: 'Home Comfort Food',
     tag: 'Home Comfort Food',
     image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop&q=85',
@@ -58,7 +58,7 @@ export const INITIAL_SHOPS: Shop[] = [
   },
   {
     id: 'shop-3',
-    name: 'Giri Bakery',
+    name: 'Royal Bakery',
     tagline: 'Pastries & Desserts',
     tag: 'Pastries & Desserts',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80',
@@ -83,7 +83,7 @@ export const INITIAL_SHOPS: Shop[] = [
   },
   {
     id: 'shop-4',
-    name: 'Giri Grill',
+    name: 'Royal Grill',
     tagline: 'BBQ & Mains',
     tag: 'BBQ & Mains',
     image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&auto=format&fit=crop&q=85',
@@ -108,7 +108,7 @@ export const INITIAL_SHOPS: Shop[] = [
   },
   {
     id: 'shop-5',
-    name: 'Giri Spice Garden',
+    name: 'Royal Spice Garden',
     tagline: 'Indian & Asian',
     tag: 'Indian & Asian',
     image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1200&auto=format&fit=crop&q=85',
@@ -132,7 +132,7 @@ export const INITIAL_SHOPS: Shop[] = [
   },
   {
     id: 'shop-6',
-    name: 'Giri Café',
+    name: 'Royal Café',
     tagline: 'Coffee & Snacks',
     tag: 'Coffee & Snacks',
     image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&auto=format&fit=crop&q=85',
@@ -157,7 +157,7 @@ export const INITIAL_SHOPS: Shop[] = [
   },
   {
     id: 'shop-7',
-    name: 'Giri Seafood & Lounge',
+    name: 'Royal Seafood & Lounge',
     tagline: 'Coastal Delicacies & Cocktails',
     tag: 'Coastal Delicacies & Cocktails',
     image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800&auto=format&fit=crop&q=80',
@@ -182,7 +182,7 @@ export const INITIAL_SHOPS: Shop[] = [
   },
   {
     id: 'shop-8',
-    name: 'Giri Express & Bistro',
+    name: 'Royal Express & Bistro',
     tagline: 'Quick Gourmet Eats',
     tag: 'Quick Gourmet Eats',
     image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80',
@@ -209,7 +209,7 @@ export const INITIAL_SHOPS: Shop[] = [
 export const getStoredShops = (): Shop[] => {
   if (typeof window === 'undefined') return INITIAL_SHOPS;
   try {
-    const saved = localStorage.getItem('giri_shops');
+    const saved = localStorage.getItem('royal_shops') || localStorage.getItem('giri_shops');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -237,7 +237,7 @@ export const getStoredShops = (): Shop[] => {
 export const saveStoredShops = (shops: Shop[]) => {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('giri_shops', JSON.stringify(shops));
+    localStorage.setItem('royal_shops', JSON.stringify(shops));
   } catch (e) {
     console.error('Error saving stored shops:', e);
   }

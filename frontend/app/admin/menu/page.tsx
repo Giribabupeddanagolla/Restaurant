@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { INITIAL_CATEGORIES, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from '@/data/mockData';
-import { Search, Plus, Edit2, Trash2, CheckCircle, XCircle, Utensils, RefreshCw, Clock, Leaf, Filter, Store, Menu, X, Sparkles } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, CheckCircle, XCircle, Utensils, RefreshCw, Clock, Leaf, Filter, Store, Menu, X, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { MenuItem } from '@/types';
 import { menuApi } from '@/services/restaurantService';
 import { formatCurrency } from '@/utils/formatters';
@@ -236,31 +236,34 @@ export default function AdminMenuPage() {
     }
   };
 
-  const filteredDishes = dishes.filter((dish) => {
-    const matchesSearch =
-      search === '' ||
-      dish.name.toLowerCase().includes(search.toLowerCase()) ||
-      dish.description.toLowerCase().includes(search.toLowerCase());
+  const filteredDishes = useMemo(() => {
+    const searchLower = search.toLowerCase();
+    return dishes.filter((dish) => {
+      const matchesSearch =
+        search === '' ||
+        dish.name.toLowerCase().includes(searchLower) ||
+        dish.description.toLowerCase().includes(searchLower);
 
-    const matchesRestaurant = selectedRestaurant === 'all' || dish.shopSlug === selectedRestaurant;
+      const matchesRestaurant = selectedRestaurant === 'all' || dish.shopSlug === selectedRestaurant;
 
-    const matchesCategory = selectedCategory === 'all' || dish.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || dish.category === selectedCategory;
 
-    let matchesDietary = true;
-    if (dietaryFilter === 'veg') {
-      matchesDietary = dish.dietary?.includes('veg') || false;
-    } else if (dietaryFilter === 'non-veg') {
-      matchesDietary = !dish.dietary?.includes('veg');
-    } else if (dietaryFilter === 'special') {
-      matchesDietary = dish.dietary?.includes('chef-special') || false;
-    } else if (dietaryFilter === 'available') {
-      matchesDietary = dish.available !== false;
-    } else if (dietaryFilter === 'out-of-stock') {
-      matchesDietary = dish.available === false;
-    }
+      let matchesDietary = true;
+      if (dietaryFilter === 'veg') {
+        matchesDietary = dish.dietary?.includes('veg') || false;
+      } else if (dietaryFilter === 'non-veg') {
+        matchesDietary = !dish.dietary?.includes('veg');
+      } else if (dietaryFilter === 'special') {
+        matchesDietary = dish.dietary?.includes('chef-special') || false;
+      } else if (dietaryFilter === 'available') {
+        matchesDietary = dish.available !== false;
+      } else if (dietaryFilter === 'out-of-stock') {
+        matchesDietary = dish.available === false;
+      }
 
-    return matchesSearch && matchesRestaurant && matchesCategory && matchesDietary;
-  });
+      return matchesSearch && matchesRestaurant && matchesCategory && matchesDietary;
+    });
+  }, [dishes, search, selectedRestaurant, selectedCategory, dietaryFilter]);
 
   const handleResetMenu = () => {
     if (!confirm('Reset menu catalog to full default gourmet items?')) return;
@@ -317,7 +320,7 @@ export default function AdminMenuPage() {
       )}
 
       {/* Search & Outlets / Filter Bar */}
-      <div className="relative w-full mb-6 z-30">
+      <div className="relative w-full mb-6 z-20">
         <div className="relative w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-4 h-4 pointer-events-none" />
 
@@ -343,16 +346,14 @@ export default function AdminMenuPage() {
               </button>
             )}
 
-            {/* Frameless 3-Lines Menu Icon Button */}
+            {/* Frameless Filter Toggle Button */}
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-                showFilterMenu ? 'text-[#8B0000] bg-[#8B0000]/15' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
-              }`}
-              title="Toggle Outlets & Categories"
-              aria-label="Toggle Outlets & Categories"
+              className="p-1.5 text-[#8B0000] hover:text-[#a00000] hover:scale-110 transition-all cursor-pointer flex items-center justify-center"
+              title="Toggle Outlets & Categories Filter"
+              aria-label="Toggle Outlets & Categories Filter"
             >
-              <Menu className="w-4 h-4" />
+              <SlidersHorizontal className="w-5 h-5" />
             </button>
           </div>
         </div>

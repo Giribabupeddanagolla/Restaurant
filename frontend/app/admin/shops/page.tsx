@@ -7,7 +7,7 @@ import { Shop } from '@/types';
 import { shopApi } from '@/services/restaurantService';
 import {
   Plus, Search, Edit2, Trash2, MapPin, Phone, Clock, Star,
-  CheckCircle, XCircle, RefreshCw, Store, Sparkles, Menu, X
+  CheckCircle, XCircle, RefreshCw, Store, Sparkles, Menu, X, Filter, SlidersHorizontal
 } from 'lucide-react';
 
 export default function AdminShopsPage() {
@@ -258,8 +258,8 @@ export default function AdminShopsPage() {
         </div>
       )}
 
-      {/* Search Bar with 3-Lines Filter Dropdown */}
-      <div className="relative w-full z-30">
+      {/* Search & Outlets Filter Bar */}
+      <div className="relative w-full mb-6 z-20">
         <div className="relative w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B0000] z-10 pointer-events-none" />
           
@@ -283,16 +283,14 @@ export default function AdminShopsPage() {
               </button>
             )}
 
-            {/* Frameless 3-Lines Icon Button */}
+            {/* Frameless Filter Toggle Button */}
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-                showFilterMenu ? 'text-[#8B0000] bg-[#8B0000]/15' : 'text-[#8B0000] hover:bg-[#8B0000]/10'
-              }`}
+              className="p-1.5 text-[#8B0000] hover:text-[#a00000] hover:scale-110 transition-all cursor-pointer flex items-center justify-center"
               title="Toggle City Filters"
               aria-label="Toggle City Filters"
             >
-              <Menu className="w-4 h-4" />
+              <SlidersHorizontal className="w-5 h-5" />
             </button>
           </div>
         </div>

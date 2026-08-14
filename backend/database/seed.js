@@ -9,7 +9,7 @@ dotenv.config();
 
 const seedData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/giri_restaurant');
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/royal_restaurant');
     console.log('🌱 Connected to MongoDB for Database Seeding...');
 
     await User.deleteMany();
@@ -19,9 +19,9 @@ const seedData = async () => {
 
     // Create Admin & Staff Users
     await User.create([
-      { name: 'Chef Rajiv Giri', email: 'admin@girirestaurant.com', password: 'password123', role: 'Admin', phone: '+919876543210' },
-      { name: 'Rahul Sharma', email: 'manager@girirestaurant.com', password: 'password123', role: 'Manager', phone: '+919876543211' },
-      { name: 'Priya Nair', email: 'chef@girirestaurant.com', password: 'password123', role: 'Chef', phone: '+919876543212' },
+      { name: 'Chef Rajiv Royal', email: 'admin@royalrestaurant.com', password: 'password123', role: 'Admin', phone: '+919876543210' },
+      { name: 'Rahul Sharma', email: 'manager@royalrestaurant.com', password: 'password123', role: 'Manager', phone: '+919876543211' },
+      { name: 'Priya Nair', email: 'chef@royalrestaurant.com', password: 'password123', role: 'Chef', phone: '+919876543212' },
     ]);
 
     // Create Categories

@@ -4,7 +4,7 @@ export const PUBLIC_OFFERS: Offer[] = [
   {
     id: 'off-1',
     title: '🎉 Welcome 20% Discount',
-    code: 'GIRI20',
+    code: 'ROYAL20',
     description: 'Get 20% off on your first dine-in or takeaway mobile order above ₹500.',
     expiry: 'Valid till Sunday',
     badge: 'NEW CUSTOMER'

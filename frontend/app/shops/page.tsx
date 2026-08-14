@@ -7,7 +7,7 @@ import { INITIAL_SHOPS, getStoredShops, saveStoredShops } from '@/data/mockData'
 import { Shop } from '@/types';
 import { shopApi } from '@/services/restaurantService';
 import ShopGalleryModal from '@/components/ShopGalleryModal';
-import { MapPin, Phone, Clock, Star, Search, ExternalLink, Utensils, CheckCircle, XCircle, Menu, X, Camera, Eye, Images } from 'lucide-react';
+import { MapPin, Phone, Clock, Star, Search, ExternalLink, Utensils, CheckCircle, XCircle, Menu, X, Camera, Eye, Images, SlidersHorizontal } from 'lucide-react';
 
 export default function ShopsPage() {
   const [shops, setShops] = useState<Shop[]>(INITIAL_SHOPS);
@@ -68,7 +68,7 @@ export default function ShopsPage() {
             Best Shops & Locations
           </h1>
           <p className="text-red-100 text-sm md:text-base leading-relaxed">
-            Find a Giri Restaurant outlet near you. Click on any shop image to view rich photo galleries of our dining halls, live kitchens, and master chef setups!
+            Find a Royal Restaurant outlet near you. Click on any shop image to view rich photo galleries of our dining halls, live kitchens, and master chef setups!
           </p>
         </div>
       </div>
@@ -98,18 +98,14 @@ export default function ShopsPage() {
               </button>
             )}
 
-            {/* Frameless 3-Lines Icon Button */}
+            {/* Frameless Filter Toggle Button */}
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className={`p-1.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-                showFilterMenu
-                  ? 'text-[#8B0000] bg-[#8B0000]/15'
-                  : 'text-[#8B0000] hover:bg-[#8B0000]/10'
-              }`}
+              className="p-1.5 text-[#8B0000] hover:text-[#a00000] hover:scale-110 transition-all cursor-pointer flex items-center justify-center"
               title="Toggle Location & City Filters"
               aria-label="Toggle location and city filters"
             >
-              <Menu className="w-4 h-4" />
+              <SlidersHorizontal className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -170,14 +166,14 @@ export default function ShopsPage() {
         {filteredShops.map((shop, idx) => {
           const shopName = (shop.name || '').toLowerCase();
           let categoryUrl = '/menu';
-          if (shopName.includes('fine dining')) categoryUrl = '/menu?shop=giri-fine-dining';
-          else if (shopName.includes('kitchen')) categoryUrl = '/menu?shop=giri-kitchen';
-          else if (shopName.includes('bakery')) categoryUrl = '/menu?shop=giri-bakery';
-          else if (shopName.includes('grill')) categoryUrl = '/menu?shop=giri-grill';
-          else if (shopName.includes('spice')) categoryUrl = '/menu?shop=giri-spice-garden';
-          else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=giri-cafe';
-          else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=giri-seafood';
-          else if (shopName.includes('express') || shopName.includes('bistro')) categoryUrl = '/menu?shop=giri-express-bistro';
+          if (shopName.includes('fine dining')) categoryUrl = '/menu?shop=royal-fine-dining';
+          else if (shopName.includes('kitchen')) categoryUrl = '/menu?shop=royal-kitchen';
+          else if (shopName.includes('bakery')) categoryUrl = '/menu?shop=royal-bakery';
+          else if (shopName.includes('grill')) categoryUrl = '/menu?shop=royal-grill';
+          else if (shopName.includes('spice')) categoryUrl = '/menu?shop=royal-spice-garden';
+          else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=royal-cafe';
+          else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=royal-seafood';
+          else if (shopName.includes('express') || shopName.includes('bistro')) categoryUrl = '/menu?shop=royal-express-bistro';
 
           const diningCount = shop.diningImages ? shop.diningImages.length : 1;
           const kitchenCount = shop.kitchenImages ? shop.kitchenImages.length : 1;

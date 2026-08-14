@@ -53,10 +53,10 @@ export default function OffersPage() {
         <p className="text-2xl mb-2">🌟</p>
         <h3 className="text-lg font-extrabold text-[#1a1008] mb-2">Loyalty Members Get More</h3>
         <p className="text-sm text-[#6b5840] max-w-md mx-auto mb-5">
-          Sign up for Giri Rewards and earn points on every order — redeem them for free dishes and exclusive deals.
+          Sign up for Royal Rewards and earn points on every order — redeem them for free dishes and exclusive deals.
         </p>
         <Link href="/contact" className="btn-primary px-6 py-2.5 rounded-xl text-sm font-bold inline-block">
-          Join Giri Rewards →
+          Join Royal Rewards →
         </Link>
       </div>
     </div>

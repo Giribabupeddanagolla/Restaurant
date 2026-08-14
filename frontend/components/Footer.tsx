@@ -21,8 +21,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="sm:col-span-2 md:col-span-1">
             <div className="flex items-center gap-3 mb-3">
-              <Image src="/giri-logo.svg" alt="Giri Restaurant" width={40} height={40} className="rounded-full bg-white p-0.5 shadow ring-1 ring-[#C8A055]/30 shrink-0" />
-              <span className="font-extrabold text-lg text-[#1a1008]">Giri Restaurant</span>
+              <Image src="/royal-logo.svg" alt="Royal Restaurant" width={40} height={40} className="rounded-full bg-white p-0.5 shadow ring-1 ring-[#C8A055]/30 shrink-0" />
+              <span className="font-extrabold text-lg text-[#1a1008]">Royal Restaurant</span>
             </div>
             <p className="text-sm text-[#6b5840] leading-relaxed mb-4">
               Good Food, Great Experience — artisanal dining with farm-fresh ingredients.
@@ -74,7 +74,7 @@ export default function Footer() {
             <div className="flex flex-col gap-2 text-sm text-[#6b5840]">
               <p>📍 742 Culinary Blvd, Suite 100</p>
               <p>📞 +1 (555) 987-6543</p>
-              <p>✉️ info@girirestaurant.com</p>
+              <p>✉️ info@royalrestaurant.com</p>
             </div>
             <Link href="/contact" className="mt-3 inline-block btn-primary text-xs px-4 py-2 rounded-lg font-bold">
               Send a Message
@@ -85,7 +85,7 @@ export default function Footer() {
         <hr className="border-none h-px bg-gradient-to-r from-transparent via-[#C8A055]/30 to-transparent mb-5" />
 
         <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-[#a09070] gap-3">
-          <p>© {new Date().getFullYear()} Giri Restaurant. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Royal Restaurant. All rights reserved.</p>
           <div className="flex gap-5">
             <Link href="/terms"   className="hover:text-[#8B0000] transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-[#8B0000] transition-colors">Privacy</Link>

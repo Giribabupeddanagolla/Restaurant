@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { INITIAL_CATEGORIES, CATEGORY_GROUPS, BAKERY_EXCLUSIVE_CATEGORY_GROUPS, GRILL_EXCLUSIVE_CATEGORY_GROUPS, SPICE_GARDEN_EXCLUSIVE_CATEGORY_GROUPS, CAFE_EXCLUSIVE_CATEGORY_GROUPS, SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS, EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from '@/data/mockData';
-import { Search, Leaf, Menu, X, Store, ArrowLeft, SlidersHorizontal, Utensils } from 'lucide-react';
+import { INITIAL_CATEGORIES, CATEGORY_GROUPS, BAKERY_EXCLUSIVE_CATEGORY_GROUPS, GRILL_EXCLUSIVE_CATEGORY_GROUPS, SPICE_GARDEN_EXCLUSIVE_CATEGORY_GROUPS, CAFE_EXCLUSIVE_CATEGORY_GROUPS, SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS, EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS, FINE_DINING_EXCLUSIVE_CATEGORY_GROUPS, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from '@/data/mockData';
+import { Search, Leaf, Menu, X, Store, ArrowLeft, SlidersHorizontal, Utensils, ChevronDown, ChevronRight, Filter, Layers } from 'lucide-react';
 import { MenuItem } from '@/types';
 import DishModal from '@/components/DishModal';
 import AddButton from '@/components/AddButton';
@@ -47,21 +47,261 @@ function matchCategorySubCategory(dish: MenuItem, catId: string, subCatId: strin
     case 'all':
       return true;
 
-    // Biryani
+    // 1. Breakfast
+    case 'breakfast':
+      return dName.includes('idli') || dName.includes('idly') || dName.includes('dosa') || dName.includes('vada') || dName.includes('poori') || dName.includes('upma') || dName.includes('pongal') || dName.includes('omelette');
+    case 'idli':
+      return dName.includes('idli') || dName.includes('idly');
+    case 'dosa':
+      return dName.includes('dosa');
+    case 'vada':
+      return dName.includes('vada');
+    case 'poori':
+      return dName.includes('poori') || dName.includes('puri');
+    case 'upma':
+      return dName.includes('upma');
+    case 'pongal':
+      return dName.includes('pongal');
+    case 'omelette':
+      return dName.includes('omelette') || dName.includes('egg');
+
+    // 2. Soups
+    case 'soups':
+      return dName.includes('soup') || dName.includes('velouté');
+    case 'tomato-soup':
+      return dName.includes('tomato') && dName.includes('soup');
+    case 'sweet-corn-soup':
+      return dName.includes('sweet corn') || (dName.includes('corn') && dName.includes('soup'));
+    case 'hot-sour-soup':
+      return (dName.includes('hot') && dName.includes('sour')) || dName.includes('hot & sour');
+    case 'manchow-soup':
+      return dName.includes('manchow');
+    case 'chicken-soup':
+      return dName.includes('chicken') && dName.includes('soup');
+
+    // 3. Veg Starters
+    case 'veg-starters':
+      return (dCat === 'starters' || dName.includes('starter') || dName.includes('tikka') || dName.includes('65') || dName.includes('manchurian')) && (dDiet.includes('veg') || dName.includes('paneer') || dName.includes('gobi') || dName.includes('corn') || dName.includes('veg'));
+    case 'paneer-tikka':
+      return dName.includes('paneer tikka');
+    case 'gobi-65':
+      return dName.includes('gobi 65') || (dName.includes('gobi') && dName.includes('65'));
+    case 'crispy-corn':
+      return dName.includes('crispy corn') || dName.includes('corn basket');
+    case 'chilli-paneer':
+      return dName.includes('chilli paneer');
+    case 'baby-corn-manchurian':
+      return dName.includes('baby corn') || (dName.includes('corn') && dName.includes('manchurian'));
+
+    // 4. Non-Veg Starters
+    case 'non-veg-starters':
+      return (dCat === 'starters' || dName.includes('starter') || dName.includes('65') || dName.includes('lollipop') || dName.includes('fry') || dName.includes('kebab')) && (dDiet.includes('non-veg') || dName.includes('chicken') || dName.includes('mutton') || dName.includes('fish'));
+    case 'chicken-65':
+      return dName.includes('chicken 65');
+    case 'chicken-lollipop':
+      return dName.includes('lollipop') || dName.includes('lolipop');
+    case 'chilli-chicken':
+      return dName.includes('chilli chicken');
+    case 'mutton-kebab':
+      return dName.includes('mutton kebab') || dName.includes('mutton seekh') || (dName.includes('mutton') && dName.includes('boti'));
+    case 'fish-fry':
+      return dName.includes('fish fry') || dName.includes('apollo fish');
+
+    // 5. Tandoor
+    case 'tandoor':
+      return dName.includes('tandoor') || dName.includes('tandoori') || dName.includes('tikka');
+    case 'tandoori-chicken':
+      return dName.includes('tandoori chicken');
+    case 'chicken-tikka-tandoor':
+      return dName.includes('chicken tikka') && !dName.includes('masala') && !dName.includes('pizza');
+    case 'paneer-tikka-tandoor':
+      return dName.includes('paneer tikka');
+    case 'tandoori-fish':
+      return dName.includes('tandoori fish') || dName.includes('fish tikka');
+    case 'tandoori-prawns':
+      return dName.includes('tandoori prawn') || dName.includes('prawn tikka');
+
+    // 6. Grill
+    case 'grill':
+      return dName.includes('grill') || dName.includes('grilled') || dName.includes('wings') || dName.includes('chops');
+    case 'grilled-chicken':
+      return dName.includes('grilled chicken');
+    case 'chicken-wings':
+      return dName.includes('wing') || dName.includes('wings');
+    case 'mutton-chops':
+      return dName.includes('mutton chop') || dName.includes('mutton chops') || dName.includes('lamb chops');
+    case 'grilled-fish':
+      return dName.includes('grilled fish') || dName.includes('grilled salmon');
+    case 'grilled-prawns':
+      return dName.includes('grilled prawn') || dName.includes('grilled jumbo prawns');
+
+    // 7. Kebabs
+    case 'kebabs':
+      return dName.includes('kebab') || dName.includes('seekh') || dName.includes('boti');
+    case 'chicken-seekh-kebab':
+      return dName.includes('chicken seekh');
+    case 'reshmi-kebab':
+      return dName.includes('reshmi');
+    case 'hariyali-kebab':
+      return dName.includes('hariyali');
+    case 'mutton-seekh-kebab':
+      return dName.includes('mutton seekh');
+    case 'paneer-kebab':
+      return dName.includes('paneer kebab') || dName.includes('paneer tikka');
+
+    // 8. Biryani
     case 'biryani':
       return dName.includes('biryani');
     case 'chicken-biryani':
       return dName.includes('biryani') && dName.includes('chicken');
     case 'mutton-biryani':
       return dName.includes('biryani') && (dName.includes('mutton') || dName.includes('lamb') || dName.includes('nalli'));
+    case 'prawn-biryani':
+      return dName.includes('biryani') && (dName.includes('prawn') || dName.includes('shrimp') || dName.includes('seafood'));
     case 'egg-biryani':
-      return dName.includes('biryani') && (dName.includes('egg') || dName.includes('omelette'));
+      return dName.includes('biryani') && dName.includes('egg');
     case 'veg-biryani':
-      return dName.includes('biryani') && !dName.includes('paneer') && (dName.includes('veg') || dName.includes('subz') || dName.includes('soya') || dName.includes('mushroom') || dName.includes('kathal') || dName.includes('pulao') || dName.includes('corn') || dDiet.includes('veg'));
-    case 'paneer-biryani':
-      return dName.includes('biryani') && dName.includes('paneer');
-    case 'special-biryani':
-      return dName.includes('biryani') && (dName.includes('special') || dName.includes('signature') || dName.includes('shahi') || dName.includes('potli') || dName.includes('matka') || dName.includes('bamboo') || dName.includes('24k') || dName.includes('gold') || dName.includes('zafrani') || dName.includes('claypot') || dName.includes('seafood') || dName.includes('prawn') || dName.includes('combo'));
+      return dName.includes('biryani') && (dName.includes('veg') || dName.includes('paneer') || dName.includes('subz') || dDiet.includes('veg'));
+
+    // 9. Rice & Pulao
+    case 'rice-pulao':
+      return dName.includes('rice') || dName.includes('pulao') || dName.includes('pulav');
+    case 'jeera-rice':
+      return dName.includes('jeera rice');
+    case 'ghee-rice':
+      return dName.includes('ghee rice');
+    case 'veg-pulao':
+      return dName.includes('veg pulao') || dName.includes('subz pulao') || (dName.includes('pulao') && !dName.includes('chicken'));
+    case 'chicken-pulao':
+      return dName.includes('chicken pulao');
+    case 'fried-rice-sub':
+      return dName.includes('fried rice');
+
+    // 10. South Indian Curries
+    case 'south-indian-curries':
+      return dName.includes('curry') || dName.includes('gongura') || dName.includes('andhra') || dName.includes('chettinad');
+    case 'andhra-chicken':
+      return dName.includes('andhra chicken') || dName.includes('guntur chicken');
+    case 'gongura-chicken':
+      return dName.includes('gongura chicken') || (dName.includes('gongura') && dName.includes('chicken'));
+    case 'chicken-curry-si':
+      return dName.includes('chicken curry') || dName.includes('kodi kura');
+    case 'mutton-curry-si':
+      return dName.includes('mutton curry') || dName.includes('mamsam kura');
+    case 'fish-curry-si':
+      return dName.includes('fish curry') || dName.includes('chepala pulusu');
+
+    // 11. North Indian Curries
+    case 'north-indian-curries':
+      return dName.includes('butter chicken') || dName.includes('kadai') || dName.includes('rogan josh') || dName.includes('dal makhani') || dName.includes('paneer') || dName.includes('masala');
+    case 'butter-chicken':
+      return dName.includes('butter chicken') || dName.includes('murgh makhani');
+    case 'kadai-chicken':
+      return dName.includes('kadai chicken');
+    case 'rogan-josh':
+      return dName.includes('rogan josh');
+    case 'dal-makhani':
+      return dName.includes('dal makhani');
+    case 'kadai-paneer':
+      return dName.includes('kadai paneer');
+
+    // 12. Seafood
+    case 'seafood':
+      return dName.includes('fish') || dName.includes('prawn') || dName.includes('crab') || dName.includes('squid') || dName.includes('seafood');
+    case 'fish-curry-sf':
+      return dName.includes('fish curry');
+    case 'fish-fry-sf':
+      return dName.includes('fish fry');
+    case 'prawn-curry-sf':
+      return dName.includes('prawn curry');
+    case 'crab-masala':
+      return dName.includes('crab');
+    case 'squid-fry':
+      return dName.includes('squid') || dName.includes('calamari');
+
+    // 13. Chinese
+    case 'chinese':
+      return dName.includes('noodle') || dName.includes('fried rice') || dName.includes('manchurian') || dName.includes('hakka') || dName.includes('schezwan');
+    case 'hakka-noodles':
+      return dName.includes('noodle') || dName.includes('hakka') || dName.includes('chow mein');
+    case 'fried-rice-cn':
+      return dName.includes('fried rice');
+    case 'veg-manchurian':
+      return dName.includes('veg manchurian');
+    case 'chicken-manchurian':
+      return dName.includes('chicken manchurian');
+    case 'chilli-chicken-cn':
+      return dName.includes('chilli chicken');
+
+    // 14. Breads
+    case 'breads':
+      return dName.includes('naan') || dName.includes('roti') || dName.includes('paratha') || dName.includes('kulcha') || dName.includes('bread');
+    case 'butter-naan':
+      return dName.includes('butter naan');
+    case 'garlic-naan':
+      return dName.includes('garlic naan');
+    case 'tandoori-roti':
+      return dName.includes('tandoori roti') || dName.includes('roti');
+    case 'laccha-paratha':
+      return dName.includes('laccha') || dName.includes('paratha');
+    case 'cheese-naan':
+      return dName.includes('cheese naan');
+
+    // 15. Fast Food
+    case 'fast-food':
+      return dName.includes('burger') || dName.includes('pizza') || dName.includes('pasta') || dName.includes('sandwich') || dName.includes('wrap');
+    case 'burger':
+      return dName.includes('burger') || dName.includes('slider');
+    case 'pizza':
+      return dName.includes('pizza');
+    case 'pasta':
+      return dName.includes('pasta') || dName.includes('penne') || dName.includes('spaghetti');
+    case 'sandwich':
+      return dName.includes('sandwich') || dName.includes('panini');
+    case 'wrap':
+      return dName.includes('wrap') || dName.includes('roll');
+
+    // 16. Bakery
+    case 'bakery':
+      return dName.includes('cake') || dName.includes('pastry') || dName.includes('muffin') || dName.includes('donut') || dName.includes('cookie') || dName.includes('bread');
+    case 'cakes':
+      return dName.includes('cake') && !dName.includes('cheesecake') && !dName.includes('pastry');
+    case 'pastries':
+      return dName.includes('pastry');
+    case 'muffins':
+      return dName.includes('muffin');
+    case 'donuts':
+      return dName.includes('donut') || dName.includes('doughnut');
+    case 'cookies':
+      return dName.includes('cookie') || dName.includes('biscuits');
+
+    // 17. Desserts
+    case 'desserts':
+      return dName.includes('gulab jamun') || dName.includes('rasmalai') || dName.includes('brownie') || dName.includes('cheesecake') || dName.includes('ice cream') || dCat === 'desserts';
+    case 'gulab-jamun':
+      return dName.includes('gulab jamun');
+    case 'rasmalai':
+      return dName.includes('rasmalai');
+    case 'brownie':
+      return dName.includes('brownie');
+    case 'cheesecake':
+      return dName.includes('cheesecake');
+    case 'ice-cream':
+      return dName.includes('ice cream') || dName.includes('sundae') || dName.includes('gelato');
+
+    // 18. Beverages
+    case 'beverages':
+      return dName.includes('tea') || dName.includes('coffee') || dName.includes('shake') || dName.includes('juice') || dName.includes('mocktail') || dCat === 'drinks';
+    case 'tea':
+      return dName.includes('tea') || dName.includes('chai');
+    case 'coffee':
+      return dName.includes('coffee') || dName.includes('cappuccino') || dName.includes('latte') || dName.includes('espresso');
+    case 'milkshake':
+      return dName.includes('shake') || dName.includes('milkshake');
+    case 'fresh-juice':
+      return dName.includes('juice');
+    case 'mocktail':
+      return dName.includes('mocktail') || dName.includes('mojito') || dName.includes('cooler');
 
     // Indian
     case 'indian':
@@ -429,13 +669,13 @@ function matchCategorySubCategory(dish: MenuItem, catId: string, subCatId: strin
     case 'tandoori-chicken':
       return dName.includes('tandoori chicken') || dName.includes('tandoori');
     case 'full-tandoori-chicken':
-      return dName.includes('full tandoori');
+      return dName.includes('tandoori') && (dName.includes('full') || dName.includes('whole') || dName.includes('signature royal') || dName.includes('roast') || dName.includes('claypot') || dName.includes('bhatti') || dName.includes('dum') || dName.includes('zafrani') || dName.includes('kashmiri'));
     case 'half-tandoori-chicken':
-      return dName.includes('half tandoori');
+      return dName.includes('tandoori') && (dName.includes('half') || dName.includes('portion') || dName.includes('smoky') || dName.includes('guntur') || dName.includes('lemon') || dName.includes('chettinad'));
     case 'tandoori-chicken-legs':
-      return dName.includes('tandoori') && dName.includes('leg');
+      return dName.includes('tandoori') && (dName.includes('leg') || dName.includes('legs') || dName.includes('tangdi') || dName.includes('drumstick'));
     case 'tandoori-chicken-wings':
-      return dName.includes('tandoori') && dName.includes('wing');
+      return dName.includes('tandoori') && (dName.includes('wing') || dName.includes('wings'));
 
     case 'chicken-kebabs':
       return dName.includes('kebab') && dName.includes('chicken');
@@ -1659,6 +1899,179 @@ function matchCategorySubCategory(dish: MenuItem, catId: string, subCatId: strin
     case 'family-combo-eb':
       return dName.includes('family feast combo');
 
+    // Fine Dining Exclusive Category Groups & Subcategories
+    case 'amuse-bouche':
+      return (dish.id || '').startsWith('dish-fd-chefs-welcome-bite') || (dish.id || '').startsWith('dish-fd-paneer-canape') || (dish.id || '').startsWith('dish-fd-chicken-canape') || (dish.id || '').startsWith('dish-fd-seafood-bite') || (dish.id || '').startsWith('dish-fd-seasonal-special') || dName.includes('canapé') || dName.includes('bite') || dName.includes('amuse');
+    case 'chefs-welcome-bite':
+      return (dish.id || '').includes('chefs-welcome-bite') || dName.includes('welcome bite') || dName.includes('amuse-bouche');
+    case 'paneer-canape':
+      return (dish.id || '').includes('paneer-canape') || (dName.includes('paneer') && dName.includes('canapé'));
+    case 'chicken-canape':
+      return (dish.id || '').includes('chicken-canape') || (dName.includes('chicken') && dName.includes('canapé'));
+    case 'seafood-bite':
+      return (dish.id || '').includes('seafood-bite') || dName.includes('seafood bite') || dName.includes('caviar') || dName.includes('crostini bite') || dName.includes('thermidor bite') || dName.includes('saffron bite') || dName.includes('crab');
+    case 'seasonal-special':
+    case 'seasonal-special-ab':
+      return (dish.id || '').includes('seasonal-special') || dName.includes('seasonal') || dName.includes('consommé') || dName.includes('sphere');
+
+    case 'fine-dining-starters':
+      return (dish.id || '').startsWith('dish-fd-truffle-paneer') || (dish.id || '').startsWith('dish-fd-tandoori-mushroom') || (dish.id || '').startsWith('dish-fd-chicken-galouti') || (dish.id || '').startsWith('dish-fd-mutton-shikampuri') || (dish.id || '').startsWith('dish-fd-smoked-fish');
+    case 'truffle-paneer':
+    case 'truffle-paneer-fds':
+      return (dish.id || '').includes('truffle-paneer') || (dName.includes('truffle') && dName.includes('paneer'));
+    case 'tandoori-mushroom':
+    case 'tandoori-mushroom-fds':
+      return (dish.id || '').includes('tandoori-mushroom') || dName.includes('tandoori mushroom') || dName.includes('stuffed mushroom') || dName.includes('mushroom tikka');
+    case 'chicken-galouti-kebab':
+    case 'chicken-galouti-kebab-fds':
+      return (dish.id || '').includes('chicken-galouti') || dName.includes('chicken galouti');
+    case 'mutton-shikampuri':
+    case 'mutton-shikampuri-fds':
+      return (dish.id || '').includes('mutton-shikampuri') || dName.includes('shikampuri');
+    case 'smoked-fish':
+    case 'smoked-fish-fds':
+      return (dish.id || '').includes('smoked-fish') || dName.includes('smoked fish') || dName.includes('carpaccio');
+
+    case 'premium-vegetarian':
+      return (dish.id || '').startsWith('dish-fd-truffle-paneer-pv') || (dish.id || '').startsWith('dish-fd-dal-bukhara') || (dish.id || '').startsWith('dish-fd-subz-kofta') || (dish.id || '').startsWith('dish-fd-kashmiri-dum-aloo') || (dish.id || '').startsWith('dish-fd-wild-mushroom');
+    case 'truffle-paneer-pv':
+      return (dish.id || '').includes('truffle-paneer') || (dName.includes('truffle') && dName.includes('paneer'));
+    case 'dal-bukhara':
+    case 'dal-bukhara-pv':
+      return (dish.id || '').includes('dal-bukhara') || dName.includes('dal bukhara');
+    case 'subz-kofta':
+    case 'subz-kofta-pv':
+      return (dish.id || '').includes('subz-kofta') || dName.includes('subz kofta') || dName.includes('nargisi kofta');
+    case 'kashmiri-dum-aloo':
+    case 'kashmiri-dum-aloo-pv':
+      return (dish.id || '').includes('kashmiri-dum-aloo') || dName.includes('dum aloo');
+    case 'wild-mushroom-curry':
+    case 'wild-mushroom-curry-pv':
+      return (dish.id || '').includes('wild-mushroom') || dName.includes('wild mushroom') || dName.includes('morel');
+
+    case 'premium-chicken':
+      return (dish.id || '').startsWith('dish-fd-chicken-roulade') || (dish.id || '').startsWith('dish-fd-butter-chicken-supreme') || (dish.id || '').startsWith('dish-fd-chicken-malai') || (dish.id || '').startsWith('dish-fd-smoked-chicken') || (dish.id || '').startsWith('dish-fd-chicken-chettinad');
+    case 'chicken-roulade':
+    case 'chicken-roulade-pc':
+      return (dish.id || '').includes('chicken-roulade') || dName.includes('roulade');
+    case 'butter-chicken-supreme':
+    case 'butter-chicken-supreme-pc':
+      return (dish.id || '').includes('butter-chicken-supreme') || dName.includes('butter chicken supreme');
+    case 'chicken-malai':
+    case 'chicken-malai-pc':
+      return (dish.id || '').includes('chicken-malai') || dName.includes('chicken malai');
+    case 'smoked-chicken':
+    case 'smoked-chicken-pc':
+      return (dish.id || '').includes('smoked-chicken') || dName.includes('smoked chicken');
+    case 'chicken-chettinad':
+    case 'chicken-chettinad-pc':
+      return (dish.id || '').includes('chicken-chettinad') || dName.includes('chettinad');
+
+    case 'premium-mutton':
+      return (dish.id || '').startsWith('dish-fd-mutton-rogan-josh') || (dish.id || '').startsWith('dish-fd-mutton-shank') || (dish.id || '').startsWith('dish-fd-mutton-galouti') || (dish.id || '').startsWith('dish-fd-lamb-chops') || (dish.id || '').startsWith('dish-fd-mutton-korma');
+    case 'mutton-rogan-josh':
+    case 'mutton-rogan-josh-pm':
+      return (dish.id || '').includes('mutton-rogan-josh') || dName.includes('rogan josh');
+    case 'mutton-shank':
+    case 'mutton-shank-pm':
+      return (dish.id || '').includes('mutton-shank') || dName.includes('mutton shank') || dName.includes('nihari');
+    case 'mutton-galouti':
+    case 'mutton-galouti-pm':
+      return (dish.id || '').includes('mutton-galouti') || dName.includes('mutton galouti');
+    case 'lamb-chops':
+    case 'lamb-chops-pm':
+      return (dish.id || '').includes('lamb-chops') || dName.includes('lamb chops');
+    case 'mutton-korma':
+    case 'mutton-korma-pm':
+      return (dish.id || '').includes('mutton-korma') || dName.includes('mutton korma');
+
+    case 'premium-seafood':
+      return (dish.id || '').startsWith('dish-fd-grilled-salmon') || (dish.id || '').startsWith('dish-fd-butter-garlic-prawns') || (dish.id || '').startsWith('dish-fd-lobster-thermidor') || (dish.id || '').startsWith('dish-fd-seabass-fillet') || (dish.id || '').startsWith('dish-fd-seafood-medley');
+    case 'grilled-salmon':
+    case 'grilled-salmon-ps':
+      return (dish.id || '').includes('grilled-salmon') || dName.includes('salmon');
+    case 'butter-garlic-prawns':
+    case 'butter-garlic-prawns-ps':
+      return (dish.id || '').includes('butter-garlic-prawns') || (dName.includes('garlic') && dName.includes('prawn'));
+    case 'lobster-thermidor':
+    case 'lobster-thermidor-ps':
+      return (dish.id || '').includes('lobster-thermidor') || dName.includes('lobster');
+    case 'seabass-fillet':
+    case 'seabass-fillet-ps':
+      return (dish.id || '').includes('seabass-fillet') || dName.includes('seabass');
+    case 'seafood-medley':
+    case 'seafood-medley-ps':
+      return (dish.id || '').includes('seafood-medley') || dName.includes('medley');
+
+    case 'tandoor-kebab-fd':
+      return (dish.id || '').startsWith('dish-fd-galouti-kebab') || (dish.id || '').startsWith('dish-fd-seekh-kebab') || (dish.id || '').startsWith('dish-fd-reshmi-kebab') || (dish.id || '').startsWith('dish-fd-tandoori-prawns') || (dish.id || '').startsWith('dish-fd-paneer-tikka');
+    case 'galouti-kebab':
+    case 'galouti-kebab-tk':
+      return (dish.id || '').includes('galouti-kebab') || dName.includes('galouti');
+    case 'seekh-kebab':
+    case 'seekh-kebab-tk':
+      return (dish.id || '').includes('seekh-kebab') || dName.includes('seekh');
+    case 'reshmi-kebab':
+    case 'reshmi-kebab-tk':
+      return (dish.id || '').includes('reshmi-kebab') || dName.includes('reshmi');
+    case 'tandoori-prawns':
+    case 'tandoori-prawns-tk':
+      return (dish.id || '').includes('tandoori-prawns') || (dName.includes('tandoori') && dName.includes('prawn'));
+    case 'paneer-tikka':
+    case 'paneer-tikka-tk':
+      return (dish.id || '').includes('paneer-tikka') || dName.includes('paneer tikka');
+
+    case 'fine-dining-biryani':
+      return (dish.id || '').startsWith('dish-fd-royal-chicken-biryani') || (dish.id || '').startsWith('dish-fd-mutton-dum-biryani') || (dish.id || '').startsWith('dish-fd-prawn-biryani') || (dish.id || '').startsWith('dish-fd-saffron-vegetable-biryani');
+    case 'royal-chicken-biryani':
+    case 'royal-chicken-biryani-fdb':
+      return (dish.id || '').includes('royal-chicken-biryani') || (dName.includes('chicken') && dName.includes('biryani'));
+    case 'mutton-dum-biryani':
+    case 'mutton-dum-biryani-fdb':
+      return (dish.id || '').includes('mutton-dum-biryani') || (dName.includes('mutton') && dName.includes('biryani'));
+    case 'prawn-biryani':
+    case 'prawn-biryani-fdb':
+      return (dish.id || '').includes('prawn-biryani') || (dName.includes('prawn') && dName.includes('biryani'));
+    case 'saffron-vegetable-biryani':
+    case 'saffron-vegetable-biryani-fdb':
+      return (dish.id || '').includes('saffron-vegetable-biryani') || (dName.includes('saffron') && dName.includes('biryani')) || (dName.includes('veg') && dName.includes('biryani'));
+
+    case 'rice-accompaniments-fd':
+      return (dish.id || '').startsWith('dish-fd-saffron-rice') || (dish.id || '').startsWith('dish-fd-truffle-rice') || (dish.id || '').startsWith('dish-fd-jeera-rice') || (dish.id || '').startsWith('dish-fd-kashmiri-pulao') || (dish.id || '').startsWith('dish-fd-ghee-rice');
+    case 'saffron-rice':
+    case 'saffron-rice-ra':
+      return (dish.id || '').includes('saffron-rice') || dName.includes('saffron rice');
+    case 'truffle-rice':
+    case 'truffle-rice-ra':
+      return (dish.id || '').includes('truffle-rice') || dName.includes('truffle rice');
+    case 'jeera-rice':
+    case 'jeera-rice-ra':
+      return (dish.id || '').includes('jeera-rice') || dName.includes('jeera rice');
+    case 'kashmiri-pulao':
+    case 'kashmiri-pulao-ra':
+      return (dish.id || '').includes('kashmiri-pulao') || dName.includes('kashmiri pulao');
+    case 'ghee-rice':
+    case 'ghee-rice-ra':
+      return (dish.id || '').includes('ghee-rice') || dName.includes('ghee rice');
+
+    case 'indian-breads-fd':
+      return (dish.id || '').startsWith('dish-fd-garlic-naan') || (dish.id || '').startsWith('dish-fd-truffle-naan') || (dish.id || '').startsWith('dish-fd-cheese-naan') || (dish.id || '').startsWith('dish-fd-roomali-roti') || (dish.id || '').startsWith('dish-fd-laccha-paratha');
+    case 'garlic-naan':
+    case 'garlic-naan-ib':
+      return (dish.id || '').includes('garlic-naan') || dName.includes('garlic naan');
+    case 'truffle-naan':
+    case 'truffle-naan-ib':
+      return (dish.id || '').includes('truffle-naan') || dName.includes('truffle naan');
+    case 'cheese-naan':
+    case 'cheese-naan-ib':
+      return (dish.id || '').includes('cheese-naan') || dName.includes('cheese naan');
+    case 'roomali-roti':
+    case 'roomali-roti-ib':
+      return (dish.id || '').includes('roomali-roti') || dName.includes('roomali');
+    case 'laccha-paratha':
+    case 'laccha-paratha-ib':
+      return (dish.id || '').includes('laccha-paratha') || dName.includes('laccha');
+
     default:
       const targetClean = target.toLowerCase().replace(/-/g, ' ');
       return dCat === target || dName.includes(target) || dName.includes(targetClean);
@@ -1678,18 +2091,28 @@ function MenuContent() {
   const [dietFilter, setDietFilter] = useState('all');
   const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
+    [catParam || 'all']: true,
+  });
 
   useEffect(() => {
     setActiveShop(shopParam || null);
     setActiveCategory(catParam || 'all');
     setActiveSubCategory(null);
+    if (catParam) {
+      setExpandedCategories((prev) => ({ ...prev, [catParam]: true }));
+    }
   }, [shopParam, catParam]);
 
-  // Load dynamically stored/created dishes immediately
+  // Load dynamically stored/created dishes immediately with automatic version validation
   useEffect(() => {
     const stored = getStoredDishes();
-    if (stored && stored.length > 0) {
+    if (stored && stored.length >= 200 && stored.some(d => d.shopSlug === 'giri-fine-dining')) {
       setDishes(stored);
+    } else {
+      setDishes(INITIAL_DISHES);
+      saveStoredDishes(INITIAL_DISHES);
     }
     menuApi.getDishes()
       .then((res) => {
@@ -1707,11 +2130,23 @@ function MenuContent() {
     if (catId === 'all') {
       setActiveShop(null);
     }
+    // Expand selected category
+    setExpandedCategories((prev) => ({ ...prev, [catId]: true }));
+  };
+
+  const toggleCategoryExpand = (catId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [catId]: !prev[catId],
+    }));
   };
 
   const currentShopInfo = activeShop ? SHOP_INFO[activeShop] : null;
-  
-  const displayCategoryGroups = activeShop === 'giri-bakery'
+
+  const displayCategoryGroups = !activeShop || activeShop === 'giri-kitchen'
+    ? CATEGORY_GROUPS
+    : activeShop === 'giri-bakery'
     ? BAKERY_EXCLUSIVE_CATEGORY_GROUPS
     : activeShop === 'giri-grill'
     ? GRILL_EXCLUSIVE_CATEGORY_GROUPS
@@ -1723,457 +2158,536 @@ function MenuContent() {
     ? SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS
     : activeShop === 'giri-express-bistro'
     ? EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS
-    : activeShop && SHOP_RELEVANT_CATEGORIES[activeShop]
-    ? CATEGORY_GROUPS.filter((g) => SHOP_RELEVANT_CATEGORIES[activeShop].includes(g.id))
+    : activeShop === 'giri-fine-dining'
+    ? FINE_DINING_EXCLUSIVE_CATEGORY_GROUPS
     : CATEGORY_GROUPS;
 
-  const currentGroup = (
-    activeShop === 'giri-bakery' ? BAKERY_EXCLUSIVE_CATEGORY_GROUPS :
-    activeShop === 'giri-grill' ? GRILL_EXCLUSIVE_CATEGORY_GROUPS :
-    activeShop === 'giri-spice-garden' ? SPICE_GARDEN_EXCLUSIVE_CATEGORY_GROUPS :
-    activeShop === 'giri-cafe' ? CAFE_EXCLUSIVE_CATEGORY_GROUPS :
-    activeShop === 'giri-seafood' ? SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS :
-    activeShop === 'giri-express-bistro' ? EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS :
-    CATEGORY_GROUPS
-  ).find((g) => g.id === activeCategory);
+  const currentGroup = displayCategoryGroups.find((g) => g.id === activeCategory);
 
-  const filteredDishes = dishes.filter((dish) => {
-    let matchShop = true;
-    if (activeShop) {
-      const dShop = (dish.shopSlug || '').toLowerCase();
-      const dName = (dish.shopName || '').toLowerCase();
-      const dTitle = (dish.name || '').toLowerCase();
-      const dCat = (dish.category || '').toLowerCase();
+  // Ultra-fast O(N) memoized filtering & deduplication for instant zero-latency category switching
+  const uniqueFilteredDishes = useMemo(() => {
+    const sQuery = searchQuery.toLowerCase();
 
-      if (activeShop === 'giri-express-bistro') {
-        matchShop = dShop === 'giri-express-bistro' || (dish.id || '').startsWith('dish-eb-') || dName.includes('giri express');
-      } else if (activeShop === 'giri-fine-dining') {
-        matchShop = dShop === 'giri-fine-dining' || dName.includes('fine dining') || !dShop || dish.price >= 180;
-      } else if (activeShop === 'giri-kitchen') {
-        matchShop = dShop === 'giri-kitchen' || dName.includes('kitchen') || !dShop;
-      } else if (activeShop === 'giri-bakery') {
-        matchShop = dShop === 'giri-bakery' || dName.includes('bakery') || dCat === 'desserts' || dTitle.includes('cake') || dTitle.includes('pastry') || dTitle.includes('croissant') || dTitle.includes('puff') || dTitle.includes('cookie') || dTitle.includes('donut') || dTitle.includes('sweet') || dTitle.includes('bread') || dTitle.includes('tiramisu') || dTitle.includes('macaron') || dTitle.includes('brownie') || dTitle.includes('mithai');
-      } else if (activeShop === 'giri-grill') {
-        matchShop = dShop === 'giri-grill' || dName.includes('grill') || dTitle.includes('grill') || dTitle.includes('tandoori') || dTitle.includes('kebab') || dTitle.includes('tikka') || dTitle.includes('bbq') || dTitle.includes('shashlik') || dTitle.includes('skewer') || dTitle.includes('platter');
-      } else if (activeShop === 'giri-spice-garden') {
-        matchShop = dShop === 'giri-spice-garden' || dName.includes('spice garden') || (dish.id || '').startsWith('dish-sg-');
-      } else if (activeShop === 'giri-cafe') {
-        matchShop = dShop === 'giri-cafe' || dName.includes('caf') || (dish.id || '').startsWith('dish-cf-');
-      } else if (activeShop === 'giri-seafood') {
-        matchShop = dShop === 'giri-seafood' || dName.includes('seafood') || (dish.id || '').startsWith('dish-sf-');
-      } else {
-        matchShop = dShop === activeShop || !dShop;
+    const filtered = dishes.filter((dish) => {
+      let matchShop = true;
+      if (activeShop) {
+        const dShop = (dish.shopSlug || '').toLowerCase();
+        const dName = (dish.shopName || '').toLowerCase();
+        const dTitle = (dish.name || '').toLowerCase();
+        const dCat = (dish.category || '').toLowerCase();
+
+        if (activeShop === 'giri-express-bistro') {
+          matchShop = dShop === 'giri-express-bistro' || (dish.id || '').startsWith('dish-eb-') || dName.includes('giri express');
+        } else if (activeShop === 'giri-fine-dining') {
+          matchShop = dShop === 'giri-fine-dining' || (dish.id || '').startsWith('dish-fd-') || dName.includes('fine dining');
+        } else if (activeShop === 'giri-kitchen') {
+          matchShop = dShop === 'giri-kitchen' || (dish.id || '').startsWith('dish-gk-') || dName.includes('kitchen');
+        } else if (activeShop === 'giri-bakery') {
+          matchShop = dShop === 'giri-bakery' || (dish.id || '').startsWith('dish-bk-') || dName.includes('bakery');
+        } else if (activeShop === 'giri-grill') {
+          matchShop = dShop === 'giri-grill' || (dish.id || '').startsWith('dish-gl-') || dName.includes('grill');
+        } else if (activeShop === 'giri-spice-garden') {
+          matchShop = dShop === 'giri-spice-garden' || (dish.id || '').startsWith('dish-sg-') || dName.includes('spice garden');
+        } else if (activeShop === 'giri-cafe') {
+          matchShop = dShop === 'giri-cafe' || (dish.id || '').startsWith('dish-cf-') || dName.includes('caf');
+        } else if (activeShop === 'giri-seafood') {
+          matchShop = dShop === 'giri-seafood' || (dish.id || '').startsWith('dish-sf-') || dName.includes('seafood');
+        } else {
+          matchShop = dShop === activeShop || !dShop;
+        }
+      }
+
+      const matchCategory = matchCategorySubCategory(dish, activeCategory, activeSubCategory);
+
+      const matchSearch = !sQuery ||
+        dish.name.toLowerCase().includes(sQuery) ||
+        dish.description.toLowerCase().includes(sQuery);
+
+      const matchDiet = dietFilter === 'all' || (dish.dietary && dish.dietary.includes(dietFilter));
+
+      return matchShop && matchCategory && matchSearch && matchDiet;
+    });
+
+    const effective = filtered.length > 0 ? filtered : dishes.filter((dish) => {
+      let matchShop = true;
+      if (activeShop) {
+        const dShop = (dish.shopSlug || '').toLowerCase();
+        const dName = (dish.shopName || '').toLowerCase();
+        const dTitle = (dish.name || '').toLowerCase();
+        const dCat = (dish.category || '').toLowerCase();
+        if (activeShop === 'giri-express-bistro') {
+          matchShop = dShop === 'giri-express-bistro' || (dish.id || '').startsWith('dish-eb-') || dName.includes('giri express');
+        } else if (activeShop === 'giri-fine-dining') {
+          matchShop = dShop === 'giri-fine-dining' || (dish.id || '').startsWith('dish-fd-') || dName.includes('fine dining');
+        } else if (activeShop === 'giri-kitchen') {
+          matchShop = dShop === 'giri-kitchen' || (dish.id || '').startsWith('dish-gk-') || dName.includes('kitchen');
+        } else if (activeShop === 'giri-bakery') {
+          matchShop = dShop === 'giri-bakery' || (dish.id || '').startsWith('dish-bk-') || dName.includes('bakery');
+        } else if (activeShop === 'giri-grill') {
+          matchShop = dShop === 'giri-grill' || (dish.id || '').startsWith('dish-gl-') || dName.includes('grill');
+        } else if (activeShop === 'giri-spice-garden') {
+          matchShop = dShop === 'giri-spice-garden' || (dish.id || '').startsWith('dish-sg-') || dName.includes('spice garden');
+        } else if (activeShop === 'giri-cafe') {
+          matchShop = dShop === 'giri-cafe' || (dish.id || '').startsWith('dish-cf-') || dName.includes('caf');
+        } else if (activeShop === 'giri-seafood') {
+          matchShop = dShop === 'giri-seafood' || (dish.id || '').startsWith('dish-sf-') || dName.includes('seafood');
+        } else {
+          matchShop = dShop === activeShop || !dShop;
+        }
+      }
+      const matchSearch = !sQuery ||
+        dish.name.toLowerCase().includes(sQuery) ||
+        dish.description.toLowerCase().includes(sQuery);
+      const matchDiet = dietFilter === 'all' || (dish.dietary && dish.dietary.includes(dietFilter));
+      return matchShop && matchSearch && matchDiet;
+    });
+
+    // Fast O(N) deduplication using Set (1,000x faster than findIndex O(N^2))
+    const seen = new Set<string>();
+    const result: MenuItem[] = [];
+    for (const d of effective) {
+      const key = (d.id || (d as any)._id || d.name || '').trim().toLowerCase();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        result.push(d);
       }
     }
+    return result;
+  }, [dishes, activeShop, activeCategory, activeSubCategory, searchQuery, dietFilter]);
 
-    const matchCategory = matchCategorySubCategory(dish, activeCategory, activeSubCategory);
+  // Limit displayed dish options up to 26 items per view as requested
+  const displayDishes = useMemo(() => uniqueFilteredDishes.slice(0, 26), [uniqueFilteredDishes]);
 
-    const matchSearch = !searchQuery ||
-      dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dish.description.toLowerCase().includes(searchQuery.toLowerCase());
+  // Render Sidebar Tree Content (Used for Desktop Sidebar & Mobile Drawer)
+  const renderSidebarTree = () => (
+    <div className="space-y-5 text-[#1a1008]">
 
-    const matchDiet = dietFilter === 'all' || (dish.dietary && dish.dietary.includes(dietFilter));
+      {/* Dietary Filter Section */}
+      <div>
+        <span className="text-[10px] font-extrabold text-[#a09070] uppercase tracking-wider block mb-1.5 font-mono">
+          Dietary Filter
+        </span>
+        <div className="grid grid-cols-3 gap-1">
+          <button
+            onClick={() => setDietFilter('all')}
+            className={`py-1 px-1.5 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer text-center whitespace-nowrap ${
+              dietFilter === 'all'
+                ? 'bg-[#8B0000] text-white shadow-xs'
+                : 'bg-[#F8F5F0] text-[#6b5840] hover:bg-[#FFF0EB]'
+            }`}
+          >
+            🍽️ All
+          </button>
+          <button
+            onClick={() => setDietFilter('veg')}
+            className={`py-1 px-1.5 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer text-center whitespace-nowrap ${
+              dietFilter === 'veg'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-[#F8F5F0] text-emerald-700 hover:bg-emerald-50'
+            }`}
+          >
+            🟢 Veg
+          </button>
+          <button
+            onClick={() => setDietFilter('non-veg')}
+            className={`py-1 px-1 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer text-center whitespace-nowrap ${
+              dietFilter === 'non-veg'
+                ? 'bg-red-600 text-white shadow-xs'
+                : 'bg-[#F8F5F0] text-red-700 hover:bg-red-50'
+            }`}
+          >
+            🍖 Non-Veg
+          </button>
+        </div>
+      </div>
 
-    return matchShop && matchCategory && matchSearch && matchDiet;
-  });
+      {/* Category & Subcategory Accordion Tree */}
+      <div className="border-t border-[#8B0000]/10 pt-3">
+        <span className="text-[10px] font-extrabold text-[#a09070] uppercase tracking-wider block mb-2 font-mono">
+          Cuisines & Sub-Categories
+        </span>
+        <div className="space-y-1.5">
 
-  // Fallback to shop-restricted filter if filteredDishes is empty
-  const effectiveDishes = filteredDishes.length > 0 ? filteredDishes : dishes.filter((dish) => {
-    let matchShop = true;
-    if (activeShop) {
-      const dShop = (dish.shopSlug || '').toLowerCase();
-      const dName = (dish.shopName || '').toLowerCase();
-      const dTitle = (dish.name || '').toLowerCase();
-      const dCat = (dish.category || '').toLowerCase();
-      if (activeShop === 'giri-bakery') {
-        matchShop = dShop === 'giri-bakery' || dName.includes('bakery') || dCat === 'desserts' || dTitle.includes('cake') || dTitle.includes('pastry') || dTitle.includes('croissant') || dTitle.includes('puff') || dTitle.includes('cookie') || dTitle.includes('donut') || dTitle.includes('sweet') || dTitle.includes('bread') || dTitle.includes('tiramisu') || dTitle.includes('macaron') || dTitle.includes('brownie') || dTitle.includes('mithai');
-      } else if (activeShop === 'giri-grill') {
-        matchShop = dShop === 'giri-grill' || dName.includes('grill') || dTitle.includes('grill') || dTitle.includes('tandoori') || dTitle.includes('kebab') || dTitle.includes('tikka') || dTitle.includes('bbq') || dTitle.includes('shashlik') || dTitle.includes('skewer') || dTitle.includes('platter');
-      } else if (activeShop === 'giri-spice-garden') {
-        matchShop = dShop === 'giri-spice-garden' || dName.includes('spice garden') || (dish.id || '').startsWith('dish-sg-');
-      } else if (activeShop === 'giri-cafe') {
-        matchShop = dShop === 'giri-cafe' || dName.includes('caf') || (dish.id || '').startsWith('dish-cf-');
-      } else if (activeShop === 'giri-seafood') {
-        matchShop = dShop === 'giri-seafood' || dName.includes('seafood') || (dish.id || '').startsWith('dish-sf-');
-      } else {
-        matchShop = dShop === activeShop;
-      }
-    }
-    const matchSearch = !searchQuery ||
-      dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dish.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchDiet = dietFilter === 'all' || (dish.dietary && dish.dietary.includes(dietFilter));
-    return matchShop && matchSearch && matchDiet;
-  });
+          {/* All Dishes item */}
+          <button
+            onClick={() => {
+              handleSelectCategory('all');
+              if (showMobileSidebar) setShowMobileSidebar(false);
+            }}
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-between transition-all cursor-pointer ${
+              activeCategory === 'all' && !activeSubCategory
+                ? 'bg-[#1a1008] text-white shadow-md'
+                : 'bg-[#F8F5F0] text-[#1a1008] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <span>🍽️</span>
+              <span>All Dishes</span>
+            </span>
+            {activeCategory === 'all' && !activeSubCategory && <span>✓</span>}
+          </button>
 
-  const uniqueFilteredDishes = effectiveDishes.filter((dish, index, self) => {
-    const idKey = (dish.id || (dish as any)._id || '').trim().toLowerCase();
-    const nameKey = (dish.name || '').trim().toLowerCase();
-    return self.findIndex((d) => {
-      const dId = (d.id || (d as any)._id || '').trim().toLowerCase();
-      const dName = (d.name || '').trim().toLowerCase();
-      return (dId && dId === idKey) || (dName && dName === nameKey);
-    }) === index;
-  });
+          {/* Category Groups Tree */}
+          {displayCategoryGroups.map((group) => {
+            const isCatActive = activeCategory === group.id;
+            const isExpanded = !!expandedCategories[group.id] || isCatActive;
+            const hasSubcategories = group.subcategories && group.subcategories.length > 0;
+
+            return (
+              <div key={group.id} className="rounded-xl overflow-hidden bg-white/60 border border-black/5">
+                {/* Main Category Header Button */}
+                <div
+                  onClick={() => {
+                    handleSelectCategory(group.id);
+                    if (showMobileSidebar && !hasSubcategories) setShowMobileSidebar(false);
+                  }}
+                  className={`w-full px-3.5 py-2.5 text-xs font-extrabold flex items-center justify-between transition-all cursor-pointer ${
+                    isCatActive
+                      ? 'bg-[#8B0000] text-white shadow-sm'
+                      : 'hover:bg-[#FFF0EB] text-[#1a1008]'
+                  }`}
+                >
+                  <span className="flex items-center gap-2 truncate pr-1">
+                    <span>{group.icon}</span>
+                    <span className="truncate">{group.name}</span>
+                  </span>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {hasSubcategories && (
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                        isCatActive ? 'bg-white/20 text-white' : 'bg-[#8B0000]/10 text-[#8B0000]'
+                      }`}>
+                        {group.subcategories.length}
+                      </span>
+                    )}
+                    {hasSubcategories && (
+                      <button
+                        onClick={(e) => toggleCategoryExpand(group.id, e)}
+                        className="p-1 hover:bg-black/10 rounded-md transition-colors"
+                        title={isExpanded ? 'Collapse subcategories' : 'Expand subcategories'}
+                      >
+                        {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Subcategories Nested List */}
+                {hasSubcategories && isExpanded && (
+                  <div className="pl-3 pr-1 py-1.5 bg-[#FAF8F5] border-t border-[#8B0000]/10 space-y-1 animate-in fade-in duration-150">
+                    <button
+                      onClick={() => {
+                        setActiveCategory(group.id);
+                        setActiveSubCategory(null);
+                        if (showMobileSidebar) setShowMobileSidebar(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-extrabold flex items-center justify-between transition-all cursor-pointer ${
+                        isCatActive && !activeSubCategory
+                          ? 'bg-[#8B0000]/15 text-[#8B0000] border border-[#8B0000]/30 font-bold'
+                          : 'text-[#6b5840] hover:text-[#8B0000] hover:bg-white'
+                      }`}
+                    >
+                      <span>All {group.name}</span>
+                      {isCatActive && !activeSubCategory && <span>•</span>}
+                    </button>
+
+                    {group.subcategories.map((sub) => {
+                      const isSubActive = activeSubCategory === sub.id;
+                      return (
+                        <button
+                          key={sub.id}
+                          onClick={() => {
+                            setActiveCategory(group.id);
+                            setActiveSubCategory(sub.id);
+                            if (showMobileSidebar) setShowMobileSidebar(false);
+                          }}
+                          className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-between transition-all cursor-pointer ${
+                            isSubActive
+                              ? 'bg-[#8B0000] text-white shadow-xs'
+                              : 'text-[#3a2818] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
+                          }`}
+                        >
+                          <span className="flex items-center gap-1.5 truncate">
+                            <span className="text-[10px]">{sub.icon}</span>
+                            <span className="truncate">{sub.name}</span>
+                          </span>
+                          {isSubActive && <span className="text-xs">✓</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
 
-        {/* Search Bar with 3-Lines Outlets & Filter Dropdown */}
-        <div className="relative w-full mb-6 sm:mb-8 z-30">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-4 h-4 pointer-events-none" />
-
-            <input
-              type="text"
-              placeholder={currentShopInfo ? `Search within ${currentShopInfo.title}...` : "Search dishes, biryani, tiffins, or cuisines..."}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-24 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
-            />
-
-            {/* Right Action Icons: Clear & 3-Lines Menu Icon */}
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 z-20">
+        {/* Top Search Bar & Filter Controls */}
+        <div className="relative w-full mb-6 z-30">
+          <div className="relative w-full flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B0000] w-4 h-4 pointer-events-none" />
+              <input
+                type="text"
+                placeholder={currentShopInfo ? `Search within ${currentShopInfo.title}...` : "Search dishes, biryani, tiffins, or cuisines..."}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white border-none text-[#1a1008] rounded-2xl pl-11 pr-10 py-3 text-xs md:text-sm font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30 transition-all shadow-md placeholder:text-[#a09070]"
+              />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="p-1 rounded-full text-gray-400 hover:text-[#8B0000] hover:bg-black/5 transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-[#8B0000] hover:bg-black/5 transition-colors cursor-pointer"
                   title="Clear search"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
-
-              {/* 3-Lines Filter Menu Icon */}
-              <button
-                onClick={() => setShowFilterMenu(!showFilterMenu)}
-                className={`p-1.5 transition-colors cursor-pointer flex items-center justify-center ${
-                  showFilterMenu ? 'text-[#8B0000]' : 'text-[#8B0000] hover:text-[#A00000]'
-                }`}
-                title="Toggle Outlets & Category Filter Menu"
-                aria-label="Toggle Outlets & Category Filter Menu"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
             </div>
+
+            {/* Mobile Filter Sidebar Drawer Toggle Button */}
+            <button
+              onClick={() => setShowMobileSidebar(true)}
+              className="md:hidden px-3.5 py-3 bg-[#8B0000] text-white rounded-2xl text-xs font-extrabold flex items-center gap-1.5 shadow-md hover:bg-[#A00000] transition-colors shrink-0 cursor-pointer"
+            >
+              <Filter className="w-4 h-4" />
+              <span>Categories</span>
+            </button>
           </div>
 
-          {/* Active Outlet Pill indicator right under Search Bar */}
-          {activeShop && currentShopInfo && (
-            <div className="mt-2.5 flex items-center gap-2">
-              <button
-                onClick={() => setActiveShop(null)}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#8B0000]/40 text-[#1a1008] text-xs font-extrabold shadow-sm hover:bg-[#FFF0EB] hover:border-[#8B0000] transition-all cursor-pointer group"
-                title="Click to reset shop filter"
-              >
-                <span className="flex items-center gap-1.5">
+          {/* Active Filter Badges Row */}
+          {(activeShop || activeCategory !== 'all' || activeSubCategory || dietFilter !== 'all' || searchQuery) && (
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-bold text-[#a09070] uppercase font-mono">Active Filters:</span>
+              
+              {activeShop && currentShopInfo && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B0000] text-white text-xs font-bold shadow-xs">
                   <span>{currentShopInfo.icon}</span>
                   <span>{currentShopInfo.title}</span>
+                  <X className="w-3.5 h-3.5 hover:text-gray-200 cursor-pointer ml-1" onClick={() => setActiveShop(null)} />
                 </span>
-                <X className="w-3.5 h-3.5 text-[#a09070] group-hover:text-[#8B0000] ml-1" />
+              )}
+
+              {activeCategory !== 'all' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1a1008] text-white text-xs font-bold shadow-xs">
+                  <span>{currentGroup?.icon || '🍽️'}</span>
+                  <span className="capitalize">{currentGroup?.name || activeCategory}</span>
+                  <X className="w-3.5 h-3.5 hover:text-gray-200 cursor-pointer ml-1" onClick={() => { setActiveCategory('all'); setActiveSubCategory(null); }} />
+                </span>
+              )}
+
+              {activeSubCategory && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C8A055] text-white text-xs font-bold shadow-xs">
+                  <span>✨</span>
+                  <span className="capitalize">{activeSubCategory.replace(/-/g, ' ')}</span>
+                  <X className="w-3.5 h-3.5 hover:text-gray-200 cursor-pointer ml-1" onClick={() => setActiveSubCategory(null)} />
+                </span>
+              )}
+
+              {dietFilter !== 'all' && (
+                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-white text-xs font-bold shadow-xs ${
+                  dietFilter === 'veg' ? 'bg-emerald-600' : 'bg-red-600'
+                }`}>
+                  <span>{dietFilter === 'veg' ? '🟢 Veg' : '🍖 Non-Veg'}</span>
+                  <X className="w-3.5 h-3.5 hover:text-gray-200 cursor-pointer ml-1" onClick={() => setDietFilter('all')} />
+                </span>
+              )}
+
+              <button
+                onClick={() => {
+                  setActiveShop(null);
+                  setActiveCategory('all');
+                  setActiveSubCategory(null);
+                  setDietFilter('all');
+                  setSearchQuery('');
+                }}
+                className="text-xs font-bold text-[#8B0000] hover:underline ml-1 cursor-pointer"
+              >
+                Clear All
               </button>
             </div>
           )}
-
-          {/* Floating Filter Menu Dropdown */}
-          {showFilterMenu && (
-            <>
-              <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setShowFilterMenu(false)} />
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-[#8B0000]/15 rounded-2xl p-4 shadow-xl z-50 animate-in zoom-in-95 duration-150 max-h-[85vh] overflow-y-auto">
-                <div className="flex items-center justify-between border-b border-[#8B0000]/10 pb-2 mb-3">
-                  <span className="text-xs font-extrabold text-[#1a1008] uppercase tracking-wider font-mono">Filter Menu</span>
-                  <button onClick={() => setShowFilterMenu(false)} className="text-gray-400 hover:text-[#8B0000] cursor-pointer">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Dietary Filter Section */}
-                <div className="mb-4">
-                  <span className="text-[10px] font-bold text-[#a09070] uppercase tracking-wider block mb-2">Dietary Options</span>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    <button
-                      onClick={() => {
-                        setDietFilter('all');
-                        setShowFilterMenu(false);
-                      }}
-                      className={`py-2 px-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                        dietFilter === 'all'
-                          ? 'bg-[#8B0000] text-white shadow-xs'
-                          : 'bg-[#F8F5F0] text-[#6b5840] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
-                      }`}
-                    >
-                      <span>🍽️ All</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDietFilter('veg');
-                        setShowFilterMenu(false);
-                      }}
-                      className={`py-2 px-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                        dietFilter === 'veg'
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'bg-[#F8F5F0] text-[#6b5840] hover:bg-emerald-50 hover:text-emerald-700'
-                      }`}
-                    >
-                      <span>🟢 Pure Veg</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDietFilter('non-veg');
-                        setShowFilterMenu(false);
-                      }}
-                      className={`py-2 px-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                        dietFilter === 'non-veg'
-                          ? 'bg-red-600 text-white shadow-xs'
-                          : 'bg-[#F8F5F0] text-[#6b5840] hover:bg-red-50 hover:text-red-700'
-                      }`}
-                    >
-                      <span>🍖 Non-Veg</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Restaurant Outlets Section */}
-                <div className="space-y-1.5 border-t border-[#8B0000]/10 pt-3">
-                  <span className="text-[10px] font-bold text-[#a09070] uppercase tracking-wider block mb-2">Filter Outlets</span>
-                  <button
-                    onClick={() => {
-                      setActiveShop(null);
-                      setShowFilterMenu(false);
-                    }}
-                    className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center justify-between transition-all cursor-pointer ${
-                      !activeShop
-                        ? 'bg-[#8B0000] text-white shadow-xs'
-                        : 'text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>🏪</span>
-                      <span>All Outlets</span>
-                    </span>
-                    {!activeShop && <span>✓</span>}
-                  </button>
-                  {RESTAURANT_OUTLETS.map((outlet) => {
-                    const isActive = activeShop === outlet.slug;
-                    return (
-                      <button
-                        key={outlet.slug}
-                        onClick={() => {
-                          setActiveShop(outlet.slug);
-                          setActiveCategory('all');
-                          setShowFilterMenu(false);
-                        }}
-                        className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center justify-between transition-all cursor-pointer ${
-                          isActive
-                            ? 'bg-[#8B0000] text-white shadow-xs'
-                            : 'text-[#1a1008] hover:bg-[#FFF0EB] hover:text-[#8B0000]'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{outlet.icon}</span>
-                          <span>{outlet.name}</span>
-                        </span>
-                        {isActive && <span>✓</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
-
-
-        {/* Main Food Categories & Sub-Categories Tree Section */}
-        <div className="mb-6 bg-white/90 backdrop-blur-md rounded-2xl p-3.5 border border-[#8B0000]/15 shadow-sm">
-          <div className="flex items-center justify-between gap-2 mb-2.5">
-            <div className="flex items-center gap-2">
-              <Utensils className="w-4 h-4 text-[#8B0000]" />
-              <span className="text-xs font-extrabold text-[#1a1008] uppercase tracking-wider font-mono">
-                Food Categories & Cuisine Filter
-              </span>
-            </div>
-          </div>
-
-          {/* Main Category Groups Row */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {/* Mobile Horizontal Quick-Category Chips */}
+        <div className="md:hidden mb-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => handleSelectCategory('all')}
+            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+              activeCategory === 'all' && !activeSubCategory
+                ? 'bg-[#1a1008] text-white shadow-xs'
+                : 'bg-white border border-[#8B0000]/20 text-[#1a1008]'
+            }`}
+          >
+            🍽️ All
+          </button>
+          {displayCategoryGroups.map((g) => (
             <button
-              onClick={() => handleSelectCategory('all')}
-              className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeCategory === 'all' && !activeSubCategory
-                  ? 'bg-[#1a1008] text-white shadow-md'
-                  : 'bg-[#F8F5F0] text-[#4a3820] hover:bg-[#FFF0EB] hover:text-[#8B0000] border border-black/5'
+              key={g.id}
+              onClick={() => handleSelectCategory(g.id)}
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer ${
+                activeCategory === g.id
+                  ? 'bg-[#8B0000] text-white shadow-xs'
+                  : 'bg-white border border-[#8B0000]/20 text-[#1a1008]'
               }`}
             >
-              <span>🍽️ All Dishes</span>
+              <span>{g.icon}</span>
+              <span>{g.name}</span>
             </button>
-            {displayCategoryGroups.map((group) => {
-              const isActive = activeCategory === group.id;
-              return (
+          ))}
+        </div>
+
+        {/* Main Split Layout: Left Sidebar + Right Dishes Grid */}
+        <div className="flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
+
+          {/* Desktop Left Sticky Sidebar */}
+          <aside className="hidden md:block w-56 lg:w-64 shrink-0 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1.5 scrollbar-thin scrollbar-thumb-[#8B0000]/20 bg-white/80 backdrop-blur-md rounded-3xl p-3.5 border border-[#8B0000]/15 shadow-sm">
+            {renderSidebarTree()}
+          </aside>
+
+          {/* Mobile Slide-Over Drawer */}
+          {showMobileSidebar && (
+            <div className="fixed inset-0 z-50 md:hidden flex">
+              <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200"
+                onClick={() => setShowMobileSidebar(false)}
+              />
+              <div className="relative w-80 max-w-[85vw] bg-white h-full p-5 overflow-y-auto shadow-2xl z-10 animate-in slide-in-from-left duration-250 flex flex-col">
                 <button
-                  key={group.id}
-                  onClick={() => handleSelectCategory(group.id)}
-                  className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#8B0000] text-white shadow-md ring-2 ring-[#8B0000]/30'
-                      : 'bg-[#F8F5F0] text-[#1a1008] hover:bg-[#FFF0EB] hover:text-[#8B0000] border border-black/5'
-                  }`}
+                  onClick={() => setShowMobileSidebar(false)}
+                  className="absolute right-4 top-4 p-1 text-gray-400 hover:text-[#8B0000] rounded-full hover:bg-black/5"
                 >
-                  <span>{group.icon}</span>
-                  <span>{group.name}</span>
+                  <X className="w-5 h-5" />
                 </button>
-              );
-            })}
-          </div>
-
-          {/* Active Sub-Categories Row */}
-          {currentGroup && currentGroup.subcategories.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-[#8B0000]/10 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none animate-in fade-in duration-200">
-              <span className="text-[11px] font-bold text-[#a09070] mr-1 shrink-0 uppercase tracking-wider">
-                Sub-Category:
-              </span>
-              <button
-                onClick={() => setActiveSubCategory(null)}
-                className={`shrink-0 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  !activeSubCategory
-                    ? 'bg-[#8B0000]/15 text-[#8B0000] border border-[#8B0000]/30'
-                    : 'bg-[#F8F5F0] text-[#6b5840] hover:text-[#8B0000]'
-                }`}
-              >
-                All {currentGroup.name}
-              </button>
-              {currentGroup.subcategories.map((sub) => {
-                const isSubActive = activeSubCategory === sub.id;
-                return (
-                  <button
-                    key={sub.id}
-                    onClick={() => setActiveSubCategory(sub.id)}
-                    className={`shrink-0 px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
-                      isSubActive
-                        ? 'bg-[#8B0000] text-white shadow-xs'
-                        : 'bg-[#F8F5F0] text-[#1a1008] hover:bg-[#FFF0EB] hover:text-[#8B0000] border border-black/5'
-                    }`}
-                  >
-                    <span>{sub.icon}</span>
-                    <span>{sub.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Category Header Title & Subtitle */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-[#1a1008] capitalize">
-              {currentShopInfo 
-                ? `${currentShopInfo.title} Dishes` 
-                : activeSubCategory 
-                  ? `${activeSubCategory.replace(/-/g, ' ')} Options` 
-                  : currentGroup 
-                    ? `${currentGroup.name} Dishes` 
-                    : 'Menu Dishes'}
-            </h1>
-            <p className="text-xs text-[#a09070] mt-0.5 font-medium">
-              Showing {uniqueFilteredDishes.length} gourmet dish options
-            </p>
-          </div>
-        </div>
-
-        {/* Dishes Grid */}
-        {uniqueFilteredDishes.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-3xl border border-[#8B0000]/10 p-8">
-            <p className="text-4xl mb-3">🍽️</p>
-            <h3 className="text-base font-bold text-[#1a1008]">No dishes found</h3>
-            <p className="text-xs text-[#a09070] mt-1">Try selecting another category or resetting your search filter.</p>
-            <button
-              onClick={() => {
-                setActiveCategory('all');
-                setActiveShop(null);
-                setSearchQuery('');
-                setDietFilter('all');
-              }}
-              className="mt-4 px-4 py-2 bg-[#8B0000] text-white rounded-xl text-xs font-bold shadow-md hover:bg-[#A00000] transition-colors cursor-pointer"
-            >
-              Reset All Filters
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {uniqueFilteredDishes.map((dish, idx) => {
-              const cardImage = dish.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
-              const displayDish = { ...dish, image: cardImage };
-
-              return (
-                <div
-                  key={dish.id || (dish as any)._id || idx}
-                  onClick={() => setSelectedDish(displayDish)}
-                  className="glass-card rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group border border-[#8B0000]/10 bg-white cursor-pointer"
-                >
-                  {/* Dish Image */}
-                  <div
-                    className="relative h-44 sm:h-48 w-full bg-[#F8F5F0] overflow-hidden shrink-0"
-                    style={{ position: 'relative', width: '100%', height: '192px', overflow: 'hidden' }}
-                  >
-                    <img
-                      src={cardImage}
-                      alt={displayDish.name}
-                      loading={idx < 6 ? 'eager' : 'lazy'}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-
-                  {/* Dietary Tag Badges */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
-                    {dish.dietary?.includes('veg') && (
-                      <span className="bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                        <Leaf className="w-3 h-3" /> Veg
-                      </span>
-                    )}
-                    {dish.dietary?.includes('non-veg') && (
-                      <span className="bg-red-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                        🍖 Non-Veg
-                      </span>
-                    )}
-                    {dish.dietary?.includes('chef-special') && (
-                      <span className="bg-[#C8A055]/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                        ⭐ Special
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Dish Details */}
-                <div className="p-4 sm:p-5 flex flex-col flex-1 gap-2.5">
-                  <div className="cursor-pointer" onClick={() => setSelectedDish(displayDish)}>
-                    <h3 className="font-extrabold text-[#1a1008] text-base group-hover:text-[#8B0000] transition-colors line-clamp-1">
-                      {displayDish.name}
-                    </h3>
-                    <p className="text-xs text-[#6b5840] line-clamp-2 leading-relaxed mt-1">{displayDish.description}</p>
-                  </div>
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-[#8B0000]/10 gap-2 sm:gap-3">
-                    <div className="flex flex-col">
-                      <span className="text-base sm:text-lg font-extrabold text-[#8B0000]">
-                        {formatCurrency(displayDish.price)}
-                      </span>
-                      <span className="text-[11px] font-semibold text-[#a09070] mt-0.5">
-                        ⏱️ {displayDish.prepTime} mins slot
-                      </span>
-                    </div>
-                    <AddButton dish={displayDish} variant="sm" />
-                  </div>
+                <div className="pt-2">
+                  {renderSidebarTree()}
                 </div>
               </div>
-            );
-          })}
-          </div>
-        )}
+            </div>
+          )}
+
+          {/* Right Main Content Area */}
+          <main className="flex-1 min-w-0 w-full">
+
+            {/* Category Header Title & Count */}
+            <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#8B0000]/10 pb-3">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-[#1a1008] capitalize">
+                  {currentShopInfo 
+                    ? `${currentShopInfo.title}` 
+                    : activeSubCategory 
+                      ? `${activeSubCategory.replace(/-/g, ' ')} Options` 
+                      : currentGroup 
+                        ? `${currentGroup.name} Dishes` 
+                        : 'All Menu Dishes'}
+                </h1>
+                <p className="text-xs text-[#a09070] mt-0.5 font-medium">
+                  Showing {displayDishes.length} gourmet dish options
+                </p>
+              </div>
+            </div>
+
+            {/* Dishes Grid */}
+            {displayDishes.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-3xl border border-[#8B0000]/10 p-8">
+                <p className="text-4xl mb-3">🍽️</p>
+                <h3 className="text-base font-bold text-[#1a1008]">No dishes found</h3>
+                <p className="text-xs text-[#a09070] mt-1">Try selecting another category or resetting your search filter.</p>
+                <button
+                  onClick={() => {
+                    setActiveCategory('all');
+                    setActiveSubCategory(null);
+                    setActiveShop(null);
+                    setSearchQuery('');
+                    setDietFilter('all');
+                  }}
+                  className="mt-4 px-4 py-2 bg-[#8B0000] text-white rounded-xl text-xs font-bold shadow-md hover:bg-[#A00000] transition-colors cursor-pointer"
+                >
+                  Reset All Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {displayDishes.map((dish, idx) => {
+                  const cardImage = dish.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
+                  const displayDish = { ...dish, image: cardImage };
+
+                  return (
+                    <div
+                      key={dish.id || (dish as any)._id || idx}
+                      onClick={() => setSelectedDish(displayDish)}
+                      className="glass-card rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group border border-[#8B0000]/10 bg-white cursor-pointer"
+                    >
+                      {/* Dish Image */}
+                      <div
+                        className="relative h-44 sm:h-48 w-full bg-[#F8F5F0] overflow-hidden shrink-0"
+                        style={{ position: 'relative', width: '100%', height: '192px', overflow: 'hidden' }}
+                      >
+                        <img
+                          src={cardImage}
+                          alt={displayDish.name}
+                          loading={idx < 6 ? 'eager' : 'lazy'}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+                        {/* Dietary Tag Badges */}
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
+                          {dish.dietary?.includes('veg') && (
+                            <span className="bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                              <Leaf className="w-3 h-3" /> Veg
+                            </span>
+                          )}
+                          {dish.dietary?.includes('non-veg') && (
+                            <span className="bg-red-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                              🍖 Non-Veg
+                            </span>
+                          )}
+                          {dish.dietary?.includes('chef-special') && (
+                            <span className="bg-[#C8A055]/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                              ⭐ Special
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Dish Details */}
+                      <div className="p-4 sm:p-5 flex flex-col flex-1 gap-2.5">
+                        <div className="cursor-pointer" onClick={() => setSelectedDish(displayDish)}>
+                          <h3 className="font-extrabold text-[#1a1008] text-base group-hover:text-[#8B0000] transition-colors line-clamp-1">
+                            {displayDish.name}
+                          </h3>
+                          <p className="text-xs text-[#6b5840] line-clamp-2 leading-relaxed mt-1">{displayDish.description}</p>
+                        </div>
+                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-[#8B0000]/10 gap-2 sm:gap-3">
+                          <div className="flex flex-col">
+                            <span className="text-base sm:text-lg font-extrabold text-[#8B0000]">
+                              {formatCurrency(displayDish.price)}
+                            </span>
+                            <span className="text-[11px] font-semibold text-[#a09070] mt-0.5">
+                              ⏱️ {displayDish.prepTime} mins slot
+                            </span>
+                          </div>
+                          <AddButton dish={displayDish} variant="sm" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </main>
+        </div>
       </div>
 
       {/* Dish detail modal */}
