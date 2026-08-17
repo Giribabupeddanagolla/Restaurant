@@ -23,8 +23,8 @@ import {
   Building2,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import ManagerDashboardPage from '../../manager/dashboard/page';
-import MerchantDashboardPage from '../../merchant/dashboard/page';
+import ManagerDashboardView from '@/components/dashboard/ManagerDashboardView';
+import MerchantDashboardView from '@/components/dashboard/MerchantDashboardView';
 import { orderApi, tableApi, reservationApi, inventoryApi } from '@/services/restaurantService';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -32,11 +32,11 @@ export default function AdminDashboardPage() {
   const { user } = useAuth();
 
   if (user?.role === 'Manager') {
-    return <ManagerDashboardPage />;
+    return <ManagerDashboardView />;
   }
 
   if (user?.role === 'Merchant') {
-    return <MerchantDashboardPage />;
+    return <MerchantDashboardView />;
   }
 
   const [stats, setStats] = useState({
@@ -105,7 +105,9 @@ export default function AdminDashboardPage() {
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8B0000]/10 pb-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#1a1008] tracking-tight">Executive ERP Control Panel</h1>
+          <h1 className="text-2xl font-extrabold text-[#1a1008] tracking-tight">
+            Welcome back, {user?.name || 'Administrator'}
+          </h1>
           <p className="text-xs text-[#6b5840] mt-0.5">Real-time operational metrics and merchant management modules</p>
         </div>
         <div className="flex items-center gap-2">

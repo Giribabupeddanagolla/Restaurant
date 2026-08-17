@@ -35,8 +35,12 @@ export default function LoginPage() {
   const redirectByRole = (role: UserRole | string) => {
     const r = (role || '').toString().toLowerCase();
 
-    if (r.includes('admin') || r.includes('manager')) {
+    if (r.includes('admin')) {
       window.location.href = '/admin/dashboard';
+    } else if (r.includes('manager')) {
+      window.location.href = '/manager/dashboard';
+    } else if (r.includes('merchant') || r.includes('vendor')) {
+      window.location.href = '/merchant/dashboard';
     } else if (r.includes('chef')) {
       window.location.href = '/admin/kitchen';
     } else if (r.includes('waiter')) {
@@ -46,7 +50,7 @@ export default function LoginPage() {
     } else if (r.includes('delivery')) {
       window.location.href = '/track';
     } else {
-      window.location.href = '/';
+      window.location.href = '/customer/dashboard';
     }
   };
 
@@ -67,6 +71,7 @@ export default function LoginPage() {
 
         {/* Login Form Card */}
         <div className="glass-card rounded-3xl p-6 sm:p-7 shadow-lg bg-white border border-[#8B0000]/10 space-y-4">
+
           {errorMsg && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold">
               {errorMsg}

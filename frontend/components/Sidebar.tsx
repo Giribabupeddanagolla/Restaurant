@@ -18,7 +18,6 @@ interface LinkItem {
 
 const ALL_LINKS: LinkItem[] = [
   { href: '/admin/dashboard',    label: 'Dashboard',      icon: LayoutDashboard, roles: ['Admin', 'Manager', 'Merchant'] },
-  { href: '/merchant/dashboard', label: 'Merchant Portal',icon: Building2,       roles: ['Merchant', 'Admin'] },
   { href: '/admin/merchants',    label: 'Merchants',      icon: Building2,       roles: ['Admin', 'Manager', 'Merchant'] },
   { href: '/admin/shops',        label: 'Shops & Outlets',icon: Store,           roles: ['Admin', 'Manager', 'Merchant'] },
   { href: '/admin/orders',       label: 'Orders',         icon: ShoppingBag,     roles: ['Admin', 'Manager', 'Cashier', 'Waiter', 'Chef', 'Merchant'] },

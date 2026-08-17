@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { INITIAL_CATEGORIES, CATEGORY_GROUPS, BAKERY_EXCLUSIVE_CATEGORY_GROUPS, GRILL_EXCLUSIVE_CATEGORY_GROUPS, SPICE_GARDEN_EXCLUSIVE_CATEGORY_GROUPS, CAFE_EXCLUSIVE_CATEGORY_GROUPS, SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS, EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS, FINE_DINING_EXCLUSIVE_CATEGORY_GROUPS, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from '@/data/mockData';
+import { INITIAL_CATEGORIES, CATEGORY_GROUPS, BAKERY_EXCLUSIVE_CATEGORY_GROUPS, GRILL_EXCLUSIVE_CATEGORY_GROUPS, SPICE_GARDEN_EXCLUSIVE_CATEGORY_GROUPS, CAFE_EXCLUSIVE_CATEGORY_GROUPS, SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS, EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS, FINE_DINING_EXCLUSIVE_CATEGORY_GROUPS, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS, getMatchingFoodImage } from '@/data/mockData';
 import { Search, Leaf, Menu, X, Store, ArrowLeft, SlidersHorizontal, Utensils, ChevronDown, ChevronRight, Filter, Layers } from 'lucide-react';
 import { MenuItem } from '@/types';
 import DishModal from '@/components/DishModal';
@@ -36,10 +36,65 @@ const SHOP_RELEVANT_CATEGORIES: Record<string, string[]> = {
 function matchCategorySubCategory(dish: MenuItem, catId: string, subCatId: string | null): boolean {
   if (catId === 'all' && !subCatId) return true;
 
+  const dCatId = String((dish as any).categoryId || (dish as any).category || '').toLowerCase().trim();
+  const dSubCatId = String((dish as any).subCategoryId || (dish as any).subCategory || '').toLowerCase().trim();
+  const dFoodType = String((dish as any).foodType || '').toLowerCase().trim();
+  const dCat = (dish.category || '').toLowerCase();
   const dName = (dish.name || '').toLowerCase();
   const dDesc = (dish.description || '').toLowerCase();
-  const dCat = (dish.category || '').toLowerCase();
   const dDiet = (dish.dietary || []).map((d) => d.toLowerCase());
+
+  const targetCat = catId ? catId.toLowerCase().trim() : '';
+  const targetSubCat = subCatId ? subCatId.toLowerCase().trim() : '';
+
+  // Direct Database ID / Key matching
+  if (targetSubCat) {
+    if (dSubCatId === targetSubCat) return true;
+    if (targetSubCat === 'veg-biryani') {
+      if (dSubCatId === 'veg-biryani' || dSubCatId === 'saffron-vegetable-biryani') return true;
+      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dFoodType === 'veg' || dDiet.includes('veg') || dName.includes('veg') || dName.includes('paneer') || dName.includes('mushroom') || dName.includes('subz') || dName.includes('saffron'))) {
+        return true;
+      }
+    }
+    if (targetSubCat === 'chicken-biryani') {
+      if (dSubCatId === 'chicken-biryani' || dSubCatId === 'royal-chicken-biryani') return true;
+      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dFoodType === 'non-veg' || dDiet.includes('non-veg') || dName.includes('chicken'))) {
+        return true;
+      }
+    }
+    if (targetSubCat === 'mutton-biryani') {
+      if (dSubCatId === 'mutton-biryani' || dSubCatId === 'mutton-dum-biryani') return true;
+      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dName.includes('mutton') || dName.includes('lamb') || dName.includes('mamsam'))) {
+        return true;
+      }
+    }
+    if (targetSubCat === 'prawn-biryani') {
+      if (dSubCatId === 'prawn-biryani') return true;
+      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dName.includes('prawn') || dName.includes('royyala') || dName.includes('shrimp'))) {
+        return true;
+      }
+    }
+    if (targetSubCat === 'egg-biryani') {
+      if (dSubCatId === 'egg-biryani') return true;
+      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dFoodType === 'egg' || dName.includes('egg'))) {
+        return true;
+      }
+    }
+    if (targetSubCat === 'dosa') {
+      if (dSubCatId === 'dosa' || dName.includes('dosa')) return true;
+    }
+    if (targetSubCat === 'idli') {
+      if (dSubCatId === 'idli' || dName.includes('idli') || dName.includes('idly')) return true;
+    }
+  } else if (targetCat) {
+    if (dCatId === targetCat) return true;
+    if (targetCat === 'biryani') {
+      if (dCatId.includes('biryani') || dSubCatId.includes('biryani') || dName.includes('biryani')) return true;
+    }
+    if (targetCat === 'breakfast') {
+      if (dCatId === 'breakfast' || dName.includes('idli') || dName.includes('dosa') || dName.includes('vada') || dName.includes('poori') || dName.includes('upma') || dName.includes('pongal')) return true;
+    }
+  }
 
   const target = subCatId || catId;
 
@@ -2108,17 +2163,17 @@ function MenuContent() {
   // Load dynamically stored/created dishes immediately with automatic version validation
   useEffect(() => {
     const stored = getStoredDishes();
-    if (stored && stored.length >= 200 && stored.some(d => d.shopSlug === 'giri-fine-dining')) {
+    if (stored && stored.length > 0) {
       setDishes(stored);
     } else {
       setDishes(INITIAL_DISHES);
-      saveStoredDishes(INITIAL_DISHES);
     }
     menuApi.getDishes()
       .then((res) => {
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-          setDishes(res.data);
-          saveStoredDishes(res.data);
+          const apiDishes = res.data;
+          const merged = [...apiDishes, ...stored.filter((s) => !apiDishes.some((a: any) => a.id === s.id))];
+          setDishes(merged);
         }
       })
       .catch(() => {});
@@ -2162,6 +2217,30 @@ function MenuContent() {
     ? FINE_DINING_EXCLUSIVE_CATEGORY_GROUPS
     : CATEGORY_GROUPS;
 
+  const shopCategoryDishCount = useMemo(() => {
+    const counts: Record<string, number> = {};
+    if (!activeShop) return counts;
+    const decoded = decodeURIComponent(activeShop).toLowerCase().trim();
+    dishes.forEach((d) => {
+      const dShop = (d.shopSlug || '').toLowerCase();
+      const dName = (d.shopName || '').toLowerCase();
+      const dMerchantId = (d.merchantId || '').toLowerCase();
+      const match =
+        dShop === decoded ||
+        dName === decoded ||
+        dMerchantId === decoded ||
+        (dShop.length > 2 && decoded.includes(dShop)) ||
+        (dName.length > 2 && decoded.includes(dName)) ||
+        (decoded.length > 2 && dShop.includes(decoded)) ||
+        (decoded.length > 2 && dName.includes(decoded));
+      if (match) {
+        const catKey = d.category ? d.category.toLowerCase() : 'all';
+        counts[catKey] = (counts[catKey] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [dishes, activeShop]);
+
   const currentGroup = displayCategoryGroups.find((g) => g.id === activeCategory);
 
   // Ultra-fast O(N) memoized filtering & deduplication for instant zero-latency category switching
@@ -2171,30 +2250,19 @@ function MenuContent() {
     const filtered = dishes.filter((dish) => {
       let matchShop = true;
       if (activeShop) {
+        const decoded = decodeURIComponent(activeShop).toLowerCase().trim();
         const dShop = (dish.shopSlug || '').toLowerCase();
         const dName = (dish.shopName || '').toLowerCase();
-        const dTitle = (dish.name || '').toLowerCase();
-        const dCat = (dish.category || '').toLowerCase();
+        const dMerchantId = (dish.merchantId || '').toLowerCase();
 
-        if (activeShop === 'giri-express-bistro') {
-          matchShop = dShop === 'giri-express-bistro' || (dish.id || '').startsWith('dish-eb-') || dName.includes('giri express');
-        } else if (activeShop === 'giri-fine-dining') {
-          matchShop = dShop === 'giri-fine-dining' || (dish.id || '').startsWith('dish-fd-') || dName.includes('fine dining');
-        } else if (activeShop === 'giri-kitchen') {
-          matchShop = dShop === 'giri-kitchen' || (dish.id || '').startsWith('dish-gk-') || dName.includes('kitchen');
-        } else if (activeShop === 'giri-bakery') {
-          matchShop = dShop === 'giri-bakery' || (dish.id || '').startsWith('dish-bk-') || dName.includes('bakery');
-        } else if (activeShop === 'giri-grill') {
-          matchShop = dShop === 'giri-grill' || (dish.id || '').startsWith('dish-gl-') || dName.includes('grill');
-        } else if (activeShop === 'giri-spice-garden') {
-          matchShop = dShop === 'giri-spice-garden' || (dish.id || '').startsWith('dish-sg-') || dName.includes('spice garden');
-        } else if (activeShop === 'giri-cafe') {
-          matchShop = dShop === 'giri-cafe' || (dish.id || '').startsWith('dish-cf-') || dName.includes('caf');
-        } else if (activeShop === 'giri-seafood') {
-          matchShop = dShop === 'giri-seafood' || (dish.id || '').startsWith('dish-sf-') || dName.includes('seafood');
-        } else {
-          matchShop = dShop === activeShop || !dShop;
-        }
+        matchShop =
+          dShop === decoded ||
+          dName === decoded ||
+          dMerchantId === decoded ||
+          (dShop.length > 2 && decoded.includes(dShop)) ||
+          (dName.length > 2 && decoded.includes(dName)) ||
+          (decoded.length > 2 && dShop.includes(decoded)) ||
+          (decoded.length > 2 && dName.includes(decoded));
       }
 
       const matchCategory = matchCategorySubCategory(dish, activeCategory, activeSubCategory);
@@ -2208,55 +2276,63 @@ function MenuContent() {
       return matchShop && matchCategory && matchSearch && matchDiet;
     });
 
-    const effective = filtered.length > 0 ? filtered : dishes.filter((dish) => {
-      let matchShop = true;
-      if (activeShop) {
-        const dShop = (dish.shopSlug || '').toLowerCase();
-        const dName = (dish.shopName || '').toLowerCase();
-        const dTitle = (dish.name || '').toLowerCase();
-        const dCat = (dish.category || '').toLowerCase();
-        if (activeShop === 'giri-express-bistro') {
-          matchShop = dShop === 'giri-express-bistro' || (dish.id || '').startsWith('dish-eb-') || dName.includes('giri express');
-        } else if (activeShop === 'giri-fine-dining') {
-          matchShop = dShop === 'giri-fine-dining' || (dish.id || '').startsWith('dish-fd-') || dName.includes('fine dining');
-        } else if (activeShop === 'giri-kitchen') {
-          matchShop = dShop === 'giri-kitchen' || (dish.id || '').startsWith('dish-gk-') || dName.includes('kitchen');
-        } else if (activeShop === 'giri-bakery') {
-          matchShop = dShop === 'giri-bakery' || (dish.id || '').startsWith('dish-bk-') || dName.includes('bakery');
-        } else if (activeShop === 'giri-grill') {
-          matchShop = dShop === 'giri-grill' || (dish.id || '').startsWith('dish-gl-') || dName.includes('grill');
-        } else if (activeShop === 'giri-spice-garden') {
-          matchShop = dShop === 'giri-spice-garden' || (dish.id || '').startsWith('dish-sg-') || dName.includes('spice garden');
-        } else if (activeShop === 'giri-cafe') {
-          matchShop = dShop === 'giri-cafe' || (dish.id || '').startsWith('dish-cf-') || dName.includes('caf');
-        } else if (activeShop === 'giri-seafood') {
-          matchShop = dShop === 'giri-seafood' || (dish.id || '').startsWith('dish-sf-') || dName.includes('seafood');
-        } else {
-          matchShop = dShop === activeShop || !dShop;
-        }
-      }
-      const matchSearch = !sQuery ||
-        dish.name.toLowerCase().includes(sQuery) ||
-        dish.description.toLowerCase().includes(sQuery);
-      const matchDiet = dietFilter === 'all' || (dish.dietary && dish.dietary.includes(dietFilter));
-      return matchShop && matchSearch && matchDiet;
+    const shopMatches = dishes.filter((dish) => {
+      if (!activeShop) return true;
+      const decoded = decodeURIComponent(activeShop).toLowerCase().trim();
+      const dShop = (dish.shopSlug || '').toLowerCase();
+      const dName = (dish.shopName || '').toLowerCase();
+      const dMerchantId = (dish.merchantId || '').toLowerCase();
+
+      return (
+        dShop === decoded ||
+        dName === decoded ||
+        dMerchantId === decoded ||
+        (dShop.length > 2 && decoded.includes(dShop)) ||
+        (dName.length > 2 && decoded.includes(dName)) ||
+        (decoded.length > 2 && dShop.includes(decoded)) ||
+        (decoded.length > 2 && dName.includes(decoded))
+      );
     });
 
-    // Fast O(N) deduplication using Set (1,000x faster than findIndex O(N^2))
+    // For activeShop (e.g. RK Restaurant, Madhan Restaurant, Andhra Restaurant), DO NOT fall back to generic non-shop template dishes!
+    const effective = filtered.length > 0
+      ? filtered
+      : (activeShop ? shopMatches : dishes.filter((dish) => {
+          const matchSearch = !sQuery || dish.name.toLowerCase().includes(sQuery) || dish.description.toLowerCase().includes(sQuery);
+          const matchDiet = dietFilter === 'all' || (dish.dietary && dish.dietary.includes(dietFilter));
+          return matchSearch && matchDiet;
+        }));
+
+    // Filter out synthetic repetitive "Special 1..20" items to maintain clean 25-30 authentic main catalog dishes
+    const cleanEffective = effective.filter((d) => {
+      if ((d as any).isMerchantDish || d.merchantId) return true;
+      return !/\bSpecial\s+\d+\b/i.test(d.name || '');
+    });
+
+    // Sort merchant-added CRUD dishes FIRST at the top of the grid!
+    const sortedEffective = [...cleanEffective].sort((a, b) => {
+      const aIsMerchant = (a as any).isMerchantDish || a.merchantId ? 1 : 0;
+      const bIsMerchant = (b as any).isMerchantDish || b.merchantId ? 1 : 0;
+      return bIsMerchant - aIsMerchant;
+    });
+
     const seen = new Set<string>();
     const result: MenuItem[] = [];
-    for (const d of effective) {
+    for (const d of sortedEffective) {
       const key = (d.id || (d as any)._id || d.name || '').trim().toLowerCase();
       if (key && !seen.has(key)) {
         seen.add(key);
-        result.push(d);
+        result.push({
+          ...d,
+          image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
+        });
       }
     }
     return result;
   }, [dishes, activeShop, activeCategory, activeSubCategory, searchQuery, dietFilter]);
 
-  // Limit displayed dish options up to 26 items per view as requested
-  const displayDishes = useMemo(() => uniqueFilteredDishes.slice(0, 26), [uniqueFilteredDishes]);
+  // Display all matching dishes without artificial truncation
+  const displayDishes = useMemo(() => uniqueFilteredDishes, [uniqueFilteredDishes]);
 
   // Render Sidebar Tree Content (Used for Desktop Sidebar & Mobile Drawer)
   const renderSidebarTree = () => (
@@ -2353,11 +2429,18 @@ function MenuContent() {
                   </span>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    {hasSubcategories && (
+                    {hasSubcategories && !activeShop && (
                       <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
                         isCatActive ? 'bg-white/20 text-white' : 'bg-[#8B0000]/10 text-[#8B0000]'
                       }`}>
                         {group.subcategories.length}
+                      </span>
+                    )}
+                    {activeShop && (shopCategoryDishCount[group.id] || 0) > 0 && (
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                        isCatActive ? 'bg-white/20 text-white' : 'bg-[#8B0000]/10 text-[#8B0000]'
+                      }`}>
+                        {shopCategoryDishCount[group.id]}
                       </span>
                     )}
                     {hasSubcategories && (
@@ -2428,6 +2511,28 @@ function MenuContent() {
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+
+        {/* Active Shop Banner */}
+        {activeShop && (
+          <div className="mb-6 rounded-3xl bg-gradient-to-r from-[#8B0000] via-[#A00000] to-[#600000] text-white p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/20">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-2xl sm:text-3xl shadow-inner shrink-0">
+                🏪
+              </div>
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-[#E0B96A]">Merchant Outlet Catalog</div>
+                <h2 className="text-xl sm:text-2xl font-black text-white capitalize">{decodeURIComponent(activeShop).replace(/-/g, ' ')}</h2>
+                <p className="text-xs text-red-100 mt-0.5 font-medium">Showing menu catalog & dishes for this restaurant outlet.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setActiveShop(null)}
+              className="bg-white/15 hover:bg-white/25 text-white border border-white/25 px-4 py-2 rounded-xl text-xs font-extrabold transition-all shrink-0 cursor-pointer text-center"
+            >
+              View All Outlets →
+            </button>
+          </div>
+        )}
 
         {/* Top Search Bar & Filter Controls */}
         <div className="relative w-full mb-6 z-30">

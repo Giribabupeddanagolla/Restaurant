@@ -28,8 +28,13 @@ export default function ShopsPage() {
     shopApi.getShops()
       .then((res) => {
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
-          setShops(res.data);
-          saveStoredShops(res.data);
+          const apiShops = res.data;
+          const mergedMap = new Map<string, Shop>();
+          stored.forEach((s) => mergedMap.set(s.id || s.name, s));
+          apiShops.forEach((s: Shop) => mergedMap.set(s.id || s.name, s));
+          const combined = Array.from(mergedMap.values());
+          setShops(combined);
+          saveStoredShops(combined);
         }
       })
       .catch(() => {})
@@ -164,16 +169,8 @@ export default function ShopsPage() {
       {/* Shops Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredShops.map((shop, idx) => {
-          const shopName = (shop.name || '').toLowerCase();
-          let categoryUrl = '/menu';
-          if (shopName.includes('fine dining')) categoryUrl = '/menu?shop=royal-fine-dining';
-          else if (shopName.includes('kitchen')) categoryUrl = '/menu?shop=royal-kitchen';
-          else if (shopName.includes('bakery')) categoryUrl = '/menu?shop=royal-bakery';
-          else if (shopName.includes('grill')) categoryUrl = '/menu?shop=royal-grill';
-          else if (shopName.includes('spice')) categoryUrl = '/menu?shop=royal-spice-garden';
-          else if (shopName.includes('café') || shopName.includes('cafe')) categoryUrl = '/menu?shop=royal-cafe';
-          else if (shopName.includes('seafood')) categoryUrl = '/menu?shop=royal-seafood';
-          else if (shopName.includes('express') || shopName.includes('bistro')) categoryUrl = '/menu?shop=royal-express-bistro';
+          const rawName = shop.name || (shop as any).shopName || shop.id || shop._id;
+          const categoryUrl = `/menu?shop=${encodeURIComponent(rawName)}`;
 
           const diningCount = shop.diningImages ? shop.diningImages.length : 1;
           const kitchenCount = shop.kitchenImages ? shop.kitchenImages.length : 1;

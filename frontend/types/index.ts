@@ -20,6 +20,7 @@ export interface MenuItem {
   available?: boolean;
   shopSlug?: string;
   shopName?: string;
+  merchantId?: string;
   customizations?: CustomizationOption[];
 }
 
@@ -80,6 +81,9 @@ export interface User {
   role: UserRole;
   phone?: string;
   avatar?: string;
+  merchantId?: string;
+  shopName?: string;
+  status?: string;
 }
 
 export interface Order {

@@ -157,7 +157,7 @@ const DEFAULT_SHOPS = [
   {
     name: 'Giri Express & Bistro',
     tagline: 'Quick Gourmet Eats',
-    image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80',
+    image: '/bistro-express.jpg',
     rating: 4.8,
     deliveryTime: '10–20 min',
     address: '122 Metro Station Plaza, Tech Park',
@@ -167,7 +167,7 @@ const DEFAULT_SHOPS = [
     isOpen: true,
     isFeatured: true,
     diningImages: [
-      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80',
+      '/bistro-express.jpg',
       'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&auto=format&fit=crop&q=80'
     ],
     kitchenImages: [
@@ -180,41 +180,94 @@ const DEFAULT_SHOPS = [
 // Helper to seed if collection is empty
 const seedDefaultShopsIfEmpty = async () => {
   try {
-    const count = await Shop.countDocuments();
-    if (count === 0) {
-      await Shop.insertMany(DEFAULT_SHOPS);
-      console.log('Seeded default shops into database');
-    }
-  } catch (err) {
-    console.error('Error seeding default shops:', err.message);
-  }
-};
-
-// @desc Get all shops / locations
+// @desc Get all shops / locations (Public API)
 // @route GET /api/v1/shops
 exports.getShops = async (req, res, next) => {
   try {
-    await seedDefaultShopsIfEmpty();
     const { featured, search } = req.query;
 
     let query = {};
     if (featured === 'true') {
       query.isFeatured = true;
     }
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { tagline: { $regex: search, $options: 'i' } },
-        { address: { $regex: search, $options: 'i' } },
-        { city: { $regex: search, $options: 'i' } },
-      ];
+
+    // 1. Fetch from Shop model
+    let dbShops = [];
+    try {
+      dbShops = await Shop.find(query).sort({ createdAt: -1 });
+    } catch (e) {}
+
+    // 2. Fetch approved and active merchants from Merchant model (MongoDB)
+    let merchantShops = [];
+    try {
+      const approvedMerchants = await Merchant.find({
+        $or: [
+          { status: 'approved', isApproved: true, isActive: true },
+          { status: 'approved' },
+          { isApproved: true }
+        ]
+      });
+
+      merchantShops = approvedMerchants.map((m) => {
+        const idStr = m._id.toString();
+        return {
+          _id: idStr,
+          id: idStr,
+          merchantId: idStr,
+          shopId: idStr,
+          name: m.shopName || m.businessName || 'Giri Spice Garden',
+          shopName: m.shopName || m.businessName || 'Giri Spice Garden',
+          tagline: m.description || 'Authentic South & North Indian fine dining restaurant.',
+          description: m.description || 'Authentic South & North Indian fine dining restaurant.',
+          category: m.category || 'Multi-Cuisine',
+          logo: m.logo || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&auto=format&fit=crop&q=85',
+          banner: m.banner || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85',
+          image: m.banner || m.logo || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
+          rating: 4.8,
+          deliveryTime: m.deliveryTime || '25-35 mins',
+          time: m.deliveryTime || '25-35 mins',
+          minimumOrder: m.minimumOrderAmount || 150,
+          minimumOrderAmount: m.minimumOrderAmount || 150,
+          address: `${m.address || 'Plot 42, Jubilee Hills Road No 36'}, ${m.area || ''}`,
+          city: m.city || 'Hyderabad',
+          phone: m.phone || '+91 98765 99999',
+          openingHours: `${m.openingTime || '11:00 AM'} - ${m.closingTime || '11:00 PM'}`,
+          isOpen: m.restaurantStatus !== 'Closed',
+          isFeatured: true,
+          status: 'active',
+          isActive: true,
+          diningImages: [m.banner, m.logo].filter(Boolean),
+          kitchenImages: [m.logo, m.banner].filter(Boolean),
+        };
+      });
+    } catch (e) {}
+
+    // Merge Shops and Merchant Shops
+    const map = new Map();
+    dbShops.forEach((s) => map.set(s._id ? s._id.toString() : s.name, s));
+    merchantShops.forEach((s) => map.set(s._id ? s._id.toString() : s.name, s));
+
+    if (map.size === 0) {
+      DEFAULT_SHOPS.forEach((s) => map.set(s._id, s));
     }
 
-    const shops = await Shop.find(query).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: shops.length, data: shops });
+    let finalShops = Array.from(map.values());
+
+    if (search) {
+      const searchLower = search.toLowerCase();
+      finalShops = finalShops.filter(
+        (s) =>
+          s.name?.toLowerCase().includes(searchLower) ||
+          s.shopName?.toLowerCase().includes(searchLower) ||
+          s.tagline?.toLowerCase().includes(searchLower) ||
+          s.city?.toLowerCase().includes(searchLower) ||
+          s.address?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    res.status(200).json({ success: true, count: finalShops.length, data: finalShops, restaurants: finalShops });
   } catch (error) {
-    // If DB is disconnected, fallback gracefully
-    res.status(200).json({ success: true, count: DEFAULT_SHOPS.length, data: DEFAULT_SHOPS });
+    res.status(200).json({ success: true, count: DEFAULT_SHOPS.length, data: DEFAULT_SHOPS, restaurants: DEFAULT_SHOPS });
   }
 };
 
@@ -222,7 +275,50 @@ exports.getShops = async (req, res, next) => {
 // @route GET /api/v1/shops/:id
 exports.getShopById = async (req, res, next) => {
   try {
-    const shop = await Shop.findById(req.params.id);
+    const shopId = req.params.id;
+    let shop = null;
+    try {
+      shop = await Shop.findById(shopId);
+    } catch (e) {}
+
+    if (!shop) {
+      try {
+        const m = await Merchant.findById(shopId);
+        if (m) {
+          const idStr = m._id.toString();
+          shop = {
+            _id: idStr,
+            id: idStr,
+            merchantId: idStr,
+            shopId: idStr,
+            name: m.shopName || m.businessName || 'Giri Spice Garden',
+            shopName: m.shopName || m.businessName || 'Giri Spice Garden',
+            tagline: m.description || 'Authentic South & North Indian fine dining restaurant.',
+            description: m.description || 'Authentic South & North Indian fine dining restaurant.',
+            category: m.category || 'Multi-Cuisine',
+            logo: m.logo || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&auto=format&fit=crop&q=85',
+            banner: m.banner || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85',
+            image: m.banner || m.logo || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
+            rating: 4.8,
+            deliveryTime: m.deliveryTime || '25-35 mins',
+            time: m.deliveryTime || '25-35 mins',
+            minimumOrder: m.minimumOrderAmount || 150,
+            minimumOrderAmount: m.minimumOrderAmount || 150,
+            address: `${m.address || 'Plot 42, Jubilee Hills Road No 36'}, ${m.area || ''}`,
+            city: m.city || 'Hyderabad',
+            phone: m.phone || '+91 98765 99999',
+            openingHours: `${m.openingTime || '11:00 AM'} - ${m.closingTime || '11:00 PM'}`,
+            isOpen: m.restaurantStatus !== 'Closed',
+            isFeatured: true,
+            status: 'active',
+            isActive: true,
+            diningImages: [m.banner, m.logo].filter(Boolean),
+            kitchenImages: [m.logo, m.banner].filter(Boolean),
+          };
+        }
+      } catch (e) {}
+    }
+
     if (!shop) {
       return res.status(404).json({ success: false, message: 'Shop location not found' });
     }

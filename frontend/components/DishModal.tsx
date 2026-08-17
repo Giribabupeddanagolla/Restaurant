@@ -23,10 +23,12 @@ export default function DishModal({ dish, onClose }: Props) {
   const inCart = items.find((i) => (i.dish.id || (i.dish as any)._id || i.dish.name) === dishId);
   const dietary = Array.isArray(dish.dietary) ? dish.dietary : [];
 
+  const isAvailable = dish.available !== false && (dish as any).isAvailable !== false && (dish as any).inStock !== false;
+
   const handleAdd = () => {
-    for (let i = 0; i < qty; i++) addItem(dish);
+    addItem(dish, qty);
     setAdded(true);
-    setTimeout(() => { setAdded(false); onClose(); }, 900);
+    setTimeout(() => { setAdded(false); onClose(); }, 800);
   };
 
   return (
@@ -100,9 +102,9 @@ export default function DishModal({ dish, onClose }: Props) {
                     <Star className="w-4 h-4 text-[#C8A055] fill-[#C8A055]" /> 4.8
                   </span>
                   <span className={`text-xs sm:text-sm font-bold px-3 py-1.5 rounded-lg ${
-                    dish.available ? 'bg-[#F0FAF4] text-[#16603A]' : 'bg-red-50 text-red-500'
+                    isAvailable ? 'bg-[#F0FAF4] text-[#16603A]' : 'bg-red-50 text-red-500'
                   }`}>
-                    {dish.available ? '✓ Available' : 'Unavailable'}
+                    {isAvailable ? '✓ Available' : 'Unavailable'}
                   </span>
                 </div>
               </div>
@@ -158,7 +160,7 @@ export default function DishModal({ dish, onClose }: Props) {
                 <div className="flex items-center gap-4 bg-[#F8F5F0] rounded-xl px-4 py-2 border border-[#C8A055]/20">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    className="w-8 h-8 rounded-full bg-white border border-[#8B0000]/20 flex items-center justify-center text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-all shadow-sm"
+                    className="w-8 h-8 rounded-full bg-white border border-[#8B0000]/20 flex items-center justify-center text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-all shadow-sm cursor-pointer"
                     aria-label="Decrease quantity"
                   >
                     <Minus className="w-4 h-4" />
@@ -166,7 +168,7 @@ export default function DishModal({ dish, onClose }: Props) {
                   <span className="text-lg font-extrabold text-[#1a1008] w-6 text-center">{qty}</span>
                   <button
                     onClick={() => setQty((q) => q + 1)}
-                    className="w-8 h-8 rounded-full bg-[#8B0000] flex items-center justify-center text-white hover:bg-[#C8102E] transition-all shadow-sm"
+                    className="w-8 h-8 rounded-full bg-[#8B0000] flex items-center justify-center text-white hover:bg-[#C8102E] transition-all shadow-sm cursor-pointer"
                     aria-label="Increase quantity"
                   >
                     <Plus className="w-4 h-4" />
@@ -177,11 +179,11 @@ export default function DishModal({ dish, onClose }: Props) {
               {/* Add to Cart button */}
               <button
                 onClick={handleAdd}
-                disabled={!dish.available}
-                className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl text-base font-extrabold transition-all shadow-md ${
+                disabled={!isAvailable}
+                className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl text-base font-extrabold transition-all shadow-md cursor-pointer ${
                   added
                     ? 'bg-[#16603A] text-white'
-                    : !dish.available
+                    : !isAvailable
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'btn-crimson'
                 }`}

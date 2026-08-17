@@ -1,7 +1,7 @@
 'use client';
 
-import CustomerDashboardPage from './dashboard/page';
+import CustomerDashboardView from '@/components/dashboard/CustomerDashboardView';
 
 export default function CustomerIndexPage() {
-  return <CustomerDashboardPage />;
+  return <CustomerDashboardView />;
 }

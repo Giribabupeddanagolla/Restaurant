@@ -12,7 +12,7 @@ interface CartContextValue {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
-  addItem: (dish: MenuItem) => void;
+  addItem: (dish: MenuItem, quantity?: number) => void;
   removeItem: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
   clearCart: () => void;
@@ -29,14 +29,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getDishId = (dish: MenuItem) => dish.id || (dish as any)._id || dish.name;
 
-  const addItem = useCallback((dish: MenuItem) => {
+  const addItem = useCallback((dish: MenuItem, quantity: number = 1) => {
     const dishId = getDishId(dish);
+    const numAdd = Math.max(1, Number(quantity) || 1);
     setItems((prev) => {
       const existing = prev.find((i) => getDishId(i.dish) === dishId);
       if (existing) {
-        return prev.map((i) => getDishId(i.dish) === dishId ? { ...i, qty: i.qty + 1 } : i);
+        return prev.map((i) => getDishId(i.dish) === dishId ? { ...i, qty: i.qty + numAdd } : i);
       }
-      return [...prev, { dish, qty: 1 }];
+      return [...prev, { dish, qty: numAdd }];
     });
     setIsOpen(true); // open drawer on add
   }, []);

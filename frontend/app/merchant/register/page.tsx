@@ -31,6 +31,7 @@ export default function MerchantRegisterPage() {
       name: storeName,
       code: `MER-${storeName.slice(0, 3).toUpperCase()}`,
       category,
+      ownerName: contactName,
       contactPerson: contactName,
       email,
       phone,
@@ -38,13 +39,17 @@ export default function MerchantRegisterPage() {
       dishesCount: 0,
       monthlySales: 0,
       commissionRate: Number(proposedCommission) || 15,
-      status: 'Under Review',
+      status: 'pending',
+      isApproved: false,
+      isActive: false,
       joinedDate: new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
       description,
     };
 
     const existing = JSON.parse(localStorage.getItem('giri_pending_merchant_requests') || '[]');
     localStorage.setItem('giri_pending_merchant_requests', JSON.stringify([pendingRequest, ...existing]));
+    localStorage.setItem('giri_current_merchant', JSON.stringify(pendingRequest));
 
     setSubmitted(true);
   };

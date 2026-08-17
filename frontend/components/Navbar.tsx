@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard, Utensils, Table, ShoppingBag, Truck, User, SlidersHorizontal } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard, Utensils, Table, ShoppingBag, Truck, User, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useState, memo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 function NavbarComponent() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const { user, logout } = useAuth();
 
   if (pathname?.startsWith('/admin')) {
@@ -24,6 +25,41 @@ function NavbarComponent() {
     { name: 'Shops',    href: '/shops' },
     { name: 'Contact',  href: '/contact' },
   ];
+
+  const getProfileLink = () => {
+    if (!user) return '/login';
+    switch (user.role) {
+      case 'Admin':
+        return '/admin/profile';
+      case 'Manager':
+        return '/manager/profile';
+      case 'Merchant':
+        return '/merchant/shop-profile';
+      default:
+        return '/user/profile';
+    }
+  };
+
+  const getDashboardLink = () => {
+    if (!user) return '/login';
+    switch (user.role) {
+      case 'Admin':
+      case 'Manager':
+        return '/admin/dashboard';
+      case 'Merchant':
+        return '/merchant/dashboard';
+      case 'Chef':
+        return '/admin/kitchen';
+      case 'Waiter':
+        return '/admin/tables';
+      case 'Cashier':
+        return '/admin/orders';
+      case 'Delivery Boy':
+        return '/track';
+      default:
+        return '/user/dashboard';
+    }
+  };
 
   const getRoleDashboardLink = () => {
     if (!user) return { href: '/login', label: 'Login', icon: User };
@@ -99,55 +135,75 @@ function NavbarComponent() {
         <div className="flex items-center gap-2 shrink-0">
           {user ? (
             <div className="flex items-center gap-2">
-              {/* Role Dashboard Link */}
-              <Link
-                href={dashboardInfo.href}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 btn-crimson rounded-lg text-xs font-extrabold whitespace-nowrap shadow-xs"
-              >
-                <DashboardIcon className="w-3.5 h-3.5" />
-                <span>{dashboardInfo.label}</span>
-              </Link>
-
-              {/* User Profile Badge */}
-              <div className="flex items-center gap-2 bg-[#F8F5F0] border border-[#8B0000]/15 px-2.5 py-1 rounded-lg">
-                {user.avatar ? (
-                  <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 border border-[#C8A055]">
-                    <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+              {/* User Profile Badge Button with Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="flex items-center gap-2 bg-[#F8F5F0] hover:bg-[#F0EAE0] border border-[#8B0000]/15 px-2.5 py-1 rounded-lg transition-all cursor-pointer shadow-xs"
+                >
+                  {user.avatar ? (
+                    <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 border border-[#C8A055]">
+                      <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+                    </div>
+                  ) : (
+                    <User className="w-4 h-4 text-[#8B0000]" />
+                  )}
+                  <div className="hidden md:flex flex-col text-left">
+                    <span className="text-[11px] font-extrabold text-[#1a1008] leading-none line-clamp-1">{user.name}</span>
+                    <span className="text-[9px] font-bold text-[#8B0000] leading-tight uppercase mt-0.5">{user.role}</span>
                   </div>
-                ) : (
-                  <User className="w-4 h-4 text-[#8B0000]" />
-                )}
-                <div className="hidden md:flex flex-col text-left">
-                  <span className="text-[11px] font-extrabold text-[#1a1008] leading-none line-clamp-1">{user.name}</span>
-                  <span className="text-[9px] font-bold text-[#8B0000] leading-tight uppercase mt-0.5">{user.role}</span>
-                </div>
-              </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-[#8B0000] transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
 
-              {/* Logout Button */}
-              <button
-                onClick={logout}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 border border-[#8B0000]/30 text-[#8B0000] hover:bg-[#8B0000] hover:text-white rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
-                title="Logout"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Logout</span>
-              </button>
+                {/* Profile Dropdown Menu */}
+                {profileDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-[#8B0000]/15 rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 space-y-0.5">
+                      <Link
+                        href={getProfileLink()}
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-extrabold text-[#1a1008] hover:bg-[#FFF8F0] hover:text-[#8B0000] transition-colors"
+                      >
+                        <User className="w-4 h-4 text-[#8B0000]" />
+                        <span>Profile</span>
+                      </Link>
+
+                      <Link
+                        href={getDashboardLink()}
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-extrabold text-[#1a1008] hover:bg-[#FFF8F0] hover:text-[#8B0000] transition-colors"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-[#8B0000]" />
+                        <span>Dashboard</span>
+                      </Link>
+
+                      <div className="border-t border-[#8B0000]/10 my-1" />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          logout();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-extrabold text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left"
+                      >
+                        <LogOut className="w-4 h-4 text-red-600" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="hidden sm:flex items-center gap-1 px-3 py-1.5 border border-[#8B0000]/30 text-[#8B0000] rounded-lg text-xs font-bold hover:bg-[#8B0000] hover:text-white transition-all whitespace-nowrap"
-              >
-                <LogIn className="w-3.5 h-3.5" /> Login
-              </Link>
-              <Link
-                href="/register"
-                className="hidden sm:flex items-center gap-1 btn-crimson px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap"
-              >
-                <UserPlus className="w-3.5 h-3.5" /> Register
-              </Link>
-            </>
+            <Link
+              href="/login"
+              className="flex items-center gap-1 px-3 py-1.5 border border-[#8B0000]/30 text-[#8B0000] rounded-lg text-xs font-bold hover:bg-[#8B0000] hover:text-white transition-all whitespace-nowrap"
+            >
+              <LogIn className="w-3.5 h-3.5" /> Login
+            </Link>
           )}
 
           {/* Frameless Mobile Menu Toggle Button */}
@@ -175,7 +231,6 @@ function NavbarComponent() {
                   <div className="text-[10px] text-[#8B0000] font-bold uppercase">{user.role}</div>
                 </div>
               </div>
-              <button onClick={logout} className="text-xs font-bold text-red-600 underline">Logout</button>
             </div>
           )}
 
@@ -193,20 +248,13 @@ function NavbarComponent() {
           ))}
 
           {!user && (
-            <div className="flex gap-3 pt-3 border-t border-[#8B0000]/10">
+            <div className="flex pt-3 border-t border-[#8B0000]/10">
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center border border-[#8B0000]/30 text-[#8B0000] py-2.5 rounded-xl text-xs font-bold"
+                className="w-full text-center border border-[#8B0000]/30 text-[#8B0000] py-2.5 rounded-xl text-xs font-bold"
               >
                 Login
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center btn-crimson py-2.5 rounded-xl text-xs font-bold"
-              >
-                Register
               </Link>
             </div>
           )}

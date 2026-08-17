@@ -185,7 +185,7 @@ export const INITIAL_SHOPS: Shop[] = [
     name: 'Royal Express & Bistro',
     tagline: 'Quick Gourmet Eats',
     tag: 'Quick Gourmet Eats',
-    image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80',
+    image: '/bistro-express.jpg',
     rating: 4.8,
     deliveryTime: '10–20 min',
     time: '10–20 min',
@@ -196,7 +196,7 @@ export const INITIAL_SHOPS: Shop[] = [
     isOpen: true,
     isFeatured: true,
     diningImages: [
-      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80',
+      '/bistro-express.jpg',
       'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&auto=format&fit=crop&q=80'
     ],
     kitchenImages: [
@@ -206,31 +206,63 @@ export const INITIAL_SHOPS: Shop[] = [
   },
 ];
 
+const DISTINCT_SHOP_IMAGES = [
+  'https://images.unsplash.com/photo-1544025162-d76694265947?w=1200&auto=format&fit=crop&q=85', // Fine Dining
+  'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=1200&auto=format&fit=crop&q=85', // Biryani / Andhra
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop&q=85', // Kitchen
+  'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&auto=format&fit=crop&q=85', // Bakery
+  'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&auto=format&fit=crop&q=85', // Grill
+  'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1200&auto=format&fit=crop&q=85', // Spice Garden
+  'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&auto=format&fit=crop&q=85', // Cafe
+  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85', // Dining Lounge
+];
+
 export const getStoredShops = (): Shop[] => {
   if (typeof window === 'undefined') return INITIAL_SHOPS;
   try {
     const saved = localStorage.getItem('royal_shops') || localStorage.getItem('giri_shops');
+    let customShops: Shop[] = [];
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        const validParsed = parsed.filter(
-          (s: Shop) => s.id !== 'shop-9' && !(s.name || '').toLowerCase().includes('ice cream')
-        );
-        const map = new Map(validParsed.map((s: Shop) => [s.id || s.name, s]));
-        INITIAL_SHOPS.forEach((s) => {
-          map.set(s.id || s.name, s);
-        });
-        const combined = Array.from(map.values()).filter(
-          (s: Shop) => s.id !== 'shop-9' && !(s.name || '').toLowerCase().includes('ice cream')
-        );
-        saveStoredShops(combined);
-        return combined;
+      if (Array.isArray(parsed)) {
+        customShops = parsed;
       }
     }
+
+    const customMap = new Map<string, Shop>();
+    customShops.forEach((s, idx) => {
+      if (s && s.id !== 'shop-9' && !(s.name || '').toLowerCase().includes('ice cream')) {
+        customMap.set(s.id || s.name, s);
+      }
+    });
+
+    const initialMap = new Map<string, Shop>();
+    INITIAL_SHOPS.forEach((s) => {
+      if (s && s.id !== 'shop-9' && !(s.name || '').toLowerCase().includes('ice cream')) {
+        initialMap.set(s.id || s.name, s);
+      }
+    });
+
+    // Newly added / custom merchant shops come FIRST
+    const customList = Array.from(customMap.values());
+    const initialList = Array.from(initialMap.values()).filter((s) => !customMap.has(s.id || s.name));
+    const combined = [...customList, ...initialList];
+
+    // Ensure distinct images across shop cards
+    const uniqueMap = new Map<string, string>();
+    const sanitized = combined.map((s, idx) => {
+      let img = s.image;
+      if (!img || uniqueMap.has(img)) {
+        img = DISTINCT_SHOP_IMAGES[idx % DISTINCT_SHOP_IMAGES.length];
+      }
+      uniqueMap.set(img, s.name);
+      return { ...s, image: img };
+    });
+
+    return sanitized;
   } catch (e) {
     console.error('Error reading stored shops:', e);
   }
-  saveStoredShops(INITIAL_SHOPS);
   return INITIAL_SHOPS;
 };
 

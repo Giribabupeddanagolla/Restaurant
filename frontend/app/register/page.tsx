@@ -94,15 +94,6 @@ export default function RegisterPage() {
 
         {/* Form Card */}
         <div className="glass-card rounded-3xl p-5 sm:p-7 shadow-lg bg-white border border-[#8B0000]/10 space-y-4">
-          
-          {/* Quick Demo Fill Button */}
-          <button
-            type="button"
-            onClick={handleQuickFill}
-            className="w-full py-2 px-3 rounded-xl bg-[#FFF8F0] border border-[#8B0000]/20 text-[#8B0000] hover:bg-[#8B0000] hover:text-white transition-all text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#C8A055]" /> Auto-Fill Demo Registration Data
-          </button>
 
           {errorMsg && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold animate-in fade-in">

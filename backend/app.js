@@ -17,6 +17,8 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const tableRoutes = require('./routes/tableRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const shopRoutes = require('./routes/shopRoutes');
+const adminMerchantRoutes = require('./routes/adminMerchantRoutes');
+const merchantRoutes = require('./routes/merchantRoutes');
 
 dotenv.config();
 
@@ -45,6 +47,10 @@ app.use('/api/v1/employees', employeeRoutes);
 app.use('/api/v1/inventory', inventoryRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/shops', shopRoutes);
+app.use('/api/v1/restaurants', shopRoutes);
+app.use('/api/restaurants', shopRoutes);
+app.use('/api/v1/admin/merchants', adminMerchantRoutes);
+app.use('/api/v1/merchant', merchantRoutes);
 
 // Global Error Handler
 app.use(errorHandler);

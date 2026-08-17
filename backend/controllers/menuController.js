@@ -2,12 +2,21 @@ const MenuItem = require('../models/MenuItem');
 
 exports.getMenuItems = async (req, res, next) => {
   try {
-    const { category, search, diet } = req.query;
-    let query = { isAvailable: true };
+    const { category, search, diet, shopId, merchantId, categoryId, subCategoryId, shop } = req.query;
+    let query = { isAvailable: { $ne: false } };
 
+    if (shopId) query.shopId = shopId;
+    if (merchantId) query.merchantId = merchantId;
+    if (categoryId) query.categoryId = categoryId;
+    if (subCategoryId) query.subCategoryId = subCategoryId;
     if (category && category !== 'all') query.category = category;
     if (search) query.name = { $regex: search, $options: 'i' };
     if (diet && diet !== 'all') query.dietary = diet;
+
+    if (shop) {
+      const shopRegex = new RegExp(shop.replace(/\s+/g, '.*'), 'i');
+      query.$or = [{ shopName: shopRegex }, { shopSlug: shopRegex }, { shopId: shop }];
+    }
 
     const items = await MenuItem.find(query);
     res.status(200).json({ success: true, count: items.length, data: items });

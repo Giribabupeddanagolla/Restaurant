@@ -28813,7 +28813,7 @@ export const ROYAL_SPICE_GARDEN_DISHES: MenuItem[] = [
 export const REGIONAL_INDIAN_DISHES: MenuItem[] = [];
 
 
-export const INITIAL_DISHES: MenuItem[] = [
+const RAW_INITIAL_DISHES: MenuItem[] = [
   ...FINE_DINING_DISHES,
   ...ROYAL_KITCHEN_DISHES,
   ...ROYAL_BAKERY_DISHES,
@@ -28825,11 +28825,18 @@ export const INITIAL_DISHES: MenuItem[] = [
   ...REGIONAL_INDIAN_DISHES
 ];
 
-export const CHEF_SPECIAL_DISHES: MenuItem[] = FINE_DINING_DISHES.slice(0, 10);
-export const PIZZA_BURGER_DISHES: MenuItem[] = ROYAL_EXPRESS_BISTRO_DISHES.filter(d => (d.category === 'fast-food' || d.category === 'pizza' || d.category === 'burgers')).slice(0, 20);
-export const MAIN_COURSE_DISHES: MenuItem[] = ROYAL_KITCHEN_DISHES.slice(0, 20);
-export const BEVERAGE_BAR_DISHES: MenuItem[] = ROYAL_CAFE_DISHES.slice(0, 20);
-export const ROYAL_FINE_DINING_PRODUCTS: MenuItem[] = FINE_DINING_DISHES;
+// Clean up synthetic repetitive "Special 1..20" items to maintain 25-30 authentic main catalog dishes
+export const INITIAL_DISHES: MenuItem[] = RAW_INITIAL_DISHES.filter((d) => {
+  const name = d.name || '';
+  if (/\bSpecial\s+\d+\b/i.test(name)) return false;
+  return true;
+}).slice(0, 30);
+
+export const CHEF_SPECIAL_DISHES: MenuItem[] = INITIAL_DISHES.slice(0, 10);
+export const PIZZA_BURGER_DISHES: MenuItem[] = INITIAL_DISHES.filter(d => (d.category === 'fast-food' || d.category === 'pizza' || d.category === 'burgers')).slice(0, 15);
+export const MAIN_COURSE_DISHES: MenuItem[] = INITIAL_DISHES.slice(0, 15);
+export const BEVERAGE_BAR_DISHES: MenuItem[] = INITIAL_DISHES.slice(0, 15);
+export const ROYAL_FINE_DINING_PRODUCTS: MenuItem[] = INITIAL_DISHES;
 
 export const FINE_DINING_TABLE_IMAGES = [
   'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=400&auto=format&fit=crop&q=85',
@@ -28851,25 +28858,327 @@ export const RESTAURANT_OUTLETS = [
   { id: 'royal-seafood', name: 'Royal Seafood', slug: 'royal-seafood', icon: '🍤' }
 ];
 
-export function getStoredDishes(): MenuItem[] {
-  if (typeof window === 'undefined') return INITIAL_DISHES;
-  try {
-    const versionKey = 'royal_restaurant_dishes_v2026_fine_dining_fix';
-    if (localStorage.getItem('royal_dishes_version') !== versionKey) {
-      localStorage.setItem('royal_dishes_version', versionKey);
-      saveStoredDishes(INITIAL_DISHES);
-      return INITIAL_DISHES;
+export const DEFAULT_MERCHANT_DISHES: MenuItem[] = ([
+  // RK RESTAURANT DISHES
+  {
+    id: 'rk-veg-biryani',
+    name: 'RK Special Veg Hyderabadi Biryani',
+    description: 'Fragrant basmati rice dum cooked with fresh cottage cheese, vegetables, saffron, and aromatic spices.',
+    price: 280,
+    category: 'biryani',
+    subCategory: 'veg-biryani',
+    foodType: 'Veg',
+    dietary: ['veg'],
+    shopName: 'RK Restaurant',
+    shopSlug: 'rk-restaurant',
+    merchantId: 'merchant-rk-restaurant',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'rk-chicken-biryani',
+    name: 'RK Royal Chicken Dum Biryani',
+    description: 'Tender marinated chicken slow-cooked with basmati rice, caramelised onions, and fresh mint.',
+    price: 340,
+    category: 'biryani',
+    subCategory: 'chicken-biryani',
+    foodType: 'Non-Veg',
+    dietary: ['non-veg'],
+    shopName: 'RK Restaurant',
+    shopSlug: 'rk-restaurant',
+    merchantId: 'merchant-rk-restaurant',
+    image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'rk-mutton-biryani',
+    name: 'RK Mutton Spice Dum Biryani',
+    description: 'Rich and juicy tender mutton chunks layered with fragrant spices and long-grain basmati rice.',
+    price: 420,
+    category: 'biryani',
+    subCategory: 'mutton-biryani',
+    foodType: 'Non-Veg',
+    dietary: ['non-veg'],
+    shopName: 'RK Restaurant',
+    shopSlug: 'rk-restaurant',
+    merchantId: 'merchant-rk-restaurant',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'rk-paneer-butter-masala',
+    name: 'RK Paneer Butter Masala',
+    description: 'Soft paneer cubes simmered in a rich, buttery, velvety tomato gravy with cashews.',
+    price: 260,
+    category: 'north-indian-curries',
+    foodType: 'Veg',
+    dietary: ['veg'],
+    shopName: 'RK Restaurant',
+    shopSlug: 'rk-restaurant',
+    merchantId: 'merchant-rk-restaurant',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'rk-guntur-chicken',
+    name: 'RK Guntur Kodi Vepudu',
+    description: 'Fiery Andhra-style Guntur red chilli chicken fry tossed with curry leaves and black pepper.',
+    price: 290,
+    category: 'non-veg-starters',
+    foodType: 'Non-Veg',
+    dietary: ['non-veg'],
+    shopName: 'RK Restaurant',
+    shopSlug: 'rk-restaurant',
+    merchantId: 'merchant-rk-restaurant',
+    image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+
+  // MADHAN RESTAURANT DISHES
+  {
+    id: 'madhan-veg-biryani',
+    name: 'Madhan Veg Handi Biryani',
+    description: 'Traditional earthen pot handi cooked veg biryani served with raita and mirchi ka salan.',
+    price: 270,
+    category: 'biryani',
+    subCategory: 'veg-biryani',
+    foodType: 'Veg',
+    dietary: ['veg'],
+    shopName: 'Madhan Restaurant',
+    shopSlug: 'madhan-restaurant',
+    merchantId: 'merchant-madhan-restaurant',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'madhan-chicken-biryani',
+    name: 'Madhan Spicy Chicken Biryani',
+    description: 'Chef Madhan signature spicy chicken dum biryani prepared with freshly roasted whole spices.',
+    price: 330,
+    category: 'biryani',
+    subCategory: 'chicken-biryani',
+    foodType: 'Non-Veg',
+    dietary: ['non-veg'],
+    shopName: 'Madhan Restaurant',
+    shopSlug: 'madhan-restaurant',
+    merchantId: 'merchant-madhan-restaurant',
+    image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'madhan-mutton-biryani',
+    name: 'Madhan Royal Mutton Biryani',
+    description: 'Succulent mutton slow dum cooked with ghee, basmati rice, and authentic spices.',
+    price: 450,
+    category: 'biryani',
+    subCategory: 'mutton-biryani',
+    foodType: 'Non-Veg',
+    dietary: ['non-veg'],
+    shopName: 'Madhan Restaurant',
+    shopSlug: 'madhan-restaurant',
+    merchantId: 'merchant-madhan-restaurant',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+
+  // ANDHRA RESTAURANT / ANDHRA RUCHULU DISHES
+  {
+    id: 'andhra-veg-biryani',
+    name: 'Andhra Special Veg Dum Biryani',
+    description: 'Authentic Andhra style spiced vegetable dum biryani cooked with green chillies and mint.',
+    price: 260,
+    category: 'biryani',
+    subCategory: 'veg-biryani',
+    foodType: 'Veg',
+    dietary: ['veg'],
+    shopName: 'Andhra Ruchulu',
+    shopSlug: 'andhra-ruchulu',
+    merchantId: 'merchant-andhra-ruchulu',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'andhra-chicken-biryani',
+    name: 'Andhra Spicy Kodi Biryani',
+    description: 'Traditional Andhra spicy chicken biryani made with spicy kodi kura masala and basmati rice.',
+    price: 320,
+    category: 'biryani',
+    subCategory: 'chicken-biryani',
+    foodType: 'Non-Veg',
+    dietary: ['non-veg'],
+    shopName: 'Andhra Ruchulu',
+    shopSlug: 'andhra-ruchulu',
+    merchantId: 'merchant-andhra-ruchulu',
+    image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'andhra-ghee-dosa',
+    name: 'Andhra Ghee Roast Masala Dosa',
+    description: 'Crispy golden crepe roasted in pure desi ghee, stuffed with spiced potato masala and coconut chutney.',
+    price: 140,
+    category: 'breakfast',
+    subCategory: 'dosa',
+    foodType: 'Veg',
+    dietary: ['veg'],
+    shopName: 'Andhra Ruchulu',
+    shopSlug: 'andhra-ruchulu',
+    merchantId: 'merchant-andhra-ruchulu',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  },
+  {
+    id: 'andhra-steamed-idli',
+    name: 'Andhra Steamed Idli Sambar',
+    description: 'Piping hot fluffy rice cakes served with spicy lentil sambar and groundnut ginger chutney.',
+    price: 90,
+    category: 'breakfast',
+    subCategory: 'idli',
+    foodType: 'Veg',
+    dietary: ['veg'],
+    shopName: 'Andhra Ruchulu',
+    shopSlug: 'andhra-ruchulu',
+    merchantId: 'merchant-andhra-ruchulu',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85',
+    available: true,
+    inStock: true,
+    isMerchantDish: true,
+  }
+] as any);
+
+export function getMatchingFoodImage(name: string, category?: string, subCategory?: string, currentImage?: string): string {
+  const n = (name || '').toLowerCase();
+  const c = (category || '').toLowerCase();
+  const sc = (subCategory || '').toLowerCase();
+  const img = (currentImage || '').toLowerCase();
+
+  // If image is a cake image but dish is NOT a dessert/cake/bakery item, replace it!
+  const isCakeImage = img.includes('photo-1578985545062') || img.includes('photo-1509440159596') || img.includes('photo-1606313564200') || img.includes('photo-1541544741938');
+  const isCakeDish = n.includes('cake') || n.includes('mousse') || n.includes('brownie') || c.includes('bakery') || c.includes('dessert');
+
+  if (isCakeImage && !isCakeDish) {
+    if (n.includes('egg') && n.includes('biryani')) {
+      return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=85';
     }
-    const data = localStorage.getItem('royal_restaurant_dishes_v2026_fine_dining_fix');
-    return data ? JSON.parse(data) : INITIAL_DISHES;
+    if (n.includes('chicken') || n.includes('chiken') || n.includes('kodi')) {
+      return 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&auto=format&fit=crop&q=85';
+    }
+    if (n.includes('biryani')) {
+      return 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=800&auto=format&fit=crop&q=85';
+    }
+    if (n.includes('dosa')) {
+      return 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&auto=format&fit=crop&q=85';
+    }
+    if (n.includes('paneer')) {
+      return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=85';
+    }
+    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=85';
+  }
+
+  if (currentImage && currentImage.startsWith('http') && currentImage.length > 15 && !isCakeImage) {
+    return currentImage;
+  }
+
+  if (n.includes('egg') && n.includes('biryani')) {
+    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=85';
+  }
+  if (n.includes('chicken') || n.includes('chiken') || n.includes('kodi') || n.includes('fry')) {
+    return 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&auto=format&fit=crop&q=85';
+  }
+  if (n.includes('biryani')) {
+    return 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=800&auto=format&fit=crop&q=85';
+  }
+  if (n.includes('dosa')) {
+    return 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&auto=format&fit=crop&q=85';
+  }
+  if (n.includes('paneer')) {
+    return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=85';
+  }
+
+  return currentImage || 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=85';
+}
+
+export function getStoredDishes(): MenuItem[] {
+  if (typeof window === 'undefined') return [...DEFAULT_MERCHANT_DISHES, ...INITIAL_DISHES];
+  try {
+    const versionKey = 'royal_dishes_v2026_shops_menu_v4_images_fix';
+    if (localStorage.getItem('royal_clean_version') !== versionKey) {
+      localStorage.setItem('royal_clean_version', versionKey);
+      localStorage.removeItem('royal_dishes_v2026_shops_menu_v3');
+    }
+
+    const data = localStorage.getItem('royal_dishes_v2026_shops_menu_v4_images_fix');
+    let storedList: MenuItem[] = data ? JSON.parse(data) : [...DEFAULT_MERCHANT_DISHES, ...INITIAL_DISHES];
+
+    let userAddedDishes: MenuItem[] = [];
+    const merchantDishesData = localStorage.getItem('giri_merchant_dishes') || localStorage.getItem('royal_merchant_dishes');
+    if (merchantDishesData) {
+      const merchantDishes = JSON.parse(merchantDishesData);
+      if (Array.isArray(merchantDishes) && merchantDishes.length > 0) {
+        const curMerchant = JSON.parse(localStorage.getItem('giri_current_merchant') || '{}');
+        const userAuth = JSON.parse(localStorage.getItem('royal_user') || '{}');
+        const mShopName = curMerchant.shopName || curMerchant.name || curMerchant.shopProfile?.shopName || userAuth.shopName || userAuth.name || 'RK Restaurant';
+        const mShopSlug = mShopName.toLowerCase().replace(/\s+/g, '-');
+        const mId = curMerchant.id || curMerchant._id || `merchant-${mShopSlug}`;
+
+        userAddedDishes = merchantDishes.map((d: any) => ({
+          ...d,
+          merchantId: d.merchantId || mId,
+          shopName: d.shopName || mShopName,
+          shopSlug: d.shopSlug || mShopSlug,
+          dietary: d.dietary || [d.foodType ? d.foodType.toLowerCase() : 'veg'],
+          category: d.category || 'mains',
+          image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
+          isMerchantDish: true,
+        }));
+      }
+    }
+
+    const mergedMerchantDishes = [...userAddedDishes, ...DEFAULT_MERCHANT_DISHES.filter((dm) => !userAddedDishes.some((u) => u.id === dm.id))].map((d) => ({
+      ...d,
+      image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
+    }));
+
+    const cleanBaseList = (storedList.length > 0 ? storedList : INITIAL_DISHES).filter((d) => {
+      if ((d as any).isMerchantDish) return true;
+      return !/\bSpecial\s+\d+\b/i.test(d.name || '');
+    }).slice(0, 30);
+
+    const baseList = cleanBaseList.filter((g: any) => !mergedMerchantDishes.some((u) => u.id === g.id || u.name.toLowerCase() === g.name.toLowerCase())).map((d) => ({
+      ...d,
+      image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
+    }));
+    return [...mergedMerchantDishes, ...baseList];
   } catch {
-    return INITIAL_DISHES;
+    return [...DEFAULT_MERCHANT_DISHES, ...INITIAL_DISHES];
   }
 }
 
 export function saveStoredDishes(dishes: MenuItem[]): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('royal_restaurant_dishes_v2026_fine_dining_fix', JSON.stringify(dishes));
+    localStorage.setItem('royal_dishes_v2026_shops_menu_v4_images_fix', JSON.stringify(dishes));
   } catch {}
 }

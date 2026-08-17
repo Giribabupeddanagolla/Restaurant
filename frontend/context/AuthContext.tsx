@@ -64,12 +64,28 @@ const DEMO_USERS: Record<string, User> = {
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
     phone: '+1 (555) 000-6666',
   },
+  'merchant@royalrestaurant.com': {
+    id: 'usr-merchant',
+    name: 'Giri Spice Garden Merchant',
+    email: 'merchant@royalrestaurant.com',
+    role: 'Merchant',
+    avatar: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=150&auto=format&fit=crop&q=80',
+    phone: '+91 98765 99999',
+  },
+  'andhra.restaurant@gmail.com': {
+    id: 'usr-merchant-andhra',
+    name: 'Andhra Spice Restaurant',
+    email: 'andhra.restaurant@gmail.com',
+    role: 'Merchant',
+    avatar: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=150&auto=format&fit=crop&q=80',
+    phone: '+91 98765 99999',
+  },
   'customer@royalrestaurant.com': {
     id: 'usr-customer',
     name: 'Sophia Williams',
     email: 'customer@royalrestaurant.com',
     role: 'Customer',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+    avatar: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=150&auto=format&fit=crop&q=80',
     phone: '+1 (555) 000-7777',
   },
 };
@@ -105,6 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!credentials.role) {
       if (lowerEmail.includes('admin')) detectedRole = 'Admin';
       else if (lowerEmail.includes('manager')) detectedRole = 'Manager';
+      else if (lowerEmail.includes('merchant') || lowerEmail.includes('vendor') || lowerEmail.includes('shop') || lowerEmail.includes('andhra') || lowerEmail.includes('sweets') || lowerEmail.includes('bakery')) detectedRole = 'Merchant';
       else if (lowerEmail.includes('chef')) detectedRole = 'Chef';
       else if (lowerEmail.includes('waiter')) detectedRole = 'Waiter';
       else if (lowerEmail.includes('cashier')) detectedRole = 'Cashier';
