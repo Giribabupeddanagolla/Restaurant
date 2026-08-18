@@ -8,6 +8,7 @@ import { Search, ChevronLeft, ChevronRight, Star, Clock, Leaf, MapPin, Sparkles,
 import { MenuItem, Shop } from '@/types';
 import AddButton from '@/components/AddButton';
 import DishModal from '@/components/DishModal';
+import SafeImage, { FALLBACK_SVG } from '@/components/SafeImage';
 import { formatCurrency } from '@/utils/formatters';
 import { shopApi, menuApi } from '@/services/restaurantService';
 
@@ -326,13 +327,16 @@ const CURATED_MAIN_DISHES: MenuItem[] = [
 ];
 
 const FILTER_TABS = [
-  { id: 'all', label: 'All Dishes', icon: Utensils },
-  { id: 'chef-special', label: '⭐ Chef Specials', icon: Sparkles },
-  { id: 'fine-dining', label: '🍽️ Fine Dining', icon: Utensils },
-  { id: 'grill', label: '🔥 Grill & BBQ', icon: Flame },
-  { id: 'bakery', label: '🍰 Bakery & Cakes', icon: Sparkles },
-  { id: 'seafood', label: '🦐 Coastal Seafood', icon: Sparkles },
-  { id: 'beverages', label: '☕ Café & Drinks', icon: Sparkles },
+  { id: 'all', label: '🍽️ All Dishes' },
+  { id: 'breakfast', label: '🥞 Breakfast' },
+  { id: 'soups', label: '🍲 Soups' },
+  { id: 'veg-starters', label: '🥦 Veg Starters' },
+  { id: 'non-veg-starters', label: '🍗 Non-Veg Starters' },
+  { id: 'tandoor', label: '🏺 Tandoor' },
+  { id: 'grill', label: '🔥 Grill' },
+  { id: 'kebabs', label: '🍢 Kebabs' },
+  { id: 'biryani', label: '🍲 Biryani' },
+  { id: 'rice-pulao', label: '🍚 Rice & Pulao' },
 ];
 
 const getCategoryPhoto = (catId: string, catName: string) => {
@@ -435,23 +439,19 @@ export default function HomePage() {
   }, []);
 
   const filteredDishes = curatedDishes.filter((dish) => {
-    const matchesSearch = search === '' ||
-      dish.name.toLowerCase().includes(search.toLowerCase()) ||
-      dish.description.toLowerCase().includes(search.toLowerCase());
+    if (!dish) return false;
+    const nameStr = (dish.name || '').toLowerCase();
+    const descStr = (dish.description || '').toLowerCase();
+    const searchStr = (search || '').toLowerCase();
+    const matchesSearch = search === '' || nameStr.includes(searchStr) || descStr.includes(searchStr);
 
     let matchesTab = true;
-    if (activeTab === 'chef-special') {
-      matchesTab = dish.dietary.includes('chef-special');
-    } else if (activeTab === 'fine-dining') {
-      matchesTab = dish.category.includes('fine-dining') || dish.category.includes('north-indian') || dish.category === 'biryani';
-    } else if (activeTab === 'grill') {
-      matchesTab = dish.category === 'grill' || dish.category === 'kebabs' || dish.category === 'tandoor';
-    } else if (activeTab === 'bakery') {
-      matchesTab = dish.category === 'bakery' || dish.category === 'desserts';
-    } else if (activeTab === 'seafood') {
-      matchesTab = dish.category === 'seafood';
-    } else if (activeTab === 'beverages') {
-      matchesTab = dish.category === 'beverages';
+    const dietaryList = Array.isArray(dish.dietary) ? dish.dietary : [];
+    const catStr = (dish.category || '').toLowerCase();
+
+    if (activeTab !== 'all') {
+      const target = activeTab.toLowerCase().replace(/-/g, ' ');
+      matchesTab = catStr === activeTab || catStr.includes(target) || catStr.replace(/-/g, ' ').includes(target);
     }
 
     return matchesSearch && matchesTab;
@@ -524,20 +524,18 @@ export default function HomePage() {
                 key={cat.id}
                 href={cat.id === 'all' ? '/menu' : `/menu?category=${cat.id}`}
                 className="shrink-0 flex flex-col items-center gap-2 group"
+                title={cat.name}
               >
                 <div className="relative w-24 h-20 sm:w-36 sm:h-28 rounded-2xl overflow-hidden border-2 border-transparent group-hover:border-[#8B0000] transition-all shadow-sm">
-                  <Image 
+                  <SafeImage 
                     src={getCategoryPhoto(cat.id, cat.name)} 
                     alt={cat.name} 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="(max-width: 640px) 96px, 144px"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-extrabold text-[#1a1008] text-center group-hover:text-[#8B0000] transition-colors max-w-[90px] sm:max-w-none">
-                  {cat.icon} {cat.name}
-                </span>
               </Link>
             ))}
           </ScrollRow>
@@ -561,8 +559,12 @@ export default function HomePage() {
               <Link key={shop._id || shop.id || idx} href={`/menu?shop=${encodeURIComponent(shop.name || (shop as any).shopName || shop.id || shop._id)}`} className="shrink-0 w-60 glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all block group">
                 <div className="relative h-36 w-full bg-[#F8F5F0]">
                   <img 
-                    src={shop.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85'} 
+                    src={shop.image || FALLBACK_SVG} 
                     alt={shop.name} 
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = FALLBACK_SVG;
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -643,7 +645,7 @@ export default function HomePage() {
               >
                 <div>
                   <div className="relative h-48 w-full bg-[#F8F5F0] overflow-hidden">
-                    <Image 
+                    <SafeImage 
                       src={dish.image} 
                       alt={dish.name} 
                       fill 
@@ -651,7 +653,7 @@ export default function HomePage() {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     />
                     <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
-                      {dish.dietary.includes('chef-special') && (
+                      {Array.isArray(dish.dietary) && dish.dietary.includes('chef-special') && (
                         <span className="bg-[#8B0000] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1">
                           <Sparkles className="w-3 h-3 text-[#C8A055]" /> Special
                         </span>
@@ -659,7 +661,7 @@ export default function HomePage() {
                     </div>
 
                     <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
-                      {dish.dietary.includes('veg') ? (
+                      {Array.isArray(dish.dietary) && dish.dietary.includes('veg') ? (
                         <span className="bg-white/95 text-[#16603A] text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#16603A]/30 shadow-xs flex items-center gap-0.5">
                           <Leaf className="w-3 h-3 text-emerald-600" /> Veg
                         </span>
@@ -687,6 +689,17 @@ export default function HomePage() {
                     <p className="text-xs text-[#6b5840] line-clamp-2 leading-relaxed">
                       {dish.description}
                     </p>
+
+                    <div className="pt-2 border-t border-[#8B0000]/10 flex flex-col gap-0.5 text-[11px] font-bold text-[#6b5840]">
+                      <div className="flex items-center gap-1 text-[#8B0000] truncate">
+                        <Building2 className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{dish.shopName || 'Giri Spice Garden'}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-500 truncate text-[10px]">
+                        <MapPin className="w-3 h-3 text-[#8B0000] shrink-0" />
+                        <span className="truncate">{dish.address || dish.city || 'Hyderabad'}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

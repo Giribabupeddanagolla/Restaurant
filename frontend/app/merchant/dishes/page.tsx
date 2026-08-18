@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Utensils, Plus, Edit, Trash2, ArrowLeft, Search, X, Check, Leaf, AlertCircle } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
+import { getMatchingFoodImage } from '@/data/mockData';
 
 interface DishItem {
   id: string;
@@ -323,9 +324,12 @@ export default function MerchantDishesPage() {
                   <td className="p-3.5">
                     <div className="flex items-center gap-3">
                       <img
-                        src={dish.image}
+                        src={getMatchingFoodImage(dish.name, dish.category, dish.subCategory, dish.image)}
                         alt={dish.name}
                         className="w-12 h-12 rounded-xl object-cover border border-[#8B0000]/15 shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = getMatchingFoodImage(dish.name, dish.category, dish.subCategory);
+                        }}
                       />
                       <div>
                         <div className="font-extrabold text-xs text-[#1a1008]">{dish.name}</div>

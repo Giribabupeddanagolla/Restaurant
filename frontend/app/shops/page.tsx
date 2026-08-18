@@ -7,7 +7,9 @@ import { INITIAL_SHOPS, getStoredShops, saveStoredShops } from '@/data/mockData'
 import { Shop } from '@/types';
 import { shopApi } from '@/services/restaurantService';
 import ShopGalleryModal from '@/components/ShopGalleryModal';
-import { MapPin, Phone, Clock, Star, Search, ExternalLink, Utensils, CheckCircle, XCircle, Menu, X, Camera, Eye, Images, SlidersHorizontal } from 'lucide-react';
+import { MapPin, Phone, Clock, Star, Search, ExternalLink, Utensils, CheckCircle, XCircle, Menu, X, Camera, Eye, Images, SlidersHorizontal, Calendar } from 'lucide-react';
+
+import { FALLBACK_SVG } from '@/components/SafeImage';
 
 export default function ShopsPage() {
   const [shops, setShops] = useState<Shop[]>(INITIAL_SHOPS);
@@ -49,11 +51,16 @@ export default function ShopsPage() {
   const cities = ['all', ...Array.from(new Set(shops.map((s) => s.city || 'Metropolitan City')))];
 
   const filteredShops = shops.filter((shop) => {
+    if (!shop) return false;
+    const nameStr = (shop.name || (shop as any).shopName || '').toLowerCase();
+    const taglineStr = (shop.tagline || (shop as any).tag || '').toLowerCase();
+    const addressStr = (shop.address || '').toLowerCase();
+    const searchStr = (search || '').toLowerCase();
     const matchesSearch =
       search === '' ||
-      shop.name.toLowerCase().includes(search.toLowerCase()) ||
-      (shop.tagline && shop.tagline.toLowerCase().includes(search.toLowerCase())) ||
-      (shop.address && shop.address.toLowerCase().includes(search.toLowerCase()));
+      nameStr.includes(searchStr) ||
+      taglineStr.includes(searchStr) ||
+      addressStr.includes(searchStr);
 
     const matchesCity = selectedCity === 'all' || (shop.city || 'Metropolitan City') === selectedCity;
 
@@ -170,7 +177,8 @@ export default function ShopsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredShops.map((shop, idx) => {
           const rawName = shop.name || (shop as any).shopName || shop.id || shop._id;
-          const categoryUrl = `/menu?shop=${encodeURIComponent(rawName)}`;
+          const sId = shop._id || shop.id || (shop as any).merchantId || rawName;
+          const categoryUrl = `/menu?shop=${encodeURIComponent(rawName)}&shopId=${encodeURIComponent(sId)}`;
 
           const diningCount = shop.diningImages ? shop.diningImages.length : 1;
           const kitchenCount = shop.kitchenImages ? shop.kitchenImages.length : 1;
@@ -181,34 +189,21 @@ export default function ShopsPage() {
               key={shop._id || shop.id || idx}
               className="glass-card rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group border border-[#8B0000]/10"
             >
-              {/* Image & Clickable Lightbox Overlay */}
-              <div
-                onClick={() => openGallery(shop, 'all')}
+              {/* Image Banner linking directly to Shop Menu */}
+              <Link
+                href={categoryUrl}
                 className="relative h-52 w-full bg-[#F8F5F0] block overflow-hidden cursor-pointer group/img"
-                title={`Click image to view photos of ${shop.name}`}
               >
                 <img
-                  src={shop.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85'}
+                  src={shop.image || FALLBACK_SVG}
                   alt={shop.name}
                   className="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-500"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop&q=85';
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = FALLBACK_SVG;
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 group-hover/img:from-black/80 transition-all" />
-
-                {/* Hover Center Badge: "Click to View Gallery" */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px] p-4 text-center">
-                  <div className="w-12 h-12 rounded-full bg-[#8B0000] flex items-center justify-center shadow-xl mb-2 group-hover/img:scale-110 transition-transform">
-                    <Camera className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/40">
-                    📷 Click to View Photos
-                  </span>
-                  <span className="text-[11px] font-semibold text-amber-200 mt-1">
-                    Dining Room ({diningCount}) • Live Kitchen ({kitchenCount})
-                  </span>
-                </div>
 
                 {/* Status Badge Top Left */}
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
@@ -228,17 +223,6 @@ export default function ShopsPage() {
                   )}
                 </div>
 
-                {/* Camera Gallery Counter Top Right */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openGallery(shop, 'all');
-                  }}
-                  className="absolute top-3 right-3 bg-black/75 hover:bg-[#8B0000] backdrop-blur-md text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-white/30 shadow-md transition-colors z-10"
-                >
-                  <Camera className="w-3.5 h-3.5 text-amber-300" /> {totalPhotos} Photos
-                </button>
-
                 {/* Rating & Delivery Time Badge */}
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-bold z-10">
                   <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 border border-white/20">
@@ -248,7 +232,7 @@ export default function ShopsPage() {
                     <Clock className="w-3.5 h-3.5 text-red-300" /> {shop.deliveryTime || shop.time || '20-30 min'}
                   </span>
                 </div>
-              </div>
+              </Link>
 
               {/* Shop Details */}
               <div className="p-5 flex flex-col flex-1 gap-3">
@@ -261,22 +245,6 @@ export default function ShopsPage() {
                       {shop.tagline || shop.tag || 'Fine Dining & Takeaway'}
                     </p>
                   </Link>
-                </div>
-
-                {/* Quick Photo Category Pills: Click to view Dining or Kitchen Photos directly */}
-                <div className="flex items-center gap-2 pt-1 flex-wrap">
-                  <button
-                    onClick={() => openGallery(shop, 'dining')}
-                    className="px-2.5 py-1 bg-[#FFF0EB] hover:bg-[#8B0000] hover:text-white border border-[#8B0000]/20 rounded-lg text-[11px] font-bold text-[#8B0000] flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
-                  >
-                    🍷 Dining Photos ({diningCount})
-                  </button>
-                  <button
-                    onClick={() => openGallery(shop, 'kitchen')}
-                    className="px-2.5 py-1 bg-[#F0FAF4] hover:bg-[#16603A] hover:text-white border border-[#16603A]/20 rounded-lg text-[11px] font-bold text-[#16603A] flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
-                  >
-                    🍳 Kitchen Photos ({kitchenCount})
-                  </button>
                 </div>
 
                 <div className="flex flex-col gap-2 text-xs text-[#6b5840] pt-2 border-t border-[#8B0000]/10">
@@ -302,7 +270,13 @@ export default function ShopsPage() {
                     href={categoryUrl}
                     className="flex-1 btn-crimson py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md"
                   >
-                    <Utensils className="w-3.5 h-3.5" /> View Category Menu
+                    <Utensils className="w-3.5 h-3.5" /> View Menu
+                  </Link>
+                  <Link
+                    href={`/user/bookings?shop=${encodeURIComponent(rawName)}&shopId=${encodeURIComponent(sId)}`}
+                    className="flex-1 border border-[#8B0000]/30 text-[#8B0000] py-2.5 rounded-xl text-xs font-extrabold hover:bg-[#FFF8F0] flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <Calendar className="w-3.5 h-3.5" /> Book Table
                   </Link>
                   {shop.mapUrl ? (
                     <a

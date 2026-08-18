@@ -2,18 +2,22 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard, Utensils, Table, ShoppingBag, Truck, User, SlidersHorizontal, ChevronDown } from 'lucide-react';
-import { useState, memo } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { Menu, X, LogIn, UserPlus, LogOut, LayoutDashboard, Utensils, Table, ShoppingBag, Truck, User, SlidersHorizontal, ChevronDown, Plus, ArrowLeft } from 'lucide-react';
+import { useState, memo, Suspense } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
-function NavbarComponent() {
+function NavbarContent() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeShopParam = searchParams ? searchParams.get('shop') : null;
+  const isShopPage = Boolean(activeShopParam);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const { user, logout } = useAuth();
 
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/merchant') || pathname?.startsWith('/manager') || isShopPage) {
     return null;
   }
 
@@ -91,45 +95,59 @@ function NavbarComponent() {
     <header className="fixed top-0 left-0 right-0 h-[64px] bg-white/95 backdrop-blur-md border-b border-[#8B0000]/10 z-50 flex items-center px-4 md:px-8 shadow-sm">
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4">
 
-        {/* Brand Logo & Title */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <Image
-            src="/royal-logo.svg"
-            alt="Royal Restaurant"
-            width={40}
-            height={40}
-            className="rounded-full bg-white shadow ring-2 ring-[#C8A055]/30 shrink-0"
-            priority
-          />
-          <div>
-            <div className="font-extrabold text-base text-[#1a1008] leading-tight whitespace-nowrap">
-              Royal Restaurant
-            </div>
-            <div className="text-[9px] text-[#C8A055] font-bold tracking-widest uppercase">
-              Good Food, Great Experience
-            </div>
-          </div>
-        </Link>
+        {/* Brand Logo & Title (or Back Symbol [ ← ] on Shop Page) */}
+        <div className="flex items-center gap-3 shrink-0">
+          {isShopPage && (
+            <Link
+              href="/shops"
+              className="p-2 rounded-xl bg-[#F8F5F0] hover:bg-[#FFF0EB] text-[#8B0000] border border-[#8B0000]/20 font-bold transition-all shadow-xs flex items-center justify-center cursor-pointer shrink-0"
+              title="Back to All Shops"
+            >
+              <ArrowLeft className="w-4.5 h-4.5" />
+            </Link>
+          )}
 
-        {/* Desktop Nav Links */}
-        <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-semibold transition-colors pb-0.5 whitespace-nowrap ${
-                  isActive
-                    ? 'text-[#8B0000] border-b-2 border-[#8B0000]'
-                    : 'text-[#4a3820] hover:text-[#8B0000]'
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
-        </nav>
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+            <Image
+              src="/royal-logo.svg"
+              alt="Royal Restaurant"
+              width={40}
+              height={40}
+              className="rounded-full bg-white shadow ring-2 ring-[#C8A055]/30 shrink-0"
+              priority
+            />
+            <div>
+              <div className="font-extrabold text-base text-[#1a1008] leading-tight whitespace-nowrap">
+                {isShopPage ? decodeURIComponent(activeShopParam || 'Shop Outlet').replace(/-/g, ' ') : 'Royal Restaurant'}
+              </div>
+              <div className="text-[9px] text-[#C8A055] font-bold tracking-widest uppercase">
+                {isShopPage ? 'Official Outlet Catalog' : 'Good Food, Great Experience'}
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Desktop Nav Links (Hidden on Shop Outlet Page as requested!) */}
+        {!isShopPage && (
+          <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-semibold transition-colors pb-0.5 whitespace-nowrap ${
+                    isActive
+                      ? 'text-[#8B0000] border-b-2 border-[#8B0000]'
+                      : 'text-[#4a3820] hover:text-[#8B0000]'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
 
         {/* Action Controls */}
         <div className="flex items-center gap-2 shrink-0">
@@ -261,6 +279,14 @@ function NavbarComponent() {
         </div>
       )}
     </header>
+  );
+}
+
+function NavbarComponent() {
+  return (
+    <Suspense fallback={null}>
+      <NavbarContent />
+    </Suspense>
   );
 }
 

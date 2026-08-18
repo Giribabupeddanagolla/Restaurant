@@ -7,7 +7,7 @@ import { Instagram, Facebook, Twitter } from 'lucide-react';
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/merchant') || pathname?.startsWith('/manager')) {
     return null;
   }
   return (

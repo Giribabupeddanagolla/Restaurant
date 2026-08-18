@@ -2,7 +2,7 @@
    GIRI RESTAURANT BACKEND - DATABASE ENGINE (backend/src/data/db.js)
    ========================================================================== */
 
-export const db = {
+const db = {
   categories: [
     { id: 'all', name: 'All Dishes', icon: '🍽️' },
     { id: 'specials', name: 'Chef Specials', icon: '⭐' },
@@ -159,3 +159,5 @@ export const db = {
     }
   ]
 };
+
+module.exports = { db };

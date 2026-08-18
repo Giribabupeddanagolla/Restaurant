@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
@@ -10,13 +10,27 @@ import { orderApi } from '@/services/restaurantService';
 
 import { usePathname } from 'next/navigation';
 
+import RestaurantInfo from '@/components/RestaurantInfo';
+import { getMatchingFoodImage } from '@/data/mockData';
+
 function CartDrawerComponent() {
   const pathname = usePathname();
-  const { items, totalItems, totalPrice, isOpen, closeCart, updateQty, removeItem, clearCart } = useCart();
+  const { items, cartShopName, totalItems, totalPrice, isOpen, closeCart, updateQty, removeItem, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
 
-  if (pathname?.startsWith('/admin')) {
+  // Lock background body scroll while Cart Drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow || '';
+      };
+    }
+  }, [isOpen]);
+
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/merchant') || pathname?.startsWith('/manager')) {
     return null;
   }
 
@@ -124,18 +138,34 @@ function CartDrawerComponent() {
           </div>
         ) : (
           <>
+            {/* Restaurant Context Header */}
+            {items.length > 0 && (
+              <div className="px-4 py-3 border-b border-[#8B0000]/10 bg-[#FFF8F0] shrink-0">
+                <RestaurantInfo
+                  shopName={items[0].dish.shopName}
+                  shopId={items[0].dish.shopId}
+                  merchantId={items[0].dish.merchantId}
+                  city={items[0].dish.city}
+                  address={items[0].dish.address}
+                  compact
+                  showViewButton
+                  onViewRestaurant={closeCart}
+                />
+              </div>
+            )}
+
             {/* Items list */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 flex flex-col gap-4">
               {items.map(({ dish, qty }) => (
                 <div key={dish.id} className="flex gap-3 p-3 rounded-2xl bg-[#F8F5F0] border border-[#C8A055]/10">
                   {/* Image */}
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-white">
                     <img
-                      src={dish.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85'}
+                      src={getMatchingFoodImage(dish.name, dish.category, dish.subCategory, dish.image)}
                       alt={dish.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
+                        (e.target as HTMLImageElement).src = getMatchingFoodImage(dish.name, dish.category, dish.subCategory);
                       }}
                     />
                   </div>

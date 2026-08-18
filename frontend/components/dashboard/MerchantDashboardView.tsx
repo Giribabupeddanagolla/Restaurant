@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
+  ArrowLeft,
   Building2,
   Store,
   Utensils,
@@ -30,9 +32,12 @@ import {
   Layers,
   Tag,
   Check,
-  X
+  X,
+  Eye,
+  Filter
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { getMatchingFoodImage } from '@/data/mockData';
 import { formatCurrency } from '@/utils/formatters';
 
 interface DishItem {
@@ -102,20 +107,36 @@ const INITIAL_DISHES: DishItem[] = [
     foodType: 'Veg',
     image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&auto=format&fit=crop&q=80',
   },
+  {
+    id: 'd-5',
+    name: 'Paneer Tikka Masala',
+    category: 'North Indian',
+    subCategory: 'Curries',
+    price: 260,
+    discount: 30,
+    finalPrice: 230,
+    prepTime: '20 mins',
+    inStock: true,
+    foodType: 'Veg',
+    image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=300&auto=format&fit=crop&q=80',
+  },
 ];
 
 export default function MerchantDashboardView() {
+  const router = useRouter();
   const { user } = useAuth();
-  const [currentMerchant, setCurrentMerchant] = useState<any>(null);
-  const [shopOpen, setShopOpen] = useState(true);
-  const [showApprovalBanner, setShowApprovalBanner] = useState(true);
 
   const [dishes, setDishes] = useState<DishItem[]>(INITIAL_DISHES);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [currentMerchant, setCurrentMerchant] = useState<any>(null);
+  const [showApprovalBanner, setShowApprovalBanner] = useState(true);
+  const [shopOpen, setShopOpen] = useState(true);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const [editingDish, setEditingDish] = useState<DishItem | null>(null);
+  // Edit Modal
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editingDish, setEditingDish] = useState<DishItem | null>(null);
   const [editFormData, setEditFormData] = useState({
     name: '',
     category: 'Biryani',
@@ -172,7 +193,7 @@ export default function MerchantDashboardView() {
     const finalPrice = Math.max(0, numPrice - numDiscount);
 
     const mShopName = currentMerchant?.shopName || currentMerchant?.name || currentMerchant?.shopProfile?.shopName || user?.shopName || user?.name || 'RK Restaurant';
-    const mShopSlug = mShopName.toLowerCase().replace(/\s+/g, '-');
+    const mShopSlug = String(mShopName || 'RK Restaurant').toLowerCase().replace(/\s+/g, '-');
     const mId = currentMerchant?.id || currentMerchant?._id || `merchant-${mShopSlug}`;
 
     const updatedList = dishes.map((d) =>
@@ -205,13 +226,21 @@ export default function MerchantDashboardView() {
         merchantId: mId,
         shopName: mShopName,
         shopSlug: mShopSlug,
-        dietary: [(d as any).foodType ? (d as any).foodType.toLowerCase() : 'veg'],
+        dietary: [(d as any).foodType ? String((d as any).foodType).toLowerCase() : 'veg'],
       }));
       const mergedGlobal = [...formattedMerchantItems, ...existingGlobal.filter((g: any) => g.merchantId !== mId && g.shopName !== mShopName)];
       localStorage.setItem('royal_restaurant_dishes_v2026_fine_dining_fix', JSON.stringify(mergedGlobal));
     } catch (err) {}
     setShowEditModal(false);
     setEditingDish(null);
+  };
+
+  const handleToggleStock = (id: string) => {
+    const updatedList = dishes.map((d) => (d.id === id ? { ...d, inStock: !d.inStock, available: !d.inStock } : d));
+    setDishes(updatedList);
+    try {
+      localStorage.setItem('giri_merchant_dishes', JSON.stringify(updatedList));
+    } catch (e) {}
   };
 
   const handleDeleteDish = (id: string) => {
@@ -222,7 +251,7 @@ export default function MerchantDashboardView() {
         localStorage.setItem('giri_merchant_dishes', JSON.stringify(updatedList));
 
         const mShopName = currentMerchant?.shopName || currentMerchant?.name || currentMerchant?.shopProfile?.shopName || user?.shopName || user?.name || 'RK Restaurant';
-        const mShopSlug = mShopName.toLowerCase().replace(/\s+/g, '-');
+        const mShopSlug = String(mShopName || 'RK Restaurant').toLowerCase().replace(/\s+/g, '-');
         const mId = currentMerchant?.id || currentMerchant?._id || `merchant-${mShopSlug}`;
         const existingGlobal = JSON.parse(localStorage.getItem('royal_restaurant_dishes_v2026_fine_dining_fix') || '[]');
         const updatedGlobal = existingGlobal.filter((g: any) => g.id !== id);
@@ -231,12 +260,75 @@ export default function MerchantDashboardView() {
     }
   };
 
-  const merchantStatus = (currentMerchant?.status || 'approved').toLowerCase();
+  const merchantStatus = String(currentMerchant?.status || 'approved').toLowerCase();
   const isApproved = merchantStatus === 'approved' || currentMerchant?.isApproved === true || currentMerchant?.status === 'Active';
 
+  const categoriesList = ['All', ...Array.from(new Set(dishes.map((d) => d.category)))];
+
+  const filteredDishes = dishes.filter((dish) => {
+    const matchSearch = searchQuery === '' || dish.name.toLowerCase().includes(searchQuery.toLowerCase()) || (dish.subCategory && dish.subCategory.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchCategory = selectedCategory === 'All' || dish.category === selectedCategory;
+    return matchSearch && matchCategory;
+  });
+
+  const merchantShopName = currentMerchant?.shopName || currentMerchant?.name || user?.shopName || currentMerchant?.shopProfile?.shopName || 'RK Restaurant';
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16">
-      {/* SECTION 4: ACCESS CONTROL GUARD FOR PENDING MERCHANTS */}
+    <div className="space-y-6 max-w-7xl mx-auto px-4 py-6 pb-16">
+      {/* TOP HEADER BAR WITH NOTIFICATION BELL & SHOP PROFILE BUTTON */}
+      <div className="sticky top-2 z-40 bg-white/95 backdrop-blur-md border border-[#8B0000]/15 py-2 px-3 sm:px-6 rounded-2xl shadow-sm flex items-center justify-between gap-2 sm:gap-4 overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <Link
+            href="/"
+            className="p-2 sm:p-2.5 rounded-xl bg-[#F8F5F0] hover:bg-[#8B0000] text-[#8B0000] hover:text-white border border-[#8B0000]/20 transition-all cursor-pointer shadow-2xs group flex items-center justify-center shrink-0"
+            title="Go to Home Page"
+            aria-label="Go to Home Page"
+          >
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
+          </Link>
+
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#8B0000] text-white flex items-center justify-center font-bold shadow-xs shrink-0">
+            <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+
+          <div className="min-w-0">
+            <div className="font-extrabold text-xs sm:text-sm text-[#1a1008] leading-tight flex items-center gap-1.5 truncate">
+              <span className="truncate">{merchantShopName}</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[8px] sm:text-[9px] font-extrabold uppercase bg-emerald-100 text-emerald-800 shrink-0">
+                Active Outlet
+              </span>
+            </div>
+            <div className="text-[9px] sm:text-[10px] text-[#6b5840] font-bold truncate">
+              Merchant Management Console
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <Link
+            href="/merchant/notifications"
+            className="relative p-2 sm:p-2.5 rounded-xl bg-[#F8F5F0] border border-[#8B0000]/15 text-[#1a1008] hover:bg-[#FFF8F0] transition-all flex items-center justify-center"
+            title="Notifications"
+          >
+            <Bell className="w-4 h-4 text-[#C8A055]" />
+            {unreadNotifsCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white font-extrabold text-[9px] flex items-center justify-center ring-2 ring-white">
+                {unreadNotifsCount}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            href="/merchant/shop-profile"
+            className="btn-crimson py-2 px-2.5 sm:px-4 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all shrink-0"
+            title="Shop Profile"
+          >
+            <Store className="w-4 h-4" />
+            <span className="hidden sm:inline">Shop Profile</span>
+          </Link>
+        </div>
+      </div>
+      {/* PENDING APPROVAL GUARD */}
       {!isApproved && (
         <div className="rounded-3xl bg-amber-50 border-2 border-amber-300 p-6 sm:p-8 text-amber-950 shadow-lg space-y-4">
           <div className="flex items-center gap-3">
@@ -266,19 +358,19 @@ export default function MerchantDashboardView() {
         </div>
       )}
 
-      {/* SECTION 3: FIRST-LOGIN APPROVAL SUCCESS BANNER */}
+      {/* FIRST-LOGIN APPROVAL BANNER */}
       {isApproved && showApprovalBanner && (
-        <div className="rounded-3xl bg-gradient-to-r from-emerald-900 to-emerald-950 p-6 text-white border border-emerald-500/40 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-800 text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-400/30">
-              <CheckCircle2 className="w-7 h-7 text-emerald-400" />
+        <div className="rounded-3xl bg-gradient-to-r from-emerald-900 to-emerald-950 p-5 text-white border border-emerald-500/40 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-800 text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-400/30">
+              <CheckCircle2 className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-extrabold text-white">
+              <h3 className="text-sm sm:text-base font-extrabold text-white">
                 🎉 Your merchant account has been approved.
               </h3>
               <p className="text-xs text-emerald-200 mt-0.5 max-w-xl">
-                Your merchant registration has been approved by Admin. You can now access your full Merchant Dashboard to add shop details, categories, dishes, prices, images, and availability.
+                Your merchant registration is live! Access your Merchant Dashboard to configure shop details, categories, dishes, prices, images, and availability.
               </p>
             </div>
           </div>
@@ -286,33 +378,34 @@ export default function MerchantDashboardView() {
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/merchant/shop-profile"
-              className="px-5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-emerald-950 text-xs font-extrabold shadow-md flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-emerald-950 text-xs font-extrabold shadow-md flex items-center gap-1.5"
             >
-              <Store className="w-4 h-4" /> Go to Shop Setup →
+              <Store className="w-3.5 h-3.5" /> Go to Shop Setup →
             </Link>
             <button
               onClick={() => setShowApprovalBanner(false)}
-              className="p-2 text-emerald-300 hover:text-white"
+              className="p-1.5 text-emerald-300 hover:text-white cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* SECTION 5: TOP HEADER & BRAND BAR */}
-      <div className="rounded-3xl bg-gradient-to-r from-[#1a1008] via-[#2d1b0d] to-[#1a1008] p-6 sm:p-8 text-white shadow-xl border border-[#C8A055]/30 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-gradient-to-bl from-[#8B0000]/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+      {/* CARD 1: DARK BRAND HEADER BANNER */}
+      <div className="rounded-2xl bg-gradient-to-r from-[#1a1008] via-[#2d1b0d] to-[#1a1008] px-5 py-4 sm:px-6 sm:py-5 text-white shadow-lg border border-[#C8A055]/30 relative overflow-hidden">
+        <div className="absolute right-0 top-0 w-96 h-96 bg-gradient-to-bl from-[#8B0000]/25 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative z-10 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#C8A055] text-white flex items-center justify-center font-extrabold text-2xl shadow-lg shrink-0 border border-white/20">
-              <Building2 className="w-8 h-8" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#C8A055] text-white flex items-center justify-center font-extrabold shadow-md shrink-0 border border-white/20">
+              <Building2 className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
-            <div>
+
+            <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span
-                  className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase flex items-center gap-1 ${
+                  className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase flex items-center gap-1 ${
                     isApproved
                       ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                       : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
@@ -323,219 +416,240 @@ export default function MerchantDashboardView() {
 
                 <button
                   onClick={() => setShopOpen(!shopOpen)}
-                  className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase cursor-pointer flex items-center gap-1 border transition-all ${
+                  className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase cursor-pointer flex items-center gap-1 border transition-all ${
                     shopOpen
-                      ? 'bg-emerald-950 text-emerald-300 border-emerald-500/50'
-                      : 'bg-red-950 text-red-300 border-red-500/50'
+                      ? 'bg-emerald-950 text-emerald-300 border-emerald-500/50 hover:bg-emerald-900'
+                      : 'bg-red-950 text-red-300 border-red-500/50 hover:bg-red-900'
                   }`}
                 >
                   <Power className="w-3 h-3" /> Shop Status: {shopOpen ? 'OPEN' : 'CLOSED'}
                 </button>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1 tracking-tight">
-                {currentMerchant?.shopName || currentMerchant?.name || user?.shopName || currentMerchant?.shopProfile?.shopName || 'Andhra Ruchulu'}
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-none">
+                {merchantShopName}
               </h1>
-              <p className="text-xs text-[#E0B96A] mt-1 font-bold">
+
+              <p className="text-[11px] text-[#E0B96A] font-medium tracking-wide">
                 Welcome back, <strong>{user?.name || 'Merchant Owner'}</strong> • Multi-Vendor Swiggy Merchant Console • Commission: <span className="font-mono text-white font-bold">15.0%</span>
               </p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Link
-              href="/merchant/notifications"
-              className="relative p-3 rounded-2xl bg-white/10 border border-white/15 text-white hover:bg-white/20 transition-all"
-            >
-              <Bell className="w-5 h-5 text-[#E0B96A]" />
-              {unreadNotifsCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white font-extrabold text-[10px] flex items-center justify-center ring-2 ring-black">
-                  {unreadNotifsCount}
+      {/* CARD 2: QUICK MODULE TABS & ANALYTICS KPI CARDS CONTAINER */}
+      <div className="glass-card rounded-2xl sm:rounded-3xl bg-white border border-[#8B0000]/10 shadow-xs p-4 sm:p-5 space-y-4">
+        {/* QUICK NAV MODULE TABS (4 MAIN ESSENTIAL MODULES) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {[
+            { href: '/merchant/categories', label: 'Food Categories', desc: 'Manage 8 Categories', icon: Layers, gradient: 'from-rose-600 to-red-700', badge: '8 Cats' },
+            { href: '/merchant/subcategories', label: 'Sub Categories', desc: 'Dish Groupings', icon: SlidersHorizontal, gradient: 'from-purple-600 to-indigo-700', badge: '12 Subs' },
+            { href: '/merchant/dishes', label: 'Dishes / Menu', desc: 'Price & Stock Catalog', icon: Utensils, gradient: 'from-emerald-600 to-teal-700', badge: `${dishes.length} Items` },
+            { href: '/merchant/orders', label: 'Store Orders', desc: 'Live Order Queue', icon: ShoppingBag, gradient: 'from-amber-500 to-orange-600', badge: '12 Live' },
+          ].map((mod) => {
+            const Icon = mod.icon;
+            return (
+              <Link
+                key={mod.href}
+                href={isApproved ? mod.href : '#'}
+                onClick={(e) => {
+                  if (!isApproved) {
+                    e.preventDefault();
+                    alert('Merchant account is under review. Please approve from Admin console first.');
+                  }
+                }}
+                className={`relative bg-[#F8F5F0]/80 p-3.5 rounded-2xl border border-[#8B0000]/10 shadow-2xs hover:shadow-md hover:bg-white transition-all duration-300 group flex flex-col justify-between overflow-hidden text-[#1a1008] ${
+                  !isApproved ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:-translate-y-0.5'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2.5">
+                  <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br ${mod.gradient} text-white flex items-center justify-center font-bold shadow-md group-hover:scale-105 transition-transform duration-300 shrink-0`}>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-white text-[#8B0000] border border-[#8B0000]/15 shrink-0">
+                    {mod.badge}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-xs font-extrabold text-[#1a1008] group-hover:text-[#8B0000] transition-colors leading-tight">
+                    {mod.label}
+                  </h4>
+                  <p className="text-[10px] text-gray-500 font-medium mt-0.5">
+                    {mod.desc}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* KPI METRIC CARDS (4 MAIN ESSENTIAL METRICS) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {[
+            { label: "Today's Orders", val: '248', icon: ShoppingBag, color: 'text-[#1a1008]', bg: 'bg-blue-50/70 border-blue-200', tag: '+14% today' },
+            { label: "Today's Sales", val: '₹24,850', icon: IndianRupee, color: 'text-[#8B0000]', bg: 'bg-rose-50/70 border-rose-200', tag: 'High Revenue' },
+            { label: 'Pending Orders', val: '12', icon: Clock, color: 'text-amber-700', bg: 'bg-amber-50/70 border-amber-200', tag: 'Action Req.' },
+            { label: 'Total Dishes', val: `${dishes.length}`, icon: Utensils, color: 'text-blue-700', bg: 'bg-indigo-50/70 border-indigo-200', tag: 'In Catalog' },
+          ].map((kpi, idx) => {
+            const KIcon = kpi.icon;
+            return (
+              <div key={idx} className={`p-3 sm:p-3.5 rounded-2xl bg-white border ${kpi.bg} shadow-2xs hover:shadow-md transition-all duration-300 text-center space-y-1 text-[#1a1008]`}>
+                <div className="flex items-center justify-between text-gray-400">
+                  <span className="text-[10px] sm:text-[11px] text-[#6b5840] font-extrabold uppercase tracking-tight truncate block">{kpi.label}</span>
+                  <KIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-60 shrink-0" />
+                </div>
+                <h3 className={`text-lg sm:text-xl font-black tracking-tight ${kpi.color}`}>{kpi.val}</h3>
+                <span className="text-[9px] sm:text-[10px] font-bold text-gray-500 bg-[#FAF6EE] px-2 py-0.5 rounded-full border border-gray-200 inline-block">
+                  {kpi.tag}
                 </span>
-              )}
-            </Link>
-
-            <Link
-              href="/merchant/shop-profile"
-              className="btn-crimson py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
-            >
-              <Store className="w-4 h-4" /> Shop Profile
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* SECTION 5 SIDEBAR NAV MODULE LINKS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-        {[
-          { href: '/merchant/shop-profile', label: 'Shop Profile', icon: Store, color: 'bg-blue-600 text-white' },
-          { href: '/merchant/categories', label: 'Food Categories', icon: Layers, color: 'bg-rose-700 text-white' },
-          { href: '/merchant/subcategories', label: 'Sub Categories', icon: SlidersHorizontal, color: 'bg-purple-700 text-white' },
-          { href: '/merchant/dishes', label: 'Dishes / Menu', icon: Utensils, color: 'bg-emerald-700 text-white' },
-          { href: '/merchant/orders', label: 'Store Orders', icon: ShoppingBag, color: 'bg-amber-600 text-white' },
-          { href: '/merchant/notifications', label: 'Notifications', icon: Bell, color: 'bg-yellow-600 text-white' },
-        ].map((mod) => {
-          const Icon = mod.icon;
-          return (
-            <Link
-              key={mod.href}
-              href={isApproved ? mod.href : '#'}
-              onClick={(e) => {
-                if (!isApproved) {
-                  e.preventDefault();
-                  alert('Merchant account is under review. Please approve from Admin console first.');
-                }
-              }}
-              className={`glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 flex flex-col items-center gap-2 text-center hover:shadow-md transition-all group ${
-                !isApproved ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-              }`}
-            >
-              <div className={`w-9 h-9 rounded-xl ${mod.color} flex items-center justify-center font-bold shadow-xs group-hover:scale-110 transition-transform`}>
-                <Icon className="w-4 h-4" />
               </div>
-              <span className="text-xs font-extrabold text-[#1a1008] group-hover:text-[#8B0000] transition-colors">
-                {mod.label}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* SECTION 6: DASHBOARD HOME KPI CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Today's Orders</span>
-          <h3 className="text-lg font-extrabold text-[#1a1008]">248</h3>
-        </div>
-
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Today's Sales</span>
-          <h3 className="text-lg font-extrabold text-[#8B0000]">₹24,850</h3>
-        </div>
-
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Categories</span>
-          <h3 className="text-lg font-extrabold text-purple-700">8</h3>
-        </div>
-
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Total Dishes</span>
-          <h3 className="text-lg font-extrabold text-blue-700">64</h3>
-        </div>
-
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Pending Orders</span>
-          <h3 className="text-lg font-extrabold text-amber-700">12</h3>
-        </div>
-
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Completed</span>
-          <h3 className="text-lg font-extrabold text-emerald-700">210</h3>
-        </div>
-
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Rating</span>
-          <h3 className="text-lg font-extrabold text-[#C8A055] flex items-center justify-center gap-0.5">
-            4.5 <Star className="w-3.5 h-3.5 fill-[#C8A055]" />
-          </h3>
-        </div>
-
-        <div className="glass-card p-3.5 rounded-2xl bg-white border border-[#8B0000]/10 text-center space-y-1">
-          <span className="text-[10px] text-[#6b5840] font-bold uppercase block">Shop Status</span>
-          <h3 className={`text-xs font-extrabold uppercase py-0.5 rounded ${shopOpen ? 'text-emerald-700 bg-emerald-50' : 'text-red-700 bg-red-50'}`}>
-            {shopOpen ? 'OPEN' : 'CLOSED'}
-          </h3>
+            );
+          })}
         </div>
       </div>
 
-      {/* SECTION 10 & 11: DISHES & PRICES PREVIEW TABLE */}
-      <div className="glass-card rounded-3xl bg-white border border-[#8B0000]/10 shadow-xs p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8B0000]/10 pb-4">
+      {/* DISHES & PRICE CATALOG TABLE SECTION */}
+      <div className="glass-card rounded-2xl sm:rounded-3xl bg-white border border-[#8B0000]/10 shadow-xs p-4 sm:p-5 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#8B0000]/10 pb-3">
           <div>
             <div className="flex items-center gap-2">
               <Utensils className="w-5 h-5 text-[#8B0000]" />
-              <h2 className="text-lg font-extrabold text-[#1a1008]">Dishes, Sub Categories & Price Catalog</h2>
+              <h2 className="text-base sm:text-lg font-extrabold text-[#1a1008]">Dishes, Sub Categories & Price Catalog</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#FFF8F0] text-[#8B0000] border border-[#8B0000]/15">
+                {filteredDishes.length} Items
+              </span>
             </div>
-            <p className="text-xs text-[#6b5840] mt-0.5">Manage merchant dish items, discounts, final prices (₹), and availability</p>
+            <p className="text-[11px] text-[#6b5840] mt-0.5 font-medium">Manage merchant dish items, discounts, final prices (₹), and availability</p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Search Input */}
+            <div className="relative min-w-[190px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search dish name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[#F8F5F0] border border-[#8B0000]/15 rounded-xl pl-9 pr-3 py-1.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-[#8B0000]/30"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-[#F8F5F0] border border-[#8B0000]/15 rounded-xl px-3 py-1.5 text-xs font-bold text-[#8B0000] outline-none"
+            >
+              {categoriesList.map((cat) => (
+                <option key={cat} value={cat}>{cat === 'All' ? 'All Categories' : cat}</option>
+              ))}
+            </select>
+
             <Link
               href="/merchant/dishes"
-              className="btn-crimson py-2 px-3.5 rounded-xl text-xs font-extrabold flex items-center gap-1 shrink-0 cursor-pointer"
+              className="btn-crimson py-1.5 px-3.5 rounded-xl text-xs font-extrabold flex items-center gap-1 shrink-0 cursor-pointer shadow-xs"
             >
               <Plus className="w-4 h-4" /> Add New Dish
             </Link>
           </div>
         </div>
 
+        {/* CATALOG TABLE */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-[#F8F5F0] border-b border-[#8B0000]/10 text-[#6b5840] font-extrabold uppercase tracking-wider text-[10px]">
-                <th className="p-3">Dish Name & Image</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Sub Category</th>
-                <th className="p-3 text-right">Orig. Price</th>
-                <th className="p-3 text-right">Discount</th>
-                <th className="p-3 text-right">Final Price</th>
-                <th className="p-3 text-center">Type</th>
-                <th className="p-3 text-center">Availability</th>
-                <th className="p-3 text-center">Actions</th>
+                <th className="py-2.5 px-3">Dish Name & Image</th>
+                <th className="py-2.5 px-3">Category</th>
+                <th className="py-2.5 px-3">Sub Category</th>
+                <th className="py-2.5 px-3 text-right">Orig. Price</th>
+                <th className="py-2.5 px-3 text-right">Discount</th>
+                <th className="py-2.5 px-3 text-right">Final Price</th>
+                <th className="py-2.5 px-3 text-center">Type</th>
+                <th className="py-2.5 px-3 text-center">Stock Availability</th>
+                <th className="py-2.5 px-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#8B0000]/10 font-medium text-[#1a1008]">
-              {dishes.map((dish) => (
-                <tr key={dish.id} className="hover:bg-[#FFF8F0]/60 transition-colors">
-                  <td className="p-3">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={dish.image}
-                        alt={dish.name}
-                        className="w-10 h-10 rounded-xl object-cover border border-[#8B0000]/15 shrink-0"
-                      />
-                      <span className="font-extrabold text-xs text-[#1a1008]">{dish.name}</span>
-                    </div>
-                  </td>
-                  <td className="p-3 text-[#4a3820] font-bold">{dish.category}</td>
-                  <td className="p-3 text-gray-600 font-bold">{dish.subCategory || 'N/A'}</td>
-                  <td className="p-3 text-right line-through text-gray-400 font-bold">₹{dish.price}</td>
-                  <td className="p-3 text-right text-emerald-700 font-bold">-₹{dish.discount}</td>
-                  <td className="p-3 text-right font-extrabold text-[#8B0000] text-sm">₹{dish.finalPrice}</td>
-                  <td className="p-3 text-center">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      dish.foodType === 'Veg' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {dish.foodType}
-                    </span>
-                  </td>
-                  <td className="p-3 text-center">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                      dish.inStock ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {dish.inStock ? 'Available' : 'Unavailable'}
-                    </span>
-                  </td>
-                  <td className="p-3 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => openEditModal(dish)}
-                        className="p-1.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-800 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs"
-                        title="Edit Dish & Price"
-                      >
-                        <Edit className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteDish(dish.id)}
-                        className="p-1.5 rounded-lg bg-red-50 border border-red-300 text-red-700 hover:bg-red-100 transition-all cursor-pointer shadow-2xs"
-                        title="Delete Dish"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+              {filteredDishes.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="p-8 text-center text-xs text-gray-500">
+                    No dishes found matching search criteria.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredDishes.map((dish) => (
+                  <tr key={dish.id} className="hover:bg-[#FFF8F0]/60 transition-colors">
+                    <td className="py-2.5 px-3 align-middle">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={getMatchingFoodImage(dish.name, dish.category, dish.subCategory, dish.image)}
+                          alt={dish.name}
+                          className="w-9 h-9 rounded-xl object-cover border border-[#8B0000]/15 shrink-0 bg-white"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = getMatchingFoodImage(dish.name, dish.category, dish.subCategory);
+                          }}
+                        />
+                        <div>
+                          <span className="font-extrabold text-xs text-[#1a1008] block leading-snug">{dish.name}</span>
+                          <span className="text-[10px] text-gray-500 font-mono">⏱️ {dish.prepTime}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-3 text-[#4a3820] font-bold align-middle">{dish.category}</td>
+                    <td className="py-2.5 px-3 text-gray-600 font-bold align-middle">{dish.subCategory || 'N/A'}</td>
+                    <td className="py-2.5 px-3 text-right line-through text-gray-400 font-bold align-middle">₹{dish.price}</td>
+                    <td className="py-2.5 px-3 text-right text-emerald-700 font-bold align-middle">-₹{dish.discount}</td>
+                    <td className="py-2.5 px-3 text-right font-extrabold text-[#8B0000] text-sm align-middle">₹{dish.finalPrice}</td>
+                    <td className="py-2.5 px-3 text-center align-middle">
+                      <span
+                        className={`px-2.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap inline-flex items-center gap-1 ${
+                          dish.foodType === 'Veg'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            : dish.foodType === 'Egg'
+                            ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                            : 'bg-red-100 text-red-800 border border-red-200'
+                        }`}
+                      >
+                        {dish.foodType === 'Veg' ? '🌱 Veg' : dish.foodType === 'Egg' ? '🥚 Egg' : '🍖 Non-Veg'}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-center align-middle">
+                      <button
+                        onClick={() => handleToggleStock(dish.id)}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold cursor-pointer transition-all shadow-2xs whitespace-nowrap inline-flex items-center gap-1 ${
+                          dish.inStock
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200'
+                            : 'bg-red-100 text-red-800 border border-red-300 hover:bg-red-200'
+                        }`}
+                        title="Click to toggle stock availability"
+                      >
+                        {dish.inStock ? '✓ Available' : '❌ Unavailable'}
+                      </button>
+                    </td>
+                    <td className="py-2.5 px-3 text-center align-middle">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => openEditModal(dish)}
+                          className="p-1.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-800 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs"
+                          title="Edit Dish & Price"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteDish(dish.id)}
+                          className="p-1.5 rounded-lg bg-red-50 border border-red-300 text-red-700 hover:bg-red-100 transition-all cursor-pointer shadow-2xs"
+                          title="Delete Dish"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -656,13 +770,13 @@ export default function MerchantDashboardView() {
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 rounded-xl border border-gray-300 font-bold hover:bg-gray-100"
+                  className="px-4 py-2 rounded-xl border border-gray-300 font-bold hover:bg-gray-100 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-crimson px-6 py-2 rounded-xl font-extrabold shadow-md flex items-center gap-1.5"
+                  className="btn-crimson px-6 py-2 rounded-xl font-extrabold shadow-md flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-4 h-4" /> Save Changes
                 </button>
@@ -671,7 +785,6 @@ export default function MerchantDashboardView() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

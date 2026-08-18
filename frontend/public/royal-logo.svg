@@ -1,27 +1,58 @@
-<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Outer circle - dark crimson -->
-  <circle cx="100" cy="100" r="95" stroke="#8B0000" stroke-width="4" fill="none"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Cream Circle Background -->
+  <circle cx="256" cy="256" r="248" fill="#FAF6EE" stroke="#E5D3B3" stroke-width="12"/>
   
-  <!-- Inner circle - gold -->
-  <circle cx="100" cy="100" r="88" stroke="#C8A055" stroke-width="3" fill="none"/>
+  <!-- Inner Crimson Red Circle Ring -->
+  <circle cx="256" cy="256" r="226" fill="none" stroke="#8B0000" stroke-width="8"/>
   
-  <!-- Crown / Chef hat - gold -->
-  <path d="M70 50 Q70 40 80 40 Q85 35 90 35 Q95 35 100 38 Q105 35 110 35 Q115 35 120 40 Q130 40 130 50 Q130 55 125 55 L75 55 Q70 55 70 50Z" fill="#C8A055"/>
-  <rect x="75" y="55" width="50" height="15" rx="2" fill="#C8A055"/>
-  
-  <!-- Text ROYAL -->
-  <text x="100" y="115" font-family="Arial, sans-serif" font-size="38" font-weight="extrabold" fill="#8B0000" text-anchor="middle" letter-spacing="1">ROYAL</text>
-  
-  <!-- Text RESTAURANT -->
-  <text x="100" y="135" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0D4A2D" text-anchor="middle" letter-spacing="2">RESTAURANT</text>
-  
-  <!-- Spoon and Fork crossed - gold -->
-  <g transform="translate(100, 150)">
-    <ellipse cx="-12" cy="-5" rx="4" ry="5" fill="#C8A055"/>
-    <rect x="-13" y="0" width="2" height="25" fill="#C8A055" transform="rotate(-20, -12, 0)"/>
-    <rect x="10" y="-5" width="2" height="30" fill="#C8A055" transform="rotate(20, 11, -5)"/>
-    <rect x="7" y="-5" width="2" height="8" fill="#C8A055" transform="rotate(20, 8, -5)"/>
-    <rect x="13" y="-5" width="2" height="8" fill="#C8A055" transform="rotate(20, 14, -5)"/>
-    <polygon points="0,-3 1,-1 3,-1 1,0 2,2 0,1 -2,2 -1,0 -3,-1 -1,-1" fill="#C8A055"/>
+  <!-- Golden Chef Hat at Top -->
+  <g transform="translate(256, 120)">
+    <!-- Puff Base -->
+    <path d="M-45 10 Q-45 -25 -20 -25 Q-15 -35 0 -35 Q15 -35 20 -25 Q45 -25 45 10 Z" fill="#C8A055"/>
+    <ellipse cx="-25" cy="-10" rx="25" ry="25" fill="#C8A055"/>
+    <ellipse cx="25" cy="-10" rx="25" ry="25" fill="#C8A055"/>
+    <ellipse cx="0" cy="-20" rx="30" ry="25" fill="#C8A055"/>
+    <!-- Band -->
+    <rect x="-38" y="10" width="76" height="20" rx="3" fill="#C8A055"/>
+    <line x1="-36" y1="12" x2="36" y2="12" stroke="#FAF6EE" stroke-width="2"/>
   </g>
+  
+  <!-- Main Brand Title: ROYAL (Crimson Red) -->
+  <text x="256" y="240" font-family="'Arial Black', Arial, sans-serif" font-size="78" font-weight="900" fill="#8B0000" text-anchor="middle" letter-spacing="4">ROYAL</text>
+  
+  <!-- Sub-Title: RESTAURANT with flanking Gold Lines -->
+  <line x1="75" y1="285" x2="145" y2="285" stroke="#C8A055" stroke-width="4" stroke-linecap="round"/>
+  <text x="256" y="295" font-family="'Arial Black', Arial, sans-serif" font-size="30" font-weight="900" fill="#0D4A2D" text-anchor="middle" letter-spacing="8">RESTAURANT</text>
+  <line x1="367" y1="285" x2="437" y2="285" stroke="#C8A055" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Crossed Fork and Spoon in Gold with Green Leaves -->
+  <g transform="translate(256, 350)">
+    <!-- Left Green Leaf Sprig -->
+    <path d="M-50 -10 Q-70 -20 -80 -10 Q-65 10 -45 5 Z" fill="#0D4A2D"/>
+    <path d="M-45 -25 Q-65 -40 -75 -25 Q-55 0 -40 -10 Z" fill="#0D4A2D"/>
+    
+    <!-- Right Green Leaf Sprig -->
+    <path d="M50 -10 Q70 -20 80 -10 Q65 10 45 5 Z" fill="#0D4A2D"/>
+    <path d="M45 -25 Q65 -40 75 -25 Q55 0 40 -10 Z" fill="#0D4A2D"/>
+    
+    <!-- Spoon (Diagonal Left to Right) -->
+    <g transform="rotate(-35)">
+      <ellipse cx="0" cy="-45" rx="14" ry="20" fill="#C8A055"/>
+      <rect x="-4" y="-30" width="8" height="70" rx="3" fill="#C8A055"/>
+    </g>
+    
+    <!-- Fork (Diagonal Right to Left) -->
+    <g transform="rotate(35)">
+      <path d="M-12 -55 L-12 -35 Q-12 -25 0 -25 Q12 -25 12 -35 L12 -55 L8 -55 L8 -38 Q8 -30 0 -30 Q-8 -30 -8 -38 L-8 -55 Z" fill="#C8A055"/>
+      <rect x="-4" y="-25" width="8" height="65" rx="3" fill="#C8A055"/>
+    </g>
+  </g>
+  
+  <!-- Curved Tagline Text Path along bottom: • GOOD FOOD, GREAT EXPERIENCE • -->
+  <path id="taglinePath" d="M 90,360 A 195,195 0 0,0 422,360" fill="none"/>
+  <text font-family="Arial, sans-serif" font-size="19" font-weight="800" fill="#C8A055" letter-spacing="3">
+    <textPath href="#taglinePath" startOffset="50%" text-anchor="middle">
+      • GOOD FOOD, GREAT EXPERIENCE •
+    </textPath>
+  </text>
 </svg>

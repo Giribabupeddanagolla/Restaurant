@@ -28859,6 +28859,557 @@ export const RESTAURANT_OUTLETS = [
 ];
 
 export const DEFAULT_MERCHANT_DISHES: MenuItem[] = ([
+  {
+    "id": "idli-1",
+    "name": "Podi Steamed Button Idli",
+    "description": "Mini steamed rice cakes tossed in aromatic ghee and spicy homemade gunpowder podi served with coconut chutney.",
+    "price": 110,
+    "prepTime": 10,
+    "rating": 4.8,
+    "reviewsCount": 142,
+    "category": "breakfast",
+    "subCategory": "idli",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "idli-2",
+    "name": "Kanchipuram Rava Idli",
+    "description": "Steamed semolina cakes spiced with cumin, pepper, cashews, and ginger served with potato sagu.",
+    "price": 120,
+    "prepTime": 12,
+    "rating": 4.7,
+    "reviewsCount": 98,
+    "category": "breakfast",
+    "subCategory": "idli",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "idli-3",
+    "name": "Classic Steamed Idli Sambar (4 Pcs)",
+    "description": "Traditional soft and fluffy rice cakes served with hot drumstick lentil sambar and 3 types of chutney.",
+    "price": 90,
+    "prepTime": 8,
+    "rating": 4.9,
+    "reviewsCount": 210,
+    "category": "breakfast",
+    "subCategory": "idli",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "idli-4",
+    "name": "Ghee Button Idli Sambar Dip",
+    "description": "Bite-sized button idlis submerged in rich piping hot sambar with a generous drizzle of desi ghee.",
+    "price": 130,
+    "prepTime": 10,
+    "rating": 4.8,
+    "reviewsCount": 165,
+    "category": "breakfast",
+    "subCategory": "idli",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "idli-5",
+    "name": "Indo-Chinese Fried Schezwan Idli",
+    "description": "Crispy fried idli cubes tossed with bell peppers, onions, and spicy Schezwan sauce.",
+    "price": 140,
+    "prepTime": 15,
+    "rating": 4.6,
+    "reviewsCount": 88,
+    "category": "breakfast",
+    "subCategory": "idli",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "idli-6",
+    "name": "Thatte Idli with Red Spicy Chutney",
+    "description": "Famous Karnataka style soft plate idli topped with fresh butter and served with spicy garlic red chutney.",
+    "price": 115,
+    "prepTime": 10,
+    "rating": 4.7,
+    "reviewsCount": 120,
+    "category": "breakfast",
+    "subCategory": "idli",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "idli-7",
+    "name": "Oats Vegetable Steamed Idli",
+    "description": "Healthy steamed oats batter blended with carrots, green peas, and cashews.",
+    "price": 125,
+    "prepTime": 12,
+    "rating": 4.5,
+    "reviewsCount": 75,
+    "category": "breakfast",
+    "subCategory": "idli",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "dosa-1",
+    "name": "Ghee Roast Masala Dosa",
+    "description": "Golden crispy rice crepe cooked in pure ghee stuffed with spiced potato masala served with coconut & tomato chutneys.",
+    "price": 150,
+    "prepTime": 12,
+    "rating": 4.9,
+    "reviewsCount": 310,
+    "category": "breakfast",
+    "subCategory": "dosa",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "dosa-2",
+    "name": "Mysore Special Red Masala Dosa",
+    "description": "Crispy dosa spread with spicy Mysore red garlic chutney and stuffed with seasoned potato filling.",
+    "price": 160,
+    "prepTime": 14,
+    "rating": 4.8,
+    "reviewsCount": 245,
+    "category": "breakfast",
+    "subCategory": "dosa",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "dosa-3",
+    "name": "Onion Rava Crispy Dosa",
+    "description": "Lacy and crispy semolina crepe loaded with finely chopped onions, green chillies, and cumin seeds.",
+    "price": 145,
+    "prepTime": 15,
+    "rating": 4.7,
+    "reviewsCount": 180,
+    "category": "breakfast",
+    "subCategory": "dosa",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "dosa-4",
+    "name": "Cheese Burst Paneer Dosa",
+    "description": "Loaded crepe packed with grated cottage cheese, melted mozzarella, capsicum, and Indian spices.",
+    "price": 190,
+    "prepTime": 15,
+    "rating": 4.9,
+    "reviewsCount": 289,
+    "category": "breakfast",
+    "subCategory": "dosa",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "dosa-5",
+    "name": "Paper Thin Golden Plain Dosa",
+    "description": "Extra large paper thin golden crisp dosa served with rich lentil sambar and fresh coconut chutney.",
+    "price": 130,
+    "prepTime": 10,
+    "rating": 4.6,
+    "reviewsCount": 160,
+    "category": "breakfast",
+    "subCategory": "dosa",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "dosa-6",
+    "name": "Special Double Egg Karam Dosa",
+    "description": "Dosa cooked with whipped egg spread, red chilli paste, onions, and black pepper.",
+    "price": 170,
+    "prepTime": 12,
+    "rating": 4.8,
+    "reviewsCount": 215,
+    "category": "breakfast",
+    "subCategory": "dosa",
+    "foodType": "Egg",
+    "dietary": [
+        "egg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "vada-1",
+    "name": "Crispy Medu Vada (3 Pcs)",
+    "description": "Golden fried crisp urad dal lentil donuts with fluffy interior served with sambar and coconut chutney.",
+    "price": 95,
+    "prepTime": 10,
+    "rating": 4.8,
+    "reviewsCount": 230,
+    "category": "breakfast",
+    "subCategory": "vada",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "vada-2",
+    "name": "Hot Sambar Dip Vada Bowl",
+    "description": "Two crispy medu vadas submerged in a bowl of piping hot lentil vegetable sambar garnished with ghee.",
+    "price": 110,
+    "prepTime": 10,
+    "rating": 4.9,
+    "reviewsCount": 185,
+    "category": "breakfast",
+    "subCategory": "vada",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "poori-1",
+    "name": "Fluffy Wheat Poori Bhaji (3 Pcs)",
+    "description": "Deep-fried puffed whole wheat bread served with classic spiced potato onion curry.",
+    "price": 120,
+    "prepTime": 12,
+    "rating": 4.9,
+    "reviewsCount": 265,
+    "category": "breakfast",
+    "subCategory": "poori",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "poori-2",
+    "name": "Punjabi Chole Poori Special Combo",
+    "description": "Puffed pooris paired with dark spicy Punjabi chickpea masala, pickling chillies, and sliced onions.",
+    "price": 150,
+    "prepTime": 15,
+    "rating": 4.8,
+    "reviewsCount": 310,
+    "category": "breakfast",
+    "subCategory": "poori",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "upma-1",
+    "name": "Desi Ghee Cashew Rava Upma",
+    "description": "Traditional roasted semolina cooked with ghee, mustard seeds, curry leaves, roasted cashews, and fresh coconut.",
+    "price": 110,
+    "prepTime": 10,
+    "rating": 4.8,
+    "reviewsCount": 150,
+    "category": "breakfast",
+    "subCategory": "upma",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "pongal-1",
+    "name": "Royal Ghee Pepper Ven Pongal",
+    "description": "Piping hot rice and yellow moong dal cooked with pure desi ghee, crushed black pepper, cumin, and fried cashews.",
+    "price": 130,
+    "prepTime": 12,
+    "rating": 4.9,
+    "reviewsCount": 240,
+    "category": "breakfast",
+    "subCategory": "pongal",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "pongal-2",
+    "name": "Sweet Jaggery Sakkarai Pongal",
+    "description": "Traditional sweet pongal made with organic jaggery, cardamom, ghee, raisins, and cashews.",
+    "price": 140,
+    "prepTime": 14,
+    "rating": 4.9,
+    "reviewsCount": 210,
+    "category": "breakfast",
+    "subCategory": "pongal",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "omelette-1",
+    "name": "Special Cheese Burst Masala Omelette",
+    "description": "Three-egg fluffy omelette stuffed with melted mozzarella cheese, chopped onions, green chillies, and tomatoes.",
+    "price": 140,
+    "prepTime": 10,
+    "rating": 4.9,
+    "reviewsCount": 280,
+    "category": "breakfast",
+    "subCategory": "omelette",
+    "foodType": "Egg",
+    "dietary": [
+        "egg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "soup-1",
+    "name": "Indo-Chinese Hot & Sour Veg Soup",
+    "description": "Zesty, spicy, and sour vegetable soup infused with soya, black pepper, bamboo shoots, and cilantro.",
+    "price": 130,
+    "prepTime": 10,
+    "rating": 4.8,
+    "reviewsCount": 190,
+    "category": "soups",
+    "subCategory": "veg-soup",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "soup-2",
+    "name": "Creamy Sweet Corn Veg Velvet Soup",
+    "description": "Thick smooth soup crushed with tender golden sweet corn kernels, spring onions, and butter.",
+    "price": 140,
+    "prepTime": 10,
+    "rating": 4.7,
+    "reviewsCount": 210,
+    "category": "soups",
+    "subCategory": "veg-soup",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "soup-3",
+    "name": "Crispy Noodle Veg Manchow Soup",
+    "description": "Popular garlic flavored broth loaded with finely chopped vegetables served with crispy fried noodles.",
+    "price": 145,
+    "prepTime": 12,
+    "rating": 4.9,
+    "reviewsCount": 320,
+    "category": "soups",
+    "subCategory": "veg-soup",
+    "foodType": "Veg",
+    "dietary": [
+        "veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+  {
+    "id": "soup-7",
+    "name": "Spicy Chicken Hot & Sour Soup",
+    "description": "Hearty chicken soup loaded with shredded chicken breast, egg drop ribbon, black pepper, and chilli soya broth.",
+    "price": 170,
+    "prepTime": 12,
+    "rating": 4.9,
+    "reviewsCount": 280,
+    "category": "soups",
+    "subCategory": "non-veg-soup",
+    "foodType": "Non-Veg",
+    "dietary": [
+        "non-veg"
+    ],
+    "shopName": "RK Restaurant",
+    "shopSlug": "rk-restaurant",
+    "merchantId": "merchant-rk-restaurant",
+    "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=85",
+    "available": true,
+    "inStock": true,
+    "isMerchantDish": true
+},
+
   // RK RESTAURANT DISHES
   {
     id: 'rk-veg-biryani',
@@ -29074,6 +29625,49 @@ export function getMatchingFoodImage(name: string, category?: string, subCategor
   const sc = (subCategory || '').toLowerCase();
   const img = (currentImage || '').toLowerCase();
 
+  const eggFriedRiceImg = 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&auto=format&fit=crop&q=85';
+
+  // 1. SOUPS MATCHING
+  if (n.includes('sweet corn') || sc.includes('sweet-corn')) {
+    return 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=800&auto=format&fit=crop&q=85';
+  }
+  if (n.includes('hot & sour') || n.includes('hot and sour') || sc.includes('hot-sour')) {
+    return 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&auto=format&fit=crop&q=85';
+  }
+  if (n.includes('manchow')) {
+    return 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=800&auto=format&fit=crop&q=85';
+  }
+  if (n.includes('mushroom') && (n.includes('soup') || c.includes('soup'))) {
+    return 'https://images.unsplash.com/photo-1588566565463-180a5b2090d2?w=800&auto=format&fit=crop&q=85';
+  }
+  if (c.includes('soup') || sc.includes('soup') || n.includes('soup')) {
+    return 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&auto=format&fit=crop&q=85';
+  }
+
+  // 2. MISMATCHED IMAGE CORRECTIONS (e.g. Idli image on Biryani / Non-Cake dish on Cake image)
+  const isIdliImage = img.includes('photo-1589301760014');
+  const isIdliDish = n.includes('idli') || n.includes('idly') || n.includes('vada') || sc.includes('idli') || sc.includes('vada');
+  if (isIdliImage && !isIdliDish) {
+    if (n.includes('mutton') || sc.includes('mutton')) {
+      return 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=85';
+    }
+    if (n.includes('chicken') || n.includes('chiken') || n.includes('kodi')) {
+      return 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&auto=format&fit=crop&q=85';
+    }
+    if (n.includes('biryani')) {
+      return 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=800&auto=format&fit=crop&q=85';
+    }
+    if (n.includes('dosa')) {
+      return 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&auto=format&fit=crop&q=85';
+    }
+  }
+
+  // Check if dish is Egg Fried Rice / Egg Rice / Eggggg Riceeeee
+  const isEggRice = (n.includes('egg') && (n.includes('rice') || n.includes('fride') || n.includes('fried'))) || n.includes('eggg');
+  if (isEggRice) {
+    return eggFriedRiceImg;
+  }
+
   // If image is a cake image but dish is NOT a dessert/cake/bakery item, replace it!
   const isCakeImage = img.includes('photo-1578985545062') || img.includes('photo-1509440159596') || img.includes('photo-1606313564200') || img.includes('photo-1541544741938');
   const isCakeDish = n.includes('cake') || n.includes('mousse') || n.includes('brownie') || c.includes('bakery') || c.includes('dessert');
@@ -29097,7 +29691,9 @@ export function getMatchingFoodImage(name: string, category?: string, subCategor
     return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=85';
   }
 
-  if (currentImage && currentImage.startsWith('http') && currentImage.length > 15 && !isCakeImage) {
+  // If currentImage is a valid http image string that is not broken
+  const isValidImg = currentImage && typeof currentImage === 'string' && currentImage.startsWith('http') && currentImage.length > 15 && !currentImage.includes('undefined') && !currentImage.includes('null');
+  if (isValidImg && !isCakeImage && !isIdliImage) {
     return currentImage;
   }
 
@@ -29116,6 +29712,9 @@ export function getMatchingFoodImage(name: string, category?: string, subCategor
   if (n.includes('paneer')) {
     return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=85';
   }
+  if (n.includes('rice') || n.includes('pulao')) {
+    return eggFriedRiceImg;
+  }
 
   return currentImage || 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=85';
 }
@@ -29123,13 +29722,13 @@ export function getMatchingFoodImage(name: string, category?: string, subCategor
 export function getStoredDishes(): MenuItem[] {
   if (typeof window === 'undefined') return [...DEFAULT_MERCHANT_DISHES, ...INITIAL_DISHES];
   try {
-    const versionKey = 'royal_dishes_v2026_shops_menu_v4_images_fix';
+    const versionKey = 'royal_dishes_v2026_shops_menu_v6_unique_images';
     if (localStorage.getItem('royal_clean_version') !== versionKey) {
       localStorage.setItem('royal_clean_version', versionKey);
       localStorage.removeItem('royal_dishes_v2026_shops_menu_v3');
     }
 
-    const data = localStorage.getItem('royal_dishes_v2026_shops_menu_v4_images_fix');
+    const data = localStorage.getItem('royal_dishes_v2026_shops_menu_v6_unique_images');
     let storedList: MenuItem[] = data ? JSON.parse(data) : [...DEFAULT_MERCHANT_DISHES, ...INITIAL_DISHES];
 
     let userAddedDishes: MenuItem[] = [];
@@ -29140,7 +29739,7 @@ export function getStoredDishes(): MenuItem[] {
         const curMerchant = JSON.parse(localStorage.getItem('giri_current_merchant') || '{}');
         const userAuth = JSON.parse(localStorage.getItem('royal_user') || '{}');
         const mShopName = curMerchant.shopName || curMerchant.name || curMerchant.shopProfile?.shopName || userAuth.shopName || userAuth.name || 'RK Restaurant';
-        const mShopSlug = mShopName.toLowerCase().replace(/\s+/g, '-');
+        const mShopSlug = String(mShopName || 'RK Restaurant').toLowerCase().replace(/\s+/g, '-');
         const mId = curMerchant.id || curMerchant._id || `merchant-${mShopSlug}`;
 
         userAddedDishes = merchantDishes.map((d: any) => ({
@@ -29148,7 +29747,7 @@ export function getStoredDishes(): MenuItem[] {
           merchantId: d.merchantId || mId,
           shopName: d.shopName || mShopName,
           shopSlug: d.shopSlug || mShopSlug,
-          dietary: d.dietary || [d.foodType ? d.foodType.toLowerCase() : 'veg'],
+          dietary: d.dietary || [d.foodType ? String(d.foodType).toLowerCase() : 'veg'],
           category: d.category || 'mains',
           image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
           isMerchantDish: true,
@@ -29162,11 +29761,12 @@ export function getStoredDishes(): MenuItem[] {
     }));
 
     const cleanBaseList = (storedList.length > 0 ? storedList : INITIAL_DISHES).filter((d) => {
+      if (!d) return false;
       if ((d as any).isMerchantDish) return true;
       return !/\bSpecial\s+\d+\b/i.test(d.name || '');
     }).slice(0, 30);
 
-    const baseList = cleanBaseList.filter((g: any) => !mergedMerchantDishes.some((u) => u.id === g.id || u.name.toLowerCase() === g.name.toLowerCase())).map((d) => ({
+    const baseList = cleanBaseList.filter((g: any) => !mergedMerchantDishes.some((u) => u.id === g.id || (u.name || '').toLowerCase() === (g.name || '').toLowerCase())).map((d) => ({
       ...d,
       image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
     }));
@@ -29179,6 +29779,6 @@ export function getStoredDishes(): MenuItem[] {
 export function saveStoredDishes(dishes: MenuItem[]): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('royal_dishes_v2026_shops_menu_v4_images_fix', JSON.stringify(dishes));
+    localStorage.setItem('royal_dishes_v2026_shops_menu_v6_unique_images', JSON.stringify(dishes));
   } catch {}
 }

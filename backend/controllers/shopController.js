@@ -1,4 +1,5 @@
 const Shop = require('../models/Shop');
+const Merchant = require('../models/Merchant');
 
 const DEFAULT_SHOPS = [
   {
@@ -177,9 +178,6 @@ const DEFAULT_SHOPS = [
   },
 ];
 
-// Helper to seed if collection is empty
-const seedDefaultShopsIfEmpty = async () => {
-  try {
 // @desc Get all shops / locations (Public API)
 // @route GET /api/v1/shops
 exports.getShops = async (req, res, next) => {

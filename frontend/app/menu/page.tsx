@@ -9,6 +9,7 @@ import { Search, Leaf, Menu, X, Store, ArrowLeft, SlidersHorizontal, Utensils, C
 import { MenuItem } from '@/types';
 import DishModal from '@/components/DishModal';
 import AddButton from '@/components/AddButton';
+import { FALLBACK_SVG } from '@/components/SafeImage';
 import { formatCurrency } from '@/utils/formatters';
 import { menuApi } from '@/services/restaurantService';
 
@@ -2135,7 +2136,7 @@ function matchCategorySubCategory(dish: MenuItem, catId: string, subCatId: strin
 
 function MenuContent() {
   const searchParams = useSearchParams();
-  const shopParam = searchParams.get('shop');
+  const shopParam = searchParams.get('shop') || searchParams.get('shopId');
   const catParam = searchParams.get('category');
 
   const [dishes, setDishes] = useState<MenuItem[]>(INITIAL_DISHES);
@@ -2152,13 +2153,15 @@ function MenuContent() {
   });
 
   useEffect(() => {
-    setActiveShop(shopParam || null);
-    setActiveCategory(catParam || 'all');
+    const sParam = searchParams.get('shop') || searchParams.get('shopId');
+    const cParam = searchParams.get('category');
+    setActiveShop(sParam || null);
+    setActiveCategory(cParam || 'all');
     setActiveSubCategory(null);
-    if (catParam) {
-      setExpandedCategories((prev) => ({ ...prev, [catParam]: true }));
+    if (cParam) {
+      setExpandedCategories((prev) => ({ ...prev, [cParam]: true }));
     }
-  }, [shopParam, catParam]);
+  }, [searchParams]);
 
   // Load dynamically stored/created dishes immediately with automatic version validation
   useEffect(() => {
@@ -2250,19 +2253,18 @@ function MenuContent() {
     const filtered = dishes.filter((dish) => {
       let matchShop = true;
       if (activeShop) {
-        const decoded = decodeURIComponent(activeShop).toLowerCase().trim();
-        const dShop = (dish.shopSlug || '').toLowerCase();
-        const dName = (dish.shopName || '').toLowerCase();
-        const dMerchantId = (dish.merchantId || '').toLowerCase();
+        const rawDecoded = decodeURIComponent(activeShop).toLowerCase().trim();
+        const decoded = rawDecoded.replace(/-/g, ' ');
+        const dShop = (dish.shopSlug || '').toLowerCase().replace(/-/g, ' ');
+        const dName = (dish.shopName || '').toLowerCase().replace(/-/g, ' ');
+        const dMerchantId = (dish.merchantId || '').toLowerCase().replace(/-/g, ' ');
 
         matchShop =
           dShop === decoded ||
           dName === decoded ||
           dMerchantId === decoded ||
-          (dShop.length > 2 && decoded.includes(dShop)) ||
-          (dName.length > 2 && decoded.includes(dName)) ||
-          (decoded.length > 2 && dShop.includes(decoded)) ||
-          (decoded.length > 2 && dName.includes(decoded));
+          (dShop.length > 2 && (decoded.includes(dShop) || dShop.includes(decoded))) ||
+          (dName.length > 2 && (decoded.includes(dName) || dName.includes(decoded)));
       }
 
       const matchCategory = matchCategorySubCategory(dish, activeCategory, activeSubCategory);
@@ -2278,30 +2280,26 @@ function MenuContent() {
 
     const shopMatches = dishes.filter((dish) => {
       if (!activeShop) return true;
-      const decoded = decodeURIComponent(activeShop).toLowerCase().trim();
-      const dShop = (dish.shopSlug || '').toLowerCase();
-      const dName = (dish.shopName || '').toLowerCase();
-      const dMerchantId = (dish.merchantId || '').toLowerCase();
+      const rawDecoded = decodeURIComponent(activeShop).toLowerCase().trim();
+      const decoded = rawDecoded.replace(/-/g, ' ');
+      const dShop = (dish.shopSlug || '').toLowerCase().replace(/-/g, ' ');
+      const dName = (dish.shopName || '').toLowerCase().replace(/-/g, ' ');
+      const dMerchantId = (dish.merchantId || '').toLowerCase().replace(/-/g, ' ');
 
       return (
         dShop === decoded ||
         dName === decoded ||
         dMerchantId === decoded ||
-        (dShop.length > 2 && decoded.includes(dShop)) ||
-        (dName.length > 2 && decoded.includes(dName)) ||
-        (decoded.length > 2 && dShop.includes(decoded)) ||
-        (decoded.length > 2 && dName.includes(decoded))
+        (dShop.length > 2 && (decoded.includes(dShop) || dShop.includes(decoded))) ||
+        (dName.length > 2 && (decoded.includes(dName) || dName.includes(decoded)))
       );
     });
 
-    // For activeShop (e.g. RK Restaurant, Madhan Restaurant, Andhra Restaurant), DO NOT fall back to generic non-shop template dishes!
     const effective = filtered.length > 0
       ? filtered
-      : (activeShop ? shopMatches : dishes.filter((dish) => {
-          const matchSearch = !sQuery || dish.name.toLowerCase().includes(sQuery) || dish.description.toLowerCase().includes(sQuery);
-          const matchDiet = dietFilter === 'all' || (dish.dietary && dish.dietary.includes(dietFilter));
-          return matchSearch && matchDiet;
-        }));
+      : (shopMatches.length > 0
+          ? shopMatches
+          : dishes);
 
     // Filter out synthetic repetitive "Special 1..20" items to maintain clean 25-30 authentic main catalog dishes
     const cleanEffective = effective.filter((d) => {
@@ -2510,24 +2508,31 @@ function MenuContent() {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+      <div className={`max-w-7xl mx-auto px-4 ${activeShop ? 'pt-2 pb-6 sm:pt-3 sm:pb-8' : 'py-6 sm:py-8'}`}>
 
         {/* Active Shop Banner */}
         {activeShop && (
-          <div className="mb-6 rounded-3xl bg-gradient-to-r from-[#8B0000] via-[#A00000] to-[#600000] text-white p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/20">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-2xl sm:text-3xl shadow-inner shrink-0">
+          <div className="mb-5 rounded-3xl bg-gradient-to-r from-[#8B0000] via-[#A00000] to-[#600000] text-white px-5 py-3.5 sm:px-6 sm:py-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border border-white/20">
+            <div className="flex items-center gap-3.5 shrink-0">
+              <Link
+                href="/shops"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 hover:bg-white/35 text-white flex items-center justify-center font-black text-lg transition-all shrink-0 cursor-pointer shadow-md border border-white/30 hover:scale-105 active:scale-95"
+                title="Back to All Shops Directory"
+              >
+                ←
+              </Link>
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center text-xl sm:text-2xl shadow-inner shrink-0">
                 🏪
               </div>
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-[#E0B96A]">Merchant Outlet Catalog</div>
-                <h2 className="text-xl sm:text-2xl font-black text-white capitalize">{decodeURIComponent(activeShop).replace(/-/g, ' ')}</h2>
-                <p className="text-xs text-red-100 mt-0.5 font-medium">Showing menu catalog & dishes for this restaurant outlet.</p>
+              <div className="flex flex-col justify-center">
+                <div className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#E0B96A] leading-none">Merchant Outlet Catalog</div>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-black text-white capitalize leading-snug mt-0.5">{decodeURIComponent(activeShop).replace(/-/g, ' ')}</h2>
+                <p className="text-[11px] sm:text-xs text-red-100 font-medium leading-none mt-0.5">Showing menu catalog & dishes for this restaurant outlet.</p>
               </div>
             </div>
             <button
               onClick={() => setActiveShop(null)}
-              className="bg-white/15 hover:bg-white/25 text-white border border-white/25 px-4 py-2 rounded-xl text-xs font-extrabold transition-all shrink-0 cursor-pointer text-center"
+              className="bg-white/15 hover:bg-white/25 text-white border border-white/25 px-4 py-2 rounded-xl text-xs font-extrabold transition-all shrink-0 cursor-pointer text-center self-start sm:self-center"
             >
               View All Outlets →
             </button>
@@ -2557,12 +2562,13 @@ function MenuContent() {
               )}
             </div>
 
-            {/* Mobile Filter Sidebar Drawer Toggle Button */}
+            {/* Mobile 3-Lines Category Drawer Toggle Button */}
             <button
               onClick={() => setShowMobileSidebar(true)}
-              className="md:hidden px-3.5 py-3 bg-[#8B0000] text-white rounded-2xl text-xs font-extrabold flex items-center gap-1.5 shadow-md hover:bg-[#A00000] transition-colors shrink-0 cursor-pointer"
+              className="md:hidden px-3.5 py-3 bg-[#8B0000] text-white rounded-2xl text-xs font-extrabold flex items-center gap-1.5 shadow-md hover:bg-[#A00000] active:scale-95 transition-all shrink-0 cursor-pointer border border-[#8B0000]/20"
+              title="Open Categories Menu"
             >
-              <Filter className="w-4 h-4" />
+              <Menu className="w-4 h-4 stroke-[2.5]" />
               <span>Categories</span>
             </button>
           </div>
@@ -2736,12 +2742,13 @@ function MenuContent() {
                         style={{ position: 'relative', width: '100%', height: '192px', overflow: 'hidden' }}
                       >
                         <img
-                          src={cardImage}
+                          src={cardImage || FALLBACK_SVG}
                           alt={displayDish.name}
                           loading={idx < 6 ? 'eager' : 'lazy'}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=85';
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = FALLBACK_SVG;
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />

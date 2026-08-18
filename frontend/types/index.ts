@@ -9,6 +9,8 @@ export interface MenuItem {
   category: string;
   subCategory?: string;
   price: number;
+  discount?: number;
+  finalPrice?: number;
   description: string;
   image: string;
   dietary: string[];
@@ -18,9 +20,12 @@ export interface MenuItem {
   preparationTime?: string;
   calories?: string;
   available?: boolean;
+  shopId?: string;
   shopSlug?: string;
   shopName?: string;
   merchantId?: string;
+  city?: string;
+  address?: string;
   customizations?: CustomizationOption[];
 }
 
@@ -52,6 +57,7 @@ export interface Review {
 export interface CartItem {
   dish: MenuItem;
   quantity: number;
+  qty?: number;
   unitPrice?: number;
   customizations?: CustomizationOption[];
 }
@@ -92,6 +98,11 @@ export interface Order {
   customerName: string;
   phone: string;
   tableNumber: string;
+  shopId?: string;
+  merchantId?: string;
+  shopName?: string;
+  address?: string;
+  orderType?: 'Dine-In' | 'Takeaway' | 'Delivery';
   items: CartItem[];
   totalAmount: number;
   status: 'Pending' | 'Confirmed' | 'Preparing' | 'Ready' | 'Served' | 'Delivered' | 'Cancelled';
@@ -109,8 +120,13 @@ export interface Reservation {
   date: string;
   time: string;
   tableId: string;
+  tableNumber?: string;
+  shopId?: string;
+  merchantId?: string;
+  restaurantName?: string;
+  address?: string;
   specialRequests?: string;
-  status: 'Pending' | 'Confirmed' | 'Seated' | 'Completed' | 'Cancelled';
+  status: 'Pending' | 'Confirmed' | 'Seated' | 'Completed' | 'Cancelled' | 'REJECTED';
 }
 
 export interface Employee {

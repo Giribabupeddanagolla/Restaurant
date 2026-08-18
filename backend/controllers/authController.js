@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { sendWelcomeEmail, sendLoginAlertEmail } = require('../services/emailService');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'giri_restaurant_secret_key', {
@@ -17,6 +18,11 @@ exports.register = async (req, res, next) => {
 
     user = await User.create({ name, email, password, phone, role: role || 'Customer' });
     const token = generateToken(user._id);
+
+    // Asynchronously dispatch welcome email (non-blocking)
+    sendWelcomeEmail({ email: user.email, name: user.name }).catch((err) =>
+      console.error('Welcome email error:', err.message)
+    );
 
     res.status(201).json({
       success: true,
@@ -41,6 +47,16 @@ exports.login = async (req, res, next) => {
     }
 
     const token = generateToken(user._id);
+
+    // Send login alert notification to the user's email and admin
+    sendLoginAlertEmail({
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      ipAddress: req.ip || req.headers['x-forwarded-for'],
+      userAgent: req.headers['user-agent'],
+    }).catch((err) => console.error('Login email notification error:', err.message));
+
     res.status(200).json({
       success: true,
       token,

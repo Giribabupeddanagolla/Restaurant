@@ -10,7 +10,7 @@ function FloatingCartButtonComponent() {
   const pathname = usePathname();
   const { totalItems, totalPrice, openCart } = useCart();
 
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/merchant') || pathname?.startsWith('/manager')) {
     return null;
   }
 

@@ -5,7 +5,7 @@ const API = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 1500,
+  timeout: 8000,
 });
 
 API.interceptors.request.use((config) => {
@@ -21,9 +21,6 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || !error.response) {
-      console.warn('Backend server not connected or initializing. Using offline mode.');
-    }
     return Promise.reject(error);
   }
 );
