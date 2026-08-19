@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Leaf, Award, Users, Clock } from 'lucide-react';

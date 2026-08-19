@@ -26,6 +26,9 @@ export interface MenuItem {
   merchantId?: string;
   city?: string;
   address?: string;
+  foodType?: string;
+  inStock?: boolean;
+  isMerchantDish?: boolean;
   customizations?: CustomizationOption[];
 }
 

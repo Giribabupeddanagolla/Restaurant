@@ -123,25 +123,45 @@ export default function MerchantDishesPage() {
     setDishes(list);
     try {
       localStorage.setItem('giri_merchant_dishes', JSON.stringify(list));
+      localStorage.setItem('royal_merchant_dishes', JSON.stringify(list));
 
-      // Sync with global stored dishes so it appears on the public menu page
-      const existingGlobal = JSON.parse(localStorage.getItem('royal_restaurant_dishes_v2026_fine_dining_fix') || '[]');
+      // Sync with global stored dishes keys
       const curMerchant = JSON.parse(localStorage.getItem('giri_current_merchant') || '{}');
       const userAuth = JSON.parse(localStorage.getItem('royal_user') || '{}');
       const mShopName = curMerchant.shopName || curMerchant.name || curMerchant.shopProfile?.shopName || userAuth.shopName || userAuth.name || 'RK Restaurant';
-      const mShopSlug = mShopName.toLowerCase().replace(/\s+/g, '-');
+      const mShopSlug = String(mShopName).toLowerCase().replace(/\s+/g, '-');
       const mId = curMerchant.id || curMerchant._id || `merchant-${mShopSlug}`;
 
-      const formattedMerchantItems = list.map((d) => ({
-        ...d,
-        merchantId: mId,
-        shopName: mShopName,
-        shopSlug: mShopSlug,
-        dietary: [d.foodType ? d.foodType.toLowerCase() : 'veg'],
-      }));
+      const formattedMerchantItems = list.map((d) => {
+        const dishImage = (d.image && typeof d.image === 'string' && d.image.trim() !== '') ? d.image.trim() : getMatchingFoodImage(d.name, d.category, d.subCategory, d.image);
+        return {
+          ...d,
+          merchantId: mId,
+          shopName: mShopName,
+          shopSlug: mShopSlug,
+          dietary: [d.foodType ? d.foodType.toLowerCase() : 'veg'],
+          image: dishImage,
+          isMerchantDish: true,
+        };
+      });
 
-      const mergedGlobal = [...formattedMerchantItems, ...existingGlobal.filter((g: any) => g.merchantId !== mId && g.shopName !== mShopName)];
-      localStorage.setItem('royal_restaurant_dishes_v2026_fine_dining_fix', JSON.stringify(mergedGlobal));
+      const keys = [
+        'royal_dishes_v2026_v10_fresh_catalog_30_items',
+        'royal_dishes_v2026_shops_menu_v6_unique_images',
+        'giri_dishes',
+      ];
+
+      keys.forEach((keyGlobal) => {
+        const existingGlobal = JSON.parse(localStorage.getItem(keyGlobal) || '[]');
+        const cleanExisting = Array.isArray(existingGlobal) ? existingGlobal : [];
+        const mergedGlobal = [...formattedMerchantItems, ...cleanExisting.filter((g: any) => g.merchantId !== mId && g.shopName !== mShopName)];
+        localStorage.setItem(keyGlobal, JSON.stringify(mergedGlobal));
+      });
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new Event('merchant_dishes_updated'));
+      }
     } catch (e) {}
   };
 
@@ -168,6 +188,9 @@ export default function MerchantDishesPage() {
     const mShopSlug = mShopName.toLowerCase().replace(/\s+/g, '-');
     const mId = curMerchant.id || curMerchant._id || `merchant-${mShopSlug}`;
 
+    // Auto-match image based on dish name and category if blank or default
+    const matchedImage = (image && typeof image === 'string' && image.trim() !== '') ? image.trim() : getMatchingFoodImage(name, category, subCategory, image);
+
     if (editingId) {
       const updated = dishes.map((d) =>
         d.id === editingId
@@ -179,7 +202,7 @@ export default function MerchantDishesPage() {
               name,
               category,
               subCategory,
-              image: image || d.image,
+              image: matchedImage,
               description,
               price: numPrice,
               discount: numDiscount,
@@ -194,7 +217,7 @@ export default function MerchantDishesPage() {
       );
       saveToStorage(updated);
     } else {
-      const created: DishItem & { merchantId: string; shopName: string; shopSlug: string } = {
+      const created: DishItem & { merchantId: string; shopName: string; shopSlug: string; isMerchantDish: boolean } = {
         id: `dish-${Date.now()}`,
         merchantId: mId,
         shopName: mShopName,
@@ -202,7 +225,7 @@ export default function MerchantDishesPage() {
         name,
         category,
         subCategory,
-        image: image || 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&auto=format&fit=crop&q=80',
+        image: matchedImage,
         description,
         price: numPrice,
         discount: numDiscount,
@@ -213,6 +236,7 @@ export default function MerchantDishesPage() {
         prepTime,
         available,
         rating: 4.8,
+        isMerchantDish: true,
       };
       saveToStorage([created, ...dishes]);
     }
@@ -452,19 +476,31 @@ export default function MerchantDishesPage() {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block font-bold text-[#1a1008] mb-1">Category *</label>
-                  <select
+                  <input
+                    type="text"
+                    required
+                    list="category-suggestions"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
+                    placeholder="e.g. Biryani, Sweets, Tiffins..."
                     className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 rounded-xl px-3 py-2 outline-none font-bold"
-                  >
-                    <option value="Biryani">Biryani</option>
-                    <option value="Starters">Starters</option>
-                    <option value="Main Course">Main Course</option>
-                    <option value="Chinese">Chinese</option>
-                    <option value="Breads">Breads</option>
-                    <option value="Desserts">Desserts</option>
-                    <option value="Beverages">Beverages</option>
-                  </select>
+                  />
+                  <datalist id="category-suggestions">
+                    <option value="Biryani" />
+                    <option value="Starters" />
+                    <option value="Main Course" />
+                    <option value="Tiffins & Breakfast" />
+                    <option value="Soups" />
+                    <option value="Grill & BBQ" />
+                    <option value="Tandoor & Kebabs" />
+                    <option value="Chinese" />
+                    <option value="Seafood" />
+                    <option value="Bakery & Desserts" />
+                    <option value="Breads" />
+                    <option value="Beverages & Coffee" />
+                    <option value="Fast Food & Wraps" />
+                    <option value="Chef Specials" />
+                  </datalist>
                 </div>
 
                 <div>
@@ -473,22 +509,38 @@ export default function MerchantDishesPage() {
                     type="text"
                     value={subCategory}
                     onChange={(e) => setSubCategory(e.target.value)}
-                    placeholder="e.g. Chicken Biryani"
+                    placeholder="e.g. Chicken Biryani, Paneer Tikka..."
                     className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 rounded-xl px-3 py-2 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-[#1a1008] mb-1">Dish Image URL *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-[#1a1008]">Dish Image URL</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const matched = getMatchingFoodImage(name, category, subCategory, image);
+                      setImage(matched);
+                    }}
+                    className="text-[10px] font-extrabold text-[#8B0000] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    ✨ Auto-Match Food Image
+                  </button>
+                </div>
                 <input
                   type="text"
-                  required
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="Leave empty or auto-match image based on dish name..."
                   className="w-full bg-[#F8F5F0] border border-[#8B0000]/20 rounded-xl px-3 py-2 outline-none"
                 />
+                {image && (
+                  <div className="mt-2 relative h-28 w-full rounded-xl overflow-hidden border border-[#8B0000]/15 bg-gray-50">
+                    <img src={image} alt="Dish Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
               </div>
 
               <div>

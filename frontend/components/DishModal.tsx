@@ -40,7 +40,7 @@ export default function DishModal({ dish, onClose }: Props) {
   const shopId = dish.shopId || dish.merchantId || encodeURIComponent(shopName);
   const shopHref = `/menu?shop=${encodeURIComponent(shopName)}&shopId=${encodeURIComponent(shopId)}`;
 
-  const modalImg = getMatchingFoodImage(dish.name, dish.category, dish.subCategory, dish.image);
+  const modalImg = (dish.image && typeof dish.image === 'string' && dish.image.trim() !== '') ? dish.image.trim() : getMatchingFoodImage(dish.name, dish.category, dish.subCategory, dish.image);
   const isAvailable = dish.available !== false && (dish as any).isAvailable !== false && (dish as any).inStock !== false;
 
   const handleAdd = () => {

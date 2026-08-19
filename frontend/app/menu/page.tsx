@@ -40,61 +40,95 @@ function matchCategorySubCategory(dish: MenuItem, catId: string, subCatId: strin
   const dCatId = String((dish as any).categoryId || (dish as any).category || '').toLowerCase().trim();
   const dSubCatId = String((dish as any).subCategoryId || (dish as any).subCategory || '').toLowerCase().trim();
   const dFoodType = String((dish as any).foodType || '').toLowerCase().trim();
-  const dCat = (dish.category || '').toLowerCase();
-  const dName = (dish.name || '').toLowerCase();
-  const dDesc = (dish.description || '').toLowerCase();
+  const dCat = (dish.category || '').toLowerCase().trim();
+  const dSubCat = (dish.subCategory || '').toLowerCase().trim();
+  const dName = (dish.name || '').toLowerCase().trim();
   const dDiet = (dish.dietary || []).map((d) => d.toLowerCase());
 
   const targetCat = catId ? catId.toLowerCase().trim() : '';
   const targetSubCat = subCatId ? subCatId.toLowerCase().trim() : '';
 
-  // Direct Database ID / Key matching
+  // 1. Specific Subcategory Matching
   if (targetSubCat) {
-    if (dSubCatId === targetSubCat) return true;
+    const targetSubClean = targetSubCat.replace(/-/g, ' ');
+
+    if (targetSubCat === 'dosa' || targetSubClean === 'dosa') {
+      if (dName.includes('idli') || dName.includes('idly') || dName.includes('vada') || dName.includes('thali') || dName.includes('samosa') || dName.includes('meal')) return false;
+      return dName.includes('dosa') || (dSubCat.includes('dosa') && !dName.includes('idli') && !dName.includes('thali') && !dName.includes('samosa'));
+    }
+
+    if (targetSubCat === 'idli' || targetSubClean === 'idli' || targetSubCat === 'idly') {
+      if (dName.includes('dosa') || dName.includes('vada') || dName.includes('thali') || dName.includes('samosa') || dName.includes('meal')) return false;
+      return dName.includes('idli') || dName.includes('idly') || (dSubCat.includes('idli') && !dName.includes('dosa') && !dName.includes('thali') && !dName.includes('samosa'));
+    }
+
+    if (targetSubCat === 'vada' || targetSubClean === 'vada') {
+      if (dName.includes('dosa') || dName.includes('idli') || dName.includes('idly') || dName.includes('thali') || dName.includes('samosa') || dName.includes('meal')) return false;
+      return dName.includes('vada') || (dSubCat.includes('vada') && !dName.includes('dosa') && !dName.includes('idli'));
+    }
+
     if (targetSubCat === 'veg-biryani') {
       if (dSubCatId === 'veg-biryani' || dSubCatId === 'saffron-vegetable-biryani') return true;
-      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dFoodType === 'veg' || dDiet.includes('veg') || dName.includes('veg') || dName.includes('paneer') || dName.includes('mushroom') || dName.includes('subz') || dName.includes('saffron'))) {
-        return true;
-      }
+      return (dCatId.includes('biryani') || dCat.includes('biryani') || dName.includes('biryani')) &&
+             !dName.includes('chicken') && !dName.includes('mutton') && !dName.includes('prawn') &&
+             (dFoodType === 'veg' || dDiet.includes('veg') || dName.includes('veg') || dName.includes('paneer') || dName.includes('mushroom') || dName.includes('subz') || dName.includes('saffron'));
     }
+
     if (targetSubCat === 'chicken-biryani') {
       if (dSubCatId === 'chicken-biryani' || dSubCatId === 'royal-chicken-biryani') return true;
-      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dFoodType === 'non-veg' || dDiet.includes('non-veg') || dName.includes('chicken'))) {
-        return true;
-      }
+      return (dCatId.includes('biryani') || dCat.includes('biryani') || dName.includes('biryani')) && (dName.includes('chicken') || dFoodType === 'non-veg');
     }
+
     if (targetSubCat === 'mutton-biryani') {
       if (dSubCatId === 'mutton-biryani' || dSubCatId === 'mutton-dum-biryani') return true;
-      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dName.includes('mutton') || dName.includes('lamb') || dName.includes('mamsam'))) {
-        return true;
-      }
+      return (dCatId.includes('biryani') || dCat.includes('biryani') || dName.includes('biryani')) && (dName.includes('mutton') || dName.includes('lamb') || dName.includes('mamsam'));
     }
+
     if (targetSubCat === 'prawn-biryani') {
-      if (dSubCatId === 'prawn-biryani') return true;
-      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dName.includes('prawn') || dName.includes('royyala') || dName.includes('shrimp'))) {
-        return true;
-      }
+      return (dCatId.includes('biryani') || dCat.includes('biryani') || dName.includes('biryani')) && (dName.includes('prawn') || dName.includes('royyala') || dName.includes('shrimp'));
     }
+
     if (targetSubCat === 'egg-biryani') {
-      if (dSubCatId === 'egg-biryani') return true;
-      if ((dCatId.includes('biryani') || dName.includes('biryani')) && (dFoodType === 'egg' || dName.includes('egg'))) {
-        return true;
-      }
+      return (dCatId.includes('biryani') || dCat.includes('biryani') || dName.includes('biryani')) && (dFoodType === 'egg' || dName.includes('egg'));
     }
-    if (targetSubCat === 'dosa') {
-      if (dSubCatId === 'dosa' || dName.includes('dosa')) return true;
+
+    // Direct Database ID / Key / Sluggified matching for custom merchant subcategories
+    if (dSubCatId === targetSubCat || dSubCatId === targetSubClean || dSubCatId.replace(/\s+/g, '-') === targetSubCat) return true;
+    if (dSubCat === targetSubClean) return true;
+    if (dSubCat.includes(targetSubClean) || dName.includes(targetSubClean)) return true;
+
+    return false;
+  }
+
+  // 2. Category Level Matching
+  if (targetCat && targetCat !== 'all') {
+    const targetCatClean = targetCat.replace(/-/g, ' ');
+
+    if (targetCat === 'dosa' || targetCatClean === 'dosa') {
+      if (dName.includes('idli') || dName.includes('idly') || dName.includes('vada')) return false;
+      return dCat.includes('dosa') || dSubCat.includes('dosa') || dName.includes('dosa');
     }
-    if (targetSubCat === 'idli') {
-      if (dSubCatId === 'idli' || dName.includes('idli') || dName.includes('idly')) return true;
+
+    if (targetCat === 'idli' || targetCatClean === 'idli') {
+      if (dName.includes('dosa') || dName.includes('vada')) return false;
+      return dCat.includes('idli') || dCat.includes('idly') || dSubCat.includes('idli') || dSubCat.includes('idly') || dName.includes('idli') || dName.includes('idly');
     }
-  } else if (targetCat) {
-    if (dCatId === targetCat) return true;
-    if (targetCat === 'biryani') {
-      if (dCatId.includes('biryani') || dSubCatId.includes('biryani') || dName.includes('biryani')) return true;
+
+    if (targetCat === 'vada' || targetCatClean === 'vada') {
+      if (dName.includes('dosa') || dName.includes('idli') || dName.includes('idly')) return false;
+      return dCat.includes('vada') || dSubCat.includes('vada') || dName.includes('vada');
     }
-    if (targetCat === 'breakfast') {
-      if (dCatId === 'breakfast' || dName.includes('idli') || dName.includes('dosa') || dName.includes('vada') || dName.includes('poori') || dName.includes('upma') || dName.includes('pongal')) return true;
+
+    if (targetCat === 'tiffin' || targetCat === 'tiffins' || targetCatClean === 'tiffin' || targetCatClean === 'tiffins' || targetCat === 'breakfast') {
+      return dCat.includes('tiffin') || dCat.includes('breakfast') || dSubCat.includes('tiffin') || dSubCat.includes('dosa') || dSubCat.includes('idli') || dSubCat.includes('vada') || dName.includes('idli') || dName.includes('idly') || dName.includes('dosa') || dName.includes('vada') || dName.includes('poori') || dName.includes('upma') || dName.includes('pongal') || dName.includes('uttapam') || dName.includes('paratha');
     }
+
+    if (targetCat === 'biryani' || targetCatClean === 'biryani') {
+      return dCat.includes('biryani') || dSubCat.includes('biryani') || dName.includes('biryani');
+    }
+
+    if (dCatId === targetCat || dCatId === targetCatClean || dCatId.replace(/\s+/g, '-') === targetCat) return true;
+    if (dCat === targetCatClean || dCat.includes(targetCatClean)) return true;
   }
 
   const target = subCatId || catId;
@@ -2165,21 +2199,36 @@ function MenuContent() {
 
   // Load dynamically stored/created dishes immediately with automatic version validation
   useEffect(() => {
-    const stored = getStoredDishes();
-    if (stored && stored.length > 0) {
-      setDishes(stored);
-    } else {
-      setDishes(INITIAL_DISHES);
-    }
+    const loadDishes = () => {
+      const stored = getStoredDishes();
+      if (stored && stored.length > 0) {
+        setDishes(stored);
+      } else {
+        setDishes(INITIAL_DISHES);
+      }
+    };
+
+    loadDishes();
+
     menuApi.getDishes()
       .then((res) => {
         if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
           const apiDishes = res.data;
+          const stored = getStoredDishes();
           const merged = [...apiDishes, ...stored.filter((s) => !apiDishes.some((a: any) => a.id === s.id))];
           setDishes(merged);
         }
       })
       .catch(() => {});
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', loadDishes);
+      window.addEventListener('merchant_dishes_updated', loadDishes);
+      return () => {
+        window.removeEventListener('storage', loadDishes);
+        window.removeEventListener('merchant_dishes_updated', loadDishes);
+      };
+    }
   }, []);
 
   const handleSelectCategory = (catId: string) => {
@@ -2202,44 +2251,174 @@ function MenuContent() {
 
   const currentShopInfo = activeShop ? SHOP_INFO[activeShop] : null;
 
-  const displayCategoryGroups = !activeShop || activeShop === 'giri-kitchen'
-    ? CATEGORY_GROUPS
-    : activeShop === 'giri-bakery'
-    ? BAKERY_EXCLUSIVE_CATEGORY_GROUPS
-    : activeShop === 'giri-grill'
-    ? GRILL_EXCLUSIVE_CATEGORY_GROUPS
-    : activeShop === 'giri-spice-garden'
-    ? SPICE_GARDEN_EXCLUSIVE_CATEGORY_GROUPS
-    : activeShop === 'giri-cafe'
-    ? CAFE_EXCLUSIVE_CATEGORY_GROUPS
-    : activeShop === 'giri-seafood'
-    ? SEAFOOD_EXCLUSIVE_CATEGORY_GROUPS
-    : activeShop === 'giri-express-bistro'
-    ? EXPRESS_BISTRO_EXCLUSIVE_CATEGORY_GROUPS
-    : activeShop === 'giri-fine-dining'
-    ? FINE_DINING_EXCLUSIVE_CATEGORY_GROUPS
-    : CATEGORY_GROUPS;
+  const shopLower = (activeShop || '').toLowerCase();
+  const isBakeryShop = shopLower.includes('bakery') || shopLower.includes('shop-3') || activeShop === 'giri-bakery' || activeShop === 'royal-bakery';
+  const isGrillShop = shopLower.includes('grill') || activeShop === 'giri-grill' || activeShop === 'royal-grill';
+  const isSpiceGardenShop = shopLower.includes('spice') || activeShop === 'giri-spice-garden' || activeShop === 'royal-spice-garden';
+  const isCafeShop = shopLower.includes('cafe') || shopLower.includes('café') || shopLower.includes('shop-6') || activeShop === 'giri-cafe' || activeShop === 'royal-cafe';
+  const isSeafoodShop = shopLower.includes('seafood') || shopLower.includes('lounge') || shopLower.includes('shop-7') || activeShop === 'giri-seafood' || activeShop === 'royal-seafood-lounge';
+  const isBistroShop = shopLower.includes('bistro') || shopLower.includes('express') || shopLower.includes('shop-8') || activeShop === 'giri-express-bistro' || activeShop === 'royal-express-bistro';
+  const isFineDiningShop = shopLower.includes('fine') || shopLower.includes('dining') || shopLower.includes('shop-1') || activeShop === 'giri-fine-dining' || activeShop === 'royal-fine-dining';
+  const isKitchenShop = shopLower.includes('kitchen') || shopLower.includes('shop-2') || activeShop === 'giri-kitchen' || activeShop === 'royal-kitchen';
+
+  const isPreSeededShop = isBakeryShop || isGrillShop || isSpiceGardenShop || isCafeShop || isSeafoodShop || isBistroShop || isFineDiningShop || isKitchenShop;
+
+  const isShopDishMatch = (dish: MenuItem, activeShopStr: string | null): boolean => {
+    if (!activeShopStr) return true;
+
+    const rawDecoded = decodeURIComponent(activeShopStr).toLowerCase().trim();
+    const decoded = rawDecoded.replace(/-/g, ' ');
+    const dShop = (dish.shopSlug || '').toLowerCase().replace(/-/g, ' ');
+    const dName = (dish.shopName || '').toLowerCase().replace(/-/g, ' ');
+    const dMerchantId = (dish.merchantId || '').toLowerCase().replace(/-/g, ' ');
+
+    const isAndhraRuchullu = decoded.includes('ruchullu') || decoded.includes('ruchulu');
+
+    if (isAndhraRuchullu) {
+      const isShopMatch =
+        dShop.includes('ruchullu') ||
+        dShop.includes('ruchulu') ||
+        dName.includes('ruchullu') ||
+        dName.includes('ruchulu') ||
+        dMerchantId.includes('ruchullu');
+
+      if (!isShopMatch) return false;
+
+      // For Andhra Ruchulu outlet, strictly REMOVE biryani items (Chicken Dum Biryani, Mutton Dum Biryani, Royal Veg Hyderabadi Biryani)
+      // and non-breakfast items.
+      const dCat = (dish.category || '').toLowerCase();
+      const dSubCat = (dish.subCategory || '').toLowerCase();
+      const dDishName = (dish.name || '').toLowerCase();
+
+      const isForbiddenBiryaniOrNonBreakfast =
+        dDishName.includes('chicken dum biryani') ||
+        dDishName.includes('mutton dum biryani') ||
+        dDishName.includes('royal veg hyderabadi biryani') ||
+        dDishName.includes('biryani') ||
+        dDishName.includes('thali') ||
+        dDishName.includes('meal') ||
+        dDishName.includes('samosa') ||
+        dCat.includes('biryani') ||
+        dSubCat.includes('biryani');
+
+      if (isForbiddenBiryaniOrNonBreakfast) return false;
+
+      const isBreakfastDish =
+        dDishName.includes('idli') ||
+        dDishName.includes('idly') ||
+        dDishName.includes('dosa') ||
+        dDishName.includes('vada') ||
+        dDishName.includes('poori') ||
+        dDishName.includes('puri') ||
+        dDishName.includes('upma') ||
+        dDishName.includes('pongal') ||
+        dDishName.includes('uttapam') ||
+        dDishName.includes('paratha') ||
+        dCat.includes('breakfast') ||
+        dCat.includes('tiffin') ||
+        dSubCat.includes('idli') ||
+        dSubCat.includes('dosa') ||
+        dSubCat.includes('vada') ||
+        (dish as any).isMerchantDish;
+
+      return isBreakfastDish;
+    }
+
+    return (
+      dShop === decoded ||
+      dName === decoded ||
+      dMerchantId === decoded ||
+      (dShop.length > 2 && (decoded.includes(dShop) || dShop.includes(decoded))) ||
+      (dName.length > 2 && (decoded.includes(dName) || dName.includes(decoded)))
+    );
+  };
+
+  const displayCategoryGroups = useMemo(() => {
+    // Categories and subcategories MUST ONLY come from actual dishes added by merchants for this outlet!
+    const result: { id: string; name: string; icon: string; subcategories: { id: string; name: string; icon: string }[] }[] = [];
+    const isAndhraRuchuluActive = (activeShop || '').toLowerCase().includes('ruchulu') || (activeShop || '').toLowerCase().includes('ruchullu');
+
+    // Filter dishes relevant to activeShop (or all dishes if no shop selected)
+    const rawShopDishes = activeShop
+      ? dishes.filter((dish) => isShopDishMatch(dish, activeShop))
+      : dishes;
+
+    // Cap Andhra Ruchulu shop catalog to at most 5 items
+    const shopDishes = isAndhraRuchuluActive ? rawShopDishes.slice(0, 5) : rawShopDishes;
+
+    // Dynamically scan shopDishes for any categories or subcategories added by merchants
+    shopDishes.forEach((d) => {
+      let catName = d.category ? String(d.category).trim() : '';
+      const subCatName = d.subCategory ? String(d.subCategory).trim() : '';
+
+      if (!catName) return;
+
+      if (isAndhraRuchuluActive) {
+        const catLower = catName.toLowerCase();
+        if (catLower === 'tiffin' || catLower === 'tiffins' || catLower === 'mains' || catLower === 'breakfast') {
+          catName = 'breakfast';
+        }
+      }
+
+      const catSlug = catName.toLowerCase().replace(/\s+/g, '-');
+      const subCatSlug = subCatName ? subCatName.toLowerCase().replace(/\s+/g, '-') : '';
+
+      // Find existing group by id, name, or slug match
+      let existingGroup = result.find(
+        (g) => g.id === catSlug || g.name.toLowerCase() === catName.toLowerCase() || g.id === catName.toLowerCase()
+      );
+
+      if (!existingGroup) {
+        existingGroup = {
+          id: catSlug,
+          name: catName,
+          icon: '✨',
+          subcategories: [],
+        };
+        result.push(existingGroup);
+      }
+
+      if (subCatName && subCatSlug) {
+        const subLower = subCatName.toLowerCase();
+        if (isAndhraRuchuluActive && (subLower === 'tiffins' || subLower === 'tiffin' || subLower === 'mains' || subLower === 'breakfast')) {
+          return;
+        }
+
+        const subExists = existingGroup.subcategories.some(
+          (s) => s.id === subCatSlug || s.name.toLowerCase() === subCatName.toLowerCase() || s.id === subCatName.toLowerCase()
+        );
+        if (!subExists) {
+          existingGroup.subcategories.push({
+            id: subCatSlug,
+            name: subCatName,
+            icon: '🍽️',
+          });
+        }
+      }
+    });
+
+    return result;
+  }, [dishes, activeShop]);
 
   const shopCategoryDishCount = useMemo(() => {
     const counts: Record<string, number> = {};
     if (!activeShop) return counts;
-    const decoded = decodeURIComponent(activeShop).toLowerCase().trim();
-    dishes.forEach((d) => {
-      const dShop = (d.shopSlug || '').toLowerCase();
-      const dName = (d.shopName || '').toLowerCase();
-      const dMerchantId = (d.merchantId || '').toLowerCase();
-      const match =
-        dShop === decoded ||
-        dName === decoded ||
-        dMerchantId === decoded ||
-        (dShop.length > 2 && decoded.includes(dShop)) ||
-        (dName.length > 2 && decoded.includes(dName)) ||
-        (decoded.length > 2 && dShop.includes(decoded)) ||
-        (decoded.length > 2 && dName.includes(decoded));
-      if (match) {
-        const catKey = d.category ? d.category.toLowerCase() : 'all';
-        counts[catKey] = (counts[catKey] || 0) + 1;
+    const isAndhraRuchuluActive = (activeShop || '').toLowerCase().includes('ruchulu') || (activeShop || '').toLowerCase().includes('ruchullu');
+
+    const shopDishes = dishes.filter((d) => isShopDishMatch(d, activeShop));
+    const cappedShopDishes = isAndhraRuchuluActive ? shopDishes.slice(0, 5) : shopDishes;
+
+    cappedShopDishes.forEach((d) => {
+      let catRaw = d.category ? d.category.toLowerCase().trim() : 'all';
+      if (isAndhraRuchuluActive && (catRaw === 'tiffin' || catRaw === 'tiffins' || catRaw === 'mains' || catRaw === 'breakfast')) {
+        catRaw = 'breakfast';
       }
+      const catSlug = catRaw.replace(/\s+/g, '-');
+      const catId = (d as any).categoryId ? (d as any).categoryId.toLowerCase().trim() : '';
+
+      counts[catRaw] = (counts[catRaw] || 0) + 1;
+      counts[catSlug] = (counts[catSlug] || 0) + 1;
+      if (catId) counts[catId] = (counts[catId] || 0) + 1;
     });
     return counts;
   }, [dishes, activeShop]);
@@ -2249,23 +2428,10 @@ function MenuContent() {
   // Ultra-fast O(N) memoized filtering & deduplication for instant zero-latency category switching
   const uniqueFilteredDishes = useMemo(() => {
     const sQuery = searchQuery.toLowerCase();
+    const isAndhraRuchuluActive = (activeShop || '').toLowerCase().includes('ruchulu') || (activeShop || '').toLowerCase().includes('ruchullu');
 
     const filtered = dishes.filter((dish) => {
-      let matchShop = true;
-      if (activeShop) {
-        const rawDecoded = decodeURIComponent(activeShop).toLowerCase().trim();
-        const decoded = rawDecoded.replace(/-/g, ' ');
-        const dShop = (dish.shopSlug || '').toLowerCase().replace(/-/g, ' ');
-        const dName = (dish.shopName || '').toLowerCase().replace(/-/g, ' ');
-        const dMerchantId = (dish.merchantId || '').toLowerCase().replace(/-/g, ' ');
-
-        matchShop =
-          dShop === decoded ||
-          dName === decoded ||
-          dMerchantId === decoded ||
-          (dShop.length > 2 && (decoded.includes(dShop) || dShop.includes(decoded))) ||
-          (dName.length > 2 && (decoded.includes(dName) || dName.includes(decoded)));
-      }
+      const matchShop = isShopDishMatch(dish, activeShop);
 
       const matchCategory = matchCategorySubCategory(dish, activeCategory, activeSubCategory);
 
@@ -2278,30 +2444,18 @@ function MenuContent() {
       return matchShop && matchCategory && matchSearch && matchDiet;
     });
 
-    const shopMatches = dishes.filter((dish) => {
-      if (!activeShop) return true;
-      const rawDecoded = decodeURIComponent(activeShop).toLowerCase().trim();
-      const decoded = rawDecoded.replace(/-/g, ' ');
-      const dShop = (dish.shopSlug || '').toLowerCase().replace(/-/g, ' ');
-      const dName = (dish.shopName || '').toLowerCase().replace(/-/g, ' ');
-      const dMerchantId = (dish.merchantId || '').toLowerCase().replace(/-/g, ' ');
+    // Fallback handling: DO NOT fall back to global dishes from other shops when browsing a specific shop!
+    let effective = filtered;
+    if (filtered.length === 0) {
+      if (activeShop) {
+        effective = [];
+      } else if (activeSubCategory || (activeCategory && activeCategory !== 'all')) {
+        const catMatches = dishes.filter((d) => matchCategorySubCategory(d, activeCategory, activeSubCategory));
+        effective = catMatches;
+      }
+    }
 
-      return (
-        dShop === decoded ||
-        dName === decoded ||
-        dMerchantId === decoded ||
-        (dShop.length > 2 && (decoded.includes(dShop) || dShop.includes(decoded))) ||
-        (dName.length > 2 && (decoded.includes(dName) || dName.includes(decoded)))
-      );
-    });
-
-    const effective = filtered.length > 0
-      ? filtered
-      : (shopMatches.length > 0
-          ? shopMatches
-          : dishes);
-
-    // Filter out synthetic repetitive "Special 1..20" items to maintain clean 25-30 authentic main catalog dishes
+    // Filter out synthetic repetitive "Special 1..20" items
     const cleanEffective = effective.filter((d) => {
       if ((d as any).isMerchantDish || d.merchantId) return true;
       return !/\bSpecial\s+\d+\b/i.test(d.name || '');
@@ -2314,19 +2468,24 @@ function MenuContent() {
       return bIsMerchant - aIsMerchant;
     });
 
-    const seen = new Set<string>();
+    const seenNames = new Set<string>();
     const result: MenuItem[] = [];
+
     for (const d of sortedEffective) {
-      const key = (d.id || (d as any)._id || d.name || '').trim().toLowerCase();
-      if (key && !seen.has(key)) {
-        seen.add(key);
+      if (!d || !d.name) continue;
+      const nameKey = d.name.trim().toLowerCase();
+      const finalImg = (d.image && typeof d.image === 'string' && d.image.trim() !== '') ? d.image.trim() : getMatchingFoodImage(d.name, d.category, d.subCategory, d.image);
+
+      if (!seenNames.has(nameKey)) {
+        seenNames.add(nameKey);
         result.push({
           ...d,
-          image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
+          image: finalImg,
         });
       }
     }
-    return result;
+
+    return isAndhraRuchuluActive ? result.slice(0, 5) : result;
   }, [dishes, activeShop, activeCategory, activeSubCategory, searchQuery, dietFilter]);
 
   // Display all matching dishes without artificial truncation
@@ -2578,10 +2737,10 @@ function MenuContent() {
             <div className="mt-3 flex items-center gap-2 flex-wrap">
               <span className="text-[11px] font-bold text-[#a09070] uppercase font-mono">Active Filters:</span>
               
-              {activeShop && currentShopInfo && (
+              {activeShop && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B0000] text-white text-xs font-bold shadow-xs">
-                  <span>{currentShopInfo.icon}</span>
-                  <span>{currentShopInfo.title}</span>
+                  <span>{currentShopInfo?.icon || '🏪'}</span>
+                  <span className="capitalize">{currentShopInfo?.title || decodeURIComponent(activeShop).replace(/-/g, ' ')}</span>
                   <X className="w-3.5 h-3.5 hover:text-gray-200 cursor-pointer ml-1" onClick={() => setActiveShop(null)} />
                 </span>
               )}
@@ -2707,22 +2866,32 @@ function MenuContent() {
 
             {/* Dishes Grid */}
             {displayDishes.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-3xl border border-[#8B0000]/10 p-8">
+              <div className="text-center py-16 bg-white rounded-3xl border border-[#8B0000]/10 p-8 shadow-xs">
                 <p className="text-4xl mb-3">🍽️</p>
-                <h3 className="text-base font-bold text-[#1a1008]">No dishes found</h3>
-                <p className="text-xs text-[#a09070] mt-1">Try selecting another category or resetting your search filter.</p>
-                <button
-                  onClick={() => {
-                    setActiveCategory('all');
-                    setActiveSubCategory(null);
-                    setActiveShop(null);
-                    setSearchQuery('');
-                    setDietFilter('all');
-                  }}
-                  className="mt-4 px-4 py-2 bg-[#8B0000] text-white rounded-xl text-xs font-bold shadow-md hover:bg-[#A00000] transition-colors cursor-pointer"
-                >
-                  Reset All Filters
-                </button>
+                <h3 className="text-base font-bold text-[#1a1008]">
+                  {activeShop ? `No dishes found for ${decodeURIComponent(activeShop)} in this section` : 'No dishes found'}
+                </h3>
+                <p className="text-xs text-[#a09070] mt-1">Try selecting another category or add new dishes to this outlet menu.</p>
+                <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    onClick={() => {
+                      setActiveCategory('all');
+                      setActiveSubCategory(null);
+                      setActiveShop(null);
+                      setSearchQuery('');
+                      setDietFilter('all');
+                    }}
+                    className="px-4 py-2 bg-gray-100 text-[#1a1008] rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors cursor-pointer"
+                  >
+                    Reset All Filters
+                  </button>
+                  <Link
+                    href="/merchant/dishes"
+                    className="px-4 py-2 bg-[#8B0000] text-white rounded-xl text-xs font-bold shadow-md hover:bg-[#A00000] transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <span>➕</span> Add Dish in Merchant Portal
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

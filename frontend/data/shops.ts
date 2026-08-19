@@ -236,6 +236,34 @@ export const getStoredShops = (): Shop[] => {
       }
     });
 
+    try {
+      const allMerchants = JSON.parse(localStorage.getItem('giri_all_merchants') || '[]');
+      if (Array.isArray(allMerchants)) {
+        allMerchants.forEach((m: any) => {
+          const shopName = m.name || m.shopName || m.companyName;
+          if (shopName) {
+            const mId = m.id || m._id || `merchant-${shopName.toLowerCase().replace(/\s+/g, '-')}`;
+            if (!customMap.has(mId) && !customMap.has(shopName)) {
+              customMap.set(mId, {
+                id: mId,
+                name: shopName,
+                tagline: m.category || m.tagline || 'Merchant Outlet',
+                image: m.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
+                rating: 4.8,
+                deliveryTime: '25-35 mins',
+                address: m.city || 'Hyderabad',
+                city: m.city || 'Hyderabad',
+                phone: m.phone || '',
+                openingHours: '10:00 AM - 11:00 PM',
+                isOpen: true,
+                isFeatured: true,
+              });
+            }
+          }
+        });
+      }
+    } catch (e) {}
+
     const initialMap = new Map<string, Shop>();
     INITIAL_SHOPS.forEach((s) => {
       if (s && s.id !== 'shop-9' && !(s.name || '').toLowerCase().includes('ice cream')) {
@@ -270,6 +298,9 @@ export const saveStoredShops = (shops: Shop[]) => {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem('royal_shops', JSON.stringify(shops));
+    localStorage.setItem('giri_shops', JSON.stringify(shops));
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('merchant_shops_updated'));
   } catch (e) {
     console.error('Error saving stored shops:', e);
   }

@@ -20,7 +20,6 @@ const nextConfig = {
       },
     ],
   },
-  distDir: process.env.NEXT_BUILD_DIR || '.next',
   productionBrowserSourceMaps: false,
   compress: true,
   swcMinify: true,

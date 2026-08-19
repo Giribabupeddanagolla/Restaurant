@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import { INITIAL_CATEGORIES, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS } from '@/data/mockData';
+import { INITIAL_CATEGORIES, INITIAL_DISHES, getStoredDishes, saveStoredDishes, RESTAURANT_OUTLETS, getMatchingFoodImage } from '@/data/mockData';
 import { Search, Plus, Edit2, Trash2, CheckCircle, XCircle, Utensils, RefreshCw, Clock, Leaf, Filter, Store, Menu, X, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { MenuItem } from '@/types';
 import { menuApi } from '@/services/restaurantService';
@@ -144,6 +144,7 @@ export default function AdminMenuPage() {
       }
 
       // Update local state and localStorage
+      const dishImg = (formData.image && typeof formData.image === 'string' && formData.image.trim() !== '') ? formData.image.trim() : getMatchingFoodImage(formData.name || '', formData.category, formData.subCategory, formData.image);
       const newDishObj: MenuItem = {
         id: editingDish?.id || `dish-${Date.now()}`,
         name: formData.name || '',
@@ -152,7 +153,7 @@ export default function AdminMenuPage() {
         shopName: formData.shopName || 'Giri Fine Dining',
         price: Number(formData.price) || 0,
         description: formData.description || '',
-        image: formData.image || '',
+        image: dishImg,
         prepTime: Number(formData.prepTime) || 15,
         available: formData.available !== false,
         dietary: formData.dietary || ['veg'],
@@ -171,6 +172,7 @@ export default function AdminMenuPage() {
       setIsModalOpen(false);
     } catch (err) {
       console.log('API save failed, fallback to localStorage update');
+      const dishImg = getMatchingFoodImage(formData.name || '', formData.category, formData.subCategory, formData.image);
       const newDishObj: MenuItem = {
         id: editingDish?.id || `dish-${Date.now()}`,
         name: formData.name || '',
@@ -179,7 +181,7 @@ export default function AdminMenuPage() {
         shopName: formData.shopName || 'Giri Fine Dining',
         price: Number(formData.price) || 0,
         description: formData.description || '',
-        image: formData.image || '',
+        image: dishImg,
         prepTime: Number(formData.prepTime) || 15,
         available: formData.available !== false,
         dietary: formData.dietary || ['veg'],

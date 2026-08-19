@@ -70,7 +70,7 @@ export default function StandaloneDishDetailPage() {
 
   const inCart = items.find((i) => (i.dish.id || (i.dish as any)._id || i.dish.name) === dish.id);
   const isAvailable = dish.available !== false && (dish as any).isAvailable !== false && (dish as any).inStock !== false;
-  const dishImg = getMatchingFoodImage(dish.name, dish.category, dish.subCategory, dish.image);
+  const dishImg = (dish.image && typeof dish.image === 'string' && dish.image.trim() !== '') ? dish.image.trim() : getMatchingFoodImage(dish.name, dish.category, dish.subCategory, dish.image);
 
   const handleAdd = () => {
     addItem(dish, qty);

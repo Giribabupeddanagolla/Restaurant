@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import { INITIAL_CATEGORIES, INITIAL_SHOPS, getStoredShops, saveStoredShops, getStoredDishes } from '@/data/mockData';
+import { INITIAL_CATEGORIES, INITIAL_SHOPS, getStoredShops, saveStoredShops, getStoredDishes, getMatchingFoodImage } from '@/data/mockData';
 import { Search, ChevronLeft, ChevronRight, Star, Clock, Leaf, MapPin, Sparkles, Flame, Check, Utensils, Building2 } from 'lucide-react';
 import { MenuItem, Shop } from '@/types';
 import AddButton from '@/components/AddButton';
@@ -34,10 +34,58 @@ const CATEGORY_IMAGES: Record<string, string> = {
   beverages:               'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=300&auto=format&fit=crop&q=85',
 };
 
-// 24 Premier Curated Main Items for Home Page
+// 25 Premier Curated Main Signature Items for Home Page
 const CURATED_MAIN_DISHES: MenuItem[] = [
   {
-    id: 'h-1',
+    id: 'm-truffle-risotto-1',
+    name: 'Wild Mushroom & Black Truffle Cream Risotto',
+    category: 'curries',
+    price: 640,
+    rating: 4.9,
+    prepTime: 20,
+    preparationTime: '20 mins',
+    dietary: ['chef-special', 'veg'],
+    description: 'Creamy Italian Carnaroli rice slow-simmered with porcini mushrooms, black truffle paste, aged Parmesan, and white truffle oil.',
+    image: 'https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-1',
+    name: 'Royal Hyderabadi Chicken Dum Biryani',
+    category: 'biryani',
+    price: 290,
+    rating: 4.9,
+    prepTime: 20,
+    preparationTime: '20 mins',
+    dietary: ['chef-special', 'non-veg'],
+    description: 'Aromatic long-grain basmati rice layered with tender marinated chicken, saffron, fried onions, and braised spices in clay handi.',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-2',
+    name: 'Lucknowi Slow-Cooked Mutton Biryani',
+    category: 'biryani',
+    price: 480,
+    rating: 4.9,
+    prepTime: 25,
+    preparationTime: '25 mins',
+    dietary: ['non-veg'],
+    description: 'Succulent lamb cuts cooked with rose water, kewra, and fragrant spices, layered with aged basmati rice.',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-3',
+    name: 'Royal Nizam Paneer Dum Biryani',
+    category: 'biryani',
+    price: 260,
+    rating: 4.8,
+    prepTime: 18,
+    preparationTime: '18 mins',
+    dietary: ['veg'],
+    description: 'Marinated malai paneer cubes, saffron rice, fresh mint leaves, and roasted cashews dum-cooked to perfection.',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-4',
     name: 'Smoked Wagyu Beef Burger',
     category: 'grill',
     price: 580,
@@ -49,131 +97,131 @@ const CURATED_MAIN_DISHES: MenuItem[] = [
     image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-2',
-    name: 'Signature Dutch Dark Chocolate Cake',
-    category: 'bakery',
-    price: 650,
-    rating: 5.0,
-    prepTime: 15,
-    preparationTime: '10-15 mins',
-    dietary: ['chef-special', 'veg'],
-    description: '70% Dutch dark chocolate layers filled with ganache and crowned with artisanal gold leaves.',
-    image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-3',
-    name: 'Norwegian Wild Salmon Steak',
-    category: 'seafood',
-    price: 890,
-    rating: 4.8,
-    prepTime: 25,
-    preparationTime: '20-25 mins',
-    dietary: ['chef-special', 'non-veg'],
-    description: 'Pan-seared Atlantic wild salmon fillet served over lemon garlic asparagus and butter emulsion.',
-    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-4',
-    name: 'Royal Hyderabadi Dum Biryani',
-    category: 'biryani',
-    price: 490,
-    rating: 4.9,
-    prepTime: 30,
-    preparationTime: '25-30 mins',
-    dietary: ['chef-special', 'non-veg'],
-    description: 'Aromatic long-grain basmati rice layered with tender marinated chicken, saffron, and fried onions in handi.',
-    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-5',
-    name: 'Truffle & Wild Mushroom Risotto',
-    category: 'fine-dining-starters',
-    price: 620,
-    rating: 4.7,
-    prepTime: 20,
-    preparationTime: '15-20 mins',
-    dietary: ['chef-special', 'veg'],
-    description: 'Creamy Arborio rice with porcini mushrooms, black truffle oil shavings, and 24-month aged Parmigiano Reggiano.',
-    image: 'https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-6',
+    id: 'm-5',
     name: 'Slow-Cooked Wood-Fired Lamb Chops',
     category: 'grill',
-    price: 850,
+    price: 790,
     rating: 4.9,
     prepTime: 25,
-    preparationTime: '20-25 mins',
-    dietary: ['chef-special', 'non-veg'],
+    preparationTime: '25 mins',
+    dietary: ['non-veg'],
     description: 'Rosemary & garlic crusted Australian lamb chops grilled over oakwood with mint reduction glaze.',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-7',
+    id: 'm-6',
     name: 'Butter Chicken Murgh Makhani',
-    category: 'north-indian-curries',
-    price: 450,
-    rating: 4.8,
-    prepTime: 20,
-    preparationTime: '15-20 mins',
+    category: 'curries',
+    price: 380,
+    rating: 4.9,
+    prepTime: 18,
+    preparationTime: '18 mins',
     dietary: ['non-veg'],
     description: 'Charcoal-grilled chicken tikka simmered in rich creamy tomato and cashew butter gravy.',
-    image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=600&auto=format&fit=crop&q=85',
+    image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-8',
+    id: 'm-7',
     name: 'Royal Paneer Butter Masala',
-    category: 'north-indian-curries',
-    price: 390,
-    rating: 4.7,
-    prepTime: 18,
+    category: 'curries',
+    price: 320,
+    rating: 4.8,
+    prepTime: 15,
     preparationTime: '15 mins',
     dietary: ['veg'],
     description: 'Fresh malai paneer cubes cooked in velvet tomato gravy infused with fenugreek and butter.',
     image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-9',
+    id: 'm-8',
+    name: 'Dal Makhani Shahi Handi',
+    category: 'curries',
+    price: 260,
+    rating: 4.9,
+    prepTime: 15,
+    preparationTime: '15 mins',
+    dietary: ['veg'],
+    description: 'Overnight slow-cooked black lentils and kidney beans enriched with fresh cream and butter.',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-9',
+    name: 'Classic Mutton Seekh Kebab',
+    category: 'kebabs',
+    price: 420,
+    rating: 4.8,
+    prepTime: 18,
+    preparationTime: '18 mins',
+    dietary: ['non-veg'],
+    description: 'Hand-ground spiced minced mutton skewers char-broiled over hot embers with mint dip.',
+    image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-10',
+    name: 'Tandoori Jumbo Prawn Skewers',
+    category: 'seafood',
+    price: 650,
+    rating: 4.9,
+    prepTime: 20,
+    preparationTime: '20 mins',
+    dietary: ['non-veg'],
+    description: 'Fresh tiger prawns marinated in Ajwain spices and hung curd, roasted in clay tandoor oven.',
+    image: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-11',
+    name: 'Tandoori Malai Broccoli',
+    category: 'tandoor',
+    price: 320,
+    rating: 4.8,
+    prepTime: 15,
+    preparationTime: '15 mins',
+    dietary: ['veg'],
+    description: 'Tender broccoli florets marinated in cardamom, cheese cream, and roasted in clay oven.',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-12',
+    name: 'Norwegian Wild Salmon Steak',
+    category: 'seafood',
+    price: 890,
+    rating: 4.9,
+    prepTime: 20,
+    preparationTime: '20 mins',
+    dietary: ['chef-special', 'non-veg'],
+    description: 'Pan-seared Atlantic wild salmon fillet served over lemon garlic asparagus and butter emulsion.',
+    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-13',
+    name: 'Signature Dutch Dark Chocolate Cake',
+    category: 'bakery-desserts',
+    price: 650,
+    rating: 5.0,
+    prepTime: 15,
+    preparationTime: '15 mins',
+    dietary: ['veg'],
+    description: '70% Dutch dark chocolate layers filled with ganache and crowned with artisanal gold leaves.',
+    image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-14',
     name: 'Red Velvet Cream Cheese Layer Cake',
-    category: 'bakery',
+    category: 'bakery-desserts',
     price: 580,
     rating: 4.9,
     prepTime: 15,
-    preparationTime: '10-15 mins',
+    preparationTime: '15 mins',
     dietary: ['veg'],
     description: 'Moist cocoa-rubbed red velvet cake frosted with smooth Madagascar vanilla cream cheese.',
     image: 'https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-10',
-    name: 'Tandoori Jumbo Prawn Skewers',
-    category: 'seafood',
-    price: 780,
-    rating: 4.8,
-    prepTime: 20,
-    preparationTime: '15-20 mins',
-    dietary: ['chef-special', 'non-veg'],
-    description: 'Fresh tiger prawns marinated in Ajwain spices and hung curd, roasted in clay tandoor oven.',
-    image: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-11',
-    name: 'Smoked BBQ Chicken Wings',
-    category: 'grill',
-    price: 390,
-    rating: 4.6,
-    prepTime: 15,
-    preparationTime: '15 mins',
-    dietary: ['non-veg'],
-    description: 'Crispy hickory-smoked chicken wings tossed in signature sweet bourbon BBQ sauce.',
-    image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-12',
+    id: 'm-15',
     name: 'Belgian Chocolate Hazelnut Pastry',
-    category: 'bakery',
+    category: 'bakery-desserts',
     price: 240,
-    rating: 4.9,
+    rating: 4.8,
     prepTime: 10,
     preparationTime: '10 mins',
     dietary: ['veg'],
@@ -181,162 +229,141 @@ const CURATED_MAIN_DISHES: MenuItem[] = [
     image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-13',
-    name: 'Dal Makhani Shahi Handi',
-    category: 'north-indian-curries',
-    price: 350,
-    rating: 4.8,
-    prepTime: 20,
-    preparationTime: '20 mins',
-    dietary: ['veg'],
-    description: 'Overnight slow-cooked black lentils and kidney beans enriched with fresh cream and butter.',
-    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-14',
-    name: 'Tandoori Malai Broccoli',
-    category: 'tandoor',
-    price: 360,
-    rating: 4.7,
-    prepTime: 15,
-    preparationTime: '15 mins',
-    dietary: ['veg'],
-    description: 'Tender broccoli florets marinated in cardamom, cheese cream, and roasted in clay oven.',
-    image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-15',
+    id: 'm-16',
     name: 'Fresh Strawberry Tartlet',
-    category: 'bakery',
+    category: 'bakery-desserts',
     price: 280,
     rating: 4.8,
     prepTime: 10,
     preparationTime: '10 mins',
     dietary: ['veg'],
-    description: 'Butter tart shell filled with vanilla pastry cream and topped with glazed fresh strawberries.',
+    description: 'Sweet butter pastry shell filled with vanilla pastry cream and crowned with fresh strawberries.',
     image: 'https://images.unsplash.com/photo-1519869325930-281384150729?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-16',
+    id: 'm-17',
+    name: 'Gourmet Truffle Wood-Fired Pizza',
+    category: 'fast-food',
+    price: 520,
+    rating: 4.9,
+    prepTime: 18,
+    preparationTime: '18 mins',
+    dietary: ['veg'],
+    description: 'Artisanal sourdough crust topped with black truffle cream, wild porcini, fior di latte mozzarella, and fresh arugula.',
+    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-18',
+    name: 'Amritsari Kulcha with Chole',
+    category: 'breakfast',
+    price: 220,
+    rating: 4.8,
+    prepTime: 12,
+    preparationTime: '12 mins',
+    dietary: ['veg'],
+    description: 'Crispy clay-oven stuffed potato and pomegranate seed naan served with spicy Punjabi chickpea curry.',
+    image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-19',
+    name: 'Authentic Crispy Masala Dosa',
+    category: 'breakfast',
+    price: 160,
+    rating: 4.8,
+    prepTime: 10,
+    preparationTime: '10 mins',
+    dietary: ['veg'],
+    description: 'Golden thin fermented rice crepe filled with spiced potato onion mash served with coconut chutney & sambar.',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-20',
+    name: 'Kerala Coconut Fish Curry',
+    category: 'seafood',
+    price: 490,
+    rating: 4.9,
+    prepTime: 20,
+    preparationTime: '20 mins',
+    dietary: ['non-veg'],
+    description: 'Seer fish fillet simmered in raw mango coconut milk curry infused with mustard seeds and curry leaves.',
+    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-21',
+    name: 'Crispy Amritsari Fish Fry',
+    category: 'non-veg-starters',
+    price: 480,
+    rating: 4.8,
+    prepTime: 15,
+    preparationTime: '15 mins',
+    dietary: ['non-veg'],
+    description: 'Golden carom seed and gram flour battered river fish fillets fried till crispy, served with mint chutney.',
+    image: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-22',
+    name: 'Chef Signature Spicy Chicken 65',
+    category: 'non-veg-starters',
+    price: 390,
+    rating: 4.7,
+    prepTime: 15,
+    preparationTime: '15 mins',
+    dietary: ['non-veg'],
+    description: 'Crispy deep-fried chicken bites tossed with curry leaves, red chili paste, and mustard seeds.',
+    image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-23',
     name: 'Artisanal Cold Brew Caramel Latte',
     category: 'beverages',
     price: 220,
     rating: 4.9,
-    prepTime: 8,
-    preparationTime: '5-10 mins',
-    dietary: ['veg'],
-    description: '18-hour cold steeped single-origin Arabica coffee layered with sea salt caramel and oat milk.',
-    image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-17',
-    name: 'Gourmet Truffle Wood-Fired Pizza',
-    category: 'fast-food',
-    price: 590,
-    rating: 4.8,
-    prepTime: 18,
-    preparationTime: '15 mins',
-    dietary: ['veg'],
-    description: 'Hand-stretched sourdough pizza topped with fior di latte mozzarella, mushrooms, and truffle glaze.',
-    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-18',
-    name: 'Amritsari Kulcha with Chole',
-    category: 'breakfast',
-    price: 290,
-    rating: 4.7,
-    prepTime: 15,
-    preparationTime: '15 mins',
-    dietary: ['veg'],
-    description: 'Stuffed potato and paneer tandoori kulcha served with spicy Punjabi chickpeas and pickle.',
-    image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-19',
-    name: 'Signature Mango Passion Fruit Cooler',
-    category: 'beverages',
-    price: 190,
-    rating: 4.8,
     prepTime: 5,
     preparationTime: '5 mins',
     dietary: ['veg'],
-    description: 'Refreshing Alphonso mango puree blended with fresh passion fruit seed pulp and mint.',
+    description: '18-hour steep Arabica cold brew espresso shaken with salted caramel syrup and creamy whole milk over ice.',
+    image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=600&auto=format&fit=crop&q=85',
+  },
+  {
+    id: 'm-24',
+    name: 'Signature Mango Passion Fruit Cooler',
+    category: 'beverages',
+    price: 180,
+    rating: 4.9,
+    prepTime: 5,
+    preparationTime: '5 mins',
+    dietary: ['veg'],
+    description: 'Fresh Alphonso mango pulp shaken with passion fruit nectar, fresh mint, and sparkling soda.',
     image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=85',
   },
   {
-    id: 'h-20',
-    name: 'Kerala Coconut Fish Curry',
-    category: 'seafood',
-    price: 520,
-    rating: 4.7,
-    prepTime: 20,
-    preparationTime: '20 mins',
-    dietary: ['non-veg'],
-    description: 'Fresh kingfish steak simmered in kokum, mustard seeds, curry leaves, and coconut milk.',
-    image: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-21',
-    name: 'Classic Mutton Seekh Kebab',
-    category: 'kebabs',
-    price: 490,
-    rating: 4.8,
-    prepTime: 20,
-    preparationTime: '20 mins',
-    dietary: ['non-veg'],
-    description: 'Minced spiced lamb skewers grilled over charcoal, served with mint chutney and onion rings.',
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-22',
-    name: 'Authentic Crispy Masala Dosa',
-    category: 'breakfast',
-    price: 190,
-    rating: 4.9,
-    prepTime: 12,
-    preparationTime: '10 mins',
-    dietary: ['veg'],
-    description: 'Golden thin crepe stuffed with spiced potato mash, served with sambar and 3 coconut chutneys.',
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-23',
-    name: 'Creamy Garlic Butter Naan',
-    category: 'breads',
-    price: 90,
-    rating: 4.8,
-    prepTime: 8,
-    preparationTime: '8 mins',
-    dietary: ['veg'],
-    description: 'Soft leavened bread baked in tandoor, brushed generously with minced garlic and butter.',
-    image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?w=600&auto=format&fit=crop&q=85',
-  },
-  {
-    id: 'h-24',
+    id: 'm-25',
     name: 'Spanish Churros with Hot Chocolate Dip',
-    category: 'desserts',
-    price: 320,
-    rating: 4.9,
+    category: 'bakery-desserts',
+    price: 260,
+    rating: 4.8,
     prepTime: 12,
-    preparationTime: '10 mins',
+    preparationTime: '12 mins',
     dietary: ['veg'],
-    description: 'Crispy cinnamon sugar dusted churros paired with warm thick melted dark chocolate.',
-    image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&auto=format&fit=crop&q=85',
+    description: 'Golden fried cinnamon sugar dusted dough pastry sticks served with thick molten dark chocolate dip.',
+    image: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=600&auto=format&fit=crop&q=85',
   },
 ];
 
 const FILTER_TABS = [
   { id: 'all', label: '🍽️ All Dishes' },
-  { id: 'breakfast', label: '🥞 Breakfast' },
-  { id: 'soups', label: '🍲 Soups' },
+  { id: 'biryani', label: '🍲 Biryani' },
+  { id: 'grill', label: '🔥 Grill & BBQ' },
+  { id: 'kebabs', label: '🍢 Kebabs' },
+  { id: 'tandoor', label: '🏺 Tandoor' },
   { id: 'veg-starters', label: '🥦 Veg Starters' },
   { id: 'non-veg-starters', label: '🍗 Non-Veg Starters' },
-  { id: 'tandoor', label: '🏺 Tandoor' },
-  { id: 'grill', label: '🔥 Grill' },
-  { id: 'kebabs', label: '🍢 Kebabs' },
-  { id: 'biryani', label: '🍲 Biryani' },
-  { id: 'rice-pulao', label: '🍚 Rice & Pulao' },
+  { id: 'curries', label: '🥘 Curries' },
+  { id: 'bakery-desserts', label: '🍰 Bakery & Sweets' },
+  { id: 'beverages', label: '🍹 Drinks' },
+  { id: 'fast-food', label: '🍔 Burgers & Pizza' },
+  { id: 'seafood', label: '🦐 Seafood' },
+  { id: 'breakfast', label: '🥞 Breakfast' },
 ];
 
 const getCategoryPhoto = (catId: string, catName: string) => {
@@ -406,17 +433,57 @@ export default function HomePage() {
     }
 
     try {
-      const storedDishes = getStoredDishes();
-      if (storedDishes && storedDishes.length > 0) {
-        const cleanDishes = storedDishes.filter((d) => {
-          if ((d as any).isMerchantDish || d.merchantId) return true;
-          return !/\bSpecial\s+\d+\b/i.test(d.name || '');
-        }).slice(0, 30);
-        if (cleanDishes.length > 0) {
-          setCuratedDishes(cleanDishes);
+      const rawList: MenuItem[] = [];
+
+      // 1. Add CURATED_MAIN_DISHES first
+      CURATED_MAIN_DISHES.forEach((d) => {
+        if (d && d.id) {
+          rawList.push({
+            ...d,
+            image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
+          });
+        }
+      });
+
+      // 2. Add merchant-added custom dishes
+      const merchantDishesData = typeof window !== 'undefined' ? (localStorage.getItem('giri_merchant_dishes') || localStorage.getItem('royal_merchant_dishes')) : null;
+      if (merchantDishesData) {
+        const parsed = JSON.parse(merchantDishesData);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          parsed.forEach((d: any, idx: number) => {
+            if (d && d.name) {
+              rawList.push({
+                ...d,
+                id: `merchant-added-${idx}-${d.name}`,
+                image: getMatchingFoodImage(d.name, d.category, d.subCategory, d.image),
+                isMerchantDish: true,
+              });
+            }
+          });
         }
       }
-    } catch (e) {}
+
+      // 3. Deduplicate strictly by dish name AND image URL, filtering out synthetic junk
+      const seenNames = new Set<string>();
+      const seenImages = new Set<string>();
+      const deduplicated: MenuItem[] = [];
+
+      rawList.forEach((item) => {
+        const nameClean = (item.name || '').toLowerCase().trim();
+        const baseName = nameClean.replace(/^(imperial 24k gold dust|classic claypot charcoal|black truffle infused|signature royal|exquisite)\s+/i, '');
+        const imgClean = (item.image || '').split('?')[0];
+
+        if (!seenNames.has(baseName) && !seenImages.has(imgClean)) {
+          seenNames.add(baseName);
+          seenImages.add(imgClean);
+          deduplicated.push(item);
+        }
+      });
+
+      setCuratedDishes(deduplicated.length > 0 ? deduplicated : CURATED_MAIN_DISHES);
+    } catch (e) {
+      setCuratedDishes(CURATED_MAIN_DISHES);
+    }
 
     shopApi.getShops()
       .then((res) => {
@@ -439,19 +506,44 @@ export default function HomePage() {
   }, []);
 
   const filteredDishes = curatedDishes.filter((dish) => {
-    if (!dish) return false;
+    if (!dish || !dish.name) return false;
     const nameStr = (dish.name || '').toLowerCase();
     const descStr = (dish.description || '').toLowerCase();
-    const searchStr = (search || '').toLowerCase();
-    const matchesSearch = search === '' || nameStr.includes(searchStr) || descStr.includes(searchStr);
+    const catStr = (dish.category || '').toLowerCase();
+    const subCatStr = (dish.subCategory || '').toLowerCase();
+    const searchTrim = (search || '').trim().toLowerCase();
+
+    let matchesSearch = true;
+    if (searchTrim !== '') {
+      const fullContent = `${nameStr} ${descStr} ${catStr} ${subCatStr}`;
+      const searchWords = searchTrim.split(/\s+/).filter(Boolean);
+      matchesSearch = fullContent.includes(searchTrim) || searchWords.every((word) => fullContent.includes(word));
+    }
 
     let matchesTab = true;
     const dietaryList = Array.isArray(dish.dietary) ? dish.dietary : [];
-    const catStr = (dish.category || '').toLowerCase();
 
-    if (activeTab !== 'all') {
+    // If search is non-empty, search across ALL categories so items like "Dutch Cake" are never hidden
+    if (activeTab !== 'all' && searchTrim === '') {
       const target = activeTab.toLowerCase().replace(/-/g, ' ');
-      matchesTab = catStr === activeTab || catStr.includes(target) || catStr.replace(/-/g, ' ').includes(target);
+      matchesTab =
+        catStr === activeTab ||
+        catStr.includes(target) ||
+        catStr.replace(/-/g, ' ').includes(target) ||
+        subCatStr.includes(target) ||
+        (activeTab === 'grill' && (catStr.includes('grill') || catStr.includes('bbq') || nameStr.includes('burger') || nameStr.includes('wings') || nameStr.includes('lamb') || nameStr.includes('steak') || nameStr.includes('ribeye') || nameStr.includes('tikka'))) ||
+        (activeTab === 'biryani' && (catStr.includes('biryani') || nameStr.includes('biryani') || nameStr.includes('mandi') || subCatStr.includes('biryani'))) ||
+        (activeTab === 'kebabs' && (catStr.includes('kebab') || nameStr.includes('kebab') || nameStr.includes('seekh') || nameStr.includes('reshmi') || nameStr.includes('tangdi') || nameStr.includes('tikka'))) ||
+        (activeTab === 'tandoor' && (catStr.includes('tandoor') || nameStr.includes('tandoori') || nameStr.includes('tikka') || nameStr.includes('shashlik'))) ||
+        (activeTab === 'veg-starters' && (catStr.includes('starter') || catStr.includes('amuse') || subCatStr.includes('starter') || catStr.includes('tandoor') || nameStr.includes('paneer') || nameStr.includes('risotto')) && dietaryList.includes('veg')) ||
+        (activeTab === 'non-veg-starters' && (catStr.includes('starter') || catStr.includes('amuse') || subCatStr.includes('starter') || catStr.includes('kebab') || catStr.includes('grill') || nameStr.includes('65') || nameStr.includes('wings') || nameStr.includes('fish fry') || nameStr.includes('prawn')) && dietaryList.includes('non-veg')) ||
+        (activeTab === 'rice-pulao' && (catStr.includes('rice') || catStr.includes('pulao') || catStr.includes('biryani'))) ||
+        (activeTab === 'curries' && (catStr.includes('curry') || catStr.includes('curries') || catStr.includes('mains') || nameStr.includes('butter chicken') || nameStr.includes('makhani') || nameStr.includes('masala') || nameStr.includes('korma'))) ||
+        (activeTab === 'bakery-desserts' && (catStr.includes('bakery') || catStr.includes('dessert') || catStr.includes('desserts') || catStr.includes('cake') || catStr.includes('sweet') || nameStr.includes('cake') || nameStr.includes('pastry') || nameStr.includes('tart') || nameStr.includes('churros') || nameStr.includes('kulfi') || nameStr.includes('jamun'))) ||
+        (activeTab === 'fast-food' && (catStr.includes('fast') || catStr.includes('burger') || catStr.includes('pizza') || catStr.includes('quick') || nameStr.includes('burger') || nameStr.includes('pizza'))) ||
+        (activeTab === 'beverages' && (catStr.includes('beverage') || catStr.includes('drink') || catStr.includes('bar') || catStr.includes('cafe') || nameStr.includes('latte') || nameStr.includes('cooler') || nameStr.includes('tea') || nameStr.includes('coffee'))) ||
+        (activeTab === 'seafood' && (catStr.includes('seafood') || nameStr.includes('salmon') || nameStr.includes('fish') || nameStr.includes('prawn') || nameStr.includes('shrimp'))) ||
+        (activeTab === 'breakfast' && (catStr.includes('breakfast') || nameStr.includes('dosa') || nameStr.includes('kulcha') || nameStr.includes('idli')));
     }
 
     return matchesSearch && matchesTab;
@@ -493,7 +585,7 @@ export default function HomePage() {
             <div className="flex gap-2 sm:gap-3 flex-wrap text-[10px] sm:text-xs text-red-100 font-medium">
               <span>🔥 Popular:</span>
               {['Wagyu Burger', 'Truffle Risotto', 'Dutch Cake', 'Biryani'].map((s) => (
-                <button key={s} onClick={() => setSearch(s)} className="underline hover:text-white transition-colors cursor-pointer">{s}</button>
+                <button key={s} onClick={() => { setSearch(s); setActiveTab('all'); }} className="underline hover:text-white transition-colors cursor-pointer">{s}</button>
               ))}
             </div>
           </div>
@@ -629,7 +721,7 @@ export default function HomePage() {
             <h3 className="font-extrabold text-base text-[#1a1008]">No Dishes Match Your Filter</h3>
             <p className="text-xs text-[#6b5840]">Try switching category tabs or clearing your search term.</p>
             <button
-              onClick={() => { setActiveTab('all'); setSearch(''); }}
+              onClick={() => { setActiveTab('all'); setSearch(''); setCuratedDishes(CURATED_MAIN_DISHES); }}
               className="btn-crimson py-2 px-4 rounded-xl text-xs font-extrabold cursor-pointer inline-block"
             >
               Reset Filters
